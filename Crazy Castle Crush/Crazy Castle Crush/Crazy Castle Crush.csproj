@@ -118,6 +118,7 @@
     <Compile Include="Gamestart.cs" />
     <Compile Include="Levels.cs" />
     <Compile Include="Menu.cs" />
+    <Compile Include="Objekte.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="CCCGame.cs" />
