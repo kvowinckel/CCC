@@ -31,6 +31,7 @@ namespace Crazy_Castle_Crush
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            
         }
 
         /// <summary>

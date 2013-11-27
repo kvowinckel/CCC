@@ -4,6 +4,7 @@ using NOVA.Graphics;
 using NOVA;
 using Microsoft.Xna.Framework.Graphics;
 using NOVA.UI;
+using System.Collections.Generic;
 
 namespace Crazy_Castle_Crush
 {
@@ -49,10 +50,28 @@ namespace Crazy_Castle_Crush
             return leftHand;
         }
 
-        public void showObjects(Vector3 position)
+        public BoxObject showObjects(float xpos, string bild)
         {
+            //Rectangle blende = new Rectangle();
+            //Texture2D textur = new Texture2D(NOVA.Core.Graphics.GraphicsDevice,3,9);
+            //UI2DRenderer.PolygonShape teest = new UI2DRenderer.PolygonShape();
+            
+            //List<Point> mappingPoints = new List<Point>(new Point[4] { new Point(0, 0), new Point(0, 1), new Point(1, 0), new Point(1, 1) });
+            //UI2DRenderer.FillRectangle(blende, textur, Color.Black);
+            
+            //UI2DRenderer.GetPolygonTexture(mappingPoints, teest, ref textur);
+            
+            Vector3 vector = new Vector3(xpos-3.7f, 0.2f, -6);
 
+            RenderMaterial bildobjekte = new RenderMaterial();
+            BoxObject blende = new BoxObject(vector, new Vector3(1, 3, 0), 0f);
+            bildobjekte.Texture = Core.Content.Load<Texture2D>(bild);
+            bildobjekte.Diffuse = Color.White.ToVector4();
+            blende.RenderMaterial = bildobjekte;
 
+            scene.Add(blende);
+            return blende;
+            
         }
 
 

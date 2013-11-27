@@ -21,12 +21,12 @@ namespace Crazy_Castle_Crush
             
             string aktuellerText = "$" + spieler.getMoney();
             UI2DRenderer.WriteText(new Vector2(scene.Camera.Position.X + 2, scene.Camera.Position.Y),           //Position
-            aktuellerText,                                                                          //Anzuzeigender Text
-            Color.Red,                                                                              //Textfarbe
-            null,                                                                                   //Interne Schriftart verwenden
-            Vector2.One,                                                                            //Textskallierung
-            UI2DRenderer.HorizontalAlignment.Left,                                                  //Horizontal zentriert
-            UI2DRenderer.VerticalAlignment.Top);                                                    //am unteren Bildschirmrand ausrichten
+                        aktuellerText,                                                                          //Anzuzeigender Text
+                        Color.Red,                                                                              //Textfarbe
+                        null,                                                                                   //Interne Schriftart verwenden
+                        Vector2.One,                                                                            //Textskallierung
+                        UI2DRenderer.HorizontalAlignment.Left,                                                  //Horizontal zentriert
+                        UI2DRenderer.VerticalAlignment.Top);                                                    //am unteren Bildschirmrand ausrichten
 
         }
 
