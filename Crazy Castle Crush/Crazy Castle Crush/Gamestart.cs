@@ -40,7 +40,8 @@ namespace Crazy_Castle_Crush
         bool schussphasenDurch;                             //TRUE wenn beide Spieler ihre Schussphase hatten
         int firedWaffen;                                    //Anzahl der abgefeuerten Waffen in einer Schussphase
         bool detecting = false;                             //Kinect benötigt
-        BoxObject rightHand = new BoxObject(new Vector3(-20,-1,-5), new Vector3(0.5f, 0.5f, 0.5f), 0f);   //Markiert die Rechte Hand
+        BoxObject rightHand;
+        BoxObject leftHand;
         
         //Erstellt zwei Spieler und das erste Level
         Spieler spieler1 = new Spieler();
@@ -57,13 +58,9 @@ namespace Crazy_Castle_Crush
         public override void Initialize()
         {
             base.Initialize();
-
             
             //Kinect initialisieren
             Scene.InitKinect();
-
-            //RGB-Kamerabild als Szenenhintergrund verwenden
-            //Scene.Kinect.ShowCameraImage = Kinect.KinectCameraImage.RGB;
 
             Scene.Physics.ForceUpdater.Gravity = new Vector3(0,-9.81f,0);            //Definierte Schwerkraft
 
@@ -74,11 +71,13 @@ namespace Crazy_Castle_Crush
             Scene.Camera=cam;
             cameraMovement = new CameraMovement(cam);
 
-
             //Objecte
             startObjects = new StartObjects(Scene);
             objekte = new Objekte(Scene);
-            Scene.Add(rightHand);
+
+            //Hände bekommen transparente Box
+            rightHand = startObjects.RightHand();
+            leftHand = startObjects.LeftHand();
 
             currentState = States.Menu;                                            //Anfangszustand
         }
@@ -457,74 +456,110 @@ namespace Crazy_Castle_Crush
                     //Aktives Skelett finden
                     foreach (NOVA.Components.Kinect.Skeleton skeleton in skeletons)
                     {
-
-                        //Detektion der Rechten hand
-                        if (skeleton.TrackingState == SkeletonTrackingState.Tracked && skeleton.Joints.Count != 0 &&
-                            skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked)
+                        if (skeleton.TrackingState == SkeletonTrackingState.Tracked && skeleton.Joints.Count != 0)
                         {
-                            //Position der rechten Hand des Spielers in Bildschirmkoodinaten
-                            Vector2 screenPos = skeleton.Joints[JointType.HandRight].ScreenPosition;
-                            Vector2 normScreenPos = new Vector2(screenPos.X, screenPos.Y);
-                            screenPos.X = screenPos.X * Scene.Game.Window.ClientBounds.Width;
-                            screenPos.Y *= Scene.Game.Window.ClientBounds.Height;
+                            #region Detektion der rechten Hand
 
-                            //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
-                            Plane plane2 = new Plane(Vector3.Forward, -4f);
-
-                            //Weltkoordinatenpunk finden
-                            Vector3 worldPos2 = Helpers.Unproject(screenPos, plane2);
-
-                            #region Box auf Hand
-                            //Position der Kugel setzen
-                            rightHand.Position = worldPos2;
-                            Console.WriteLine("set");
-                            #endregion
-
-                            #region WEITER klick
-                            //Wenn sich die rechte Hand in der oberen, rechten Ecke befindet -> Klick auf WEITER
-                            if (normScreenPos.X >= 0.9f && normScreenPos.Y >= 0.9f)
+                            if (skeleton.Joints[JointType.HandRight].TrackingState == JointTrackingState.Tracked)
                             {
-                                if (currentState == States.Bauphase1O)
-                                {
-                                    prewState = States.Bauphase1O;
+                                //Position der rechten Hand des Spielers in Bildschirmkoodinaten
+                                Vector2 screenPos = skeleton.Joints[JointType.HandRight].ScreenPosition;
+                                Vector2 normScreenPos = new Vector2(screenPos.X, screenPos.Y);
+                                screenPos.X = screenPos.X * Scene.Game.Window.ClientBounds.Width;
+                                screenPos.Y *= Scene.Game.Window.ClientBounds.Height;
 
-                                    //wenn Spieler2 über genügend Geld zum bauen verfügt, Bauphase Spieler 2
-                                    //Wenn Spieler2 mehr Geld besitzt fängt er die Schussphase2 an
-                                    if (spieler2.getMoney() >= level.getMinMoney() || spieler2.getMoney() > spieler1.getMoney())
+                                //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
+                                Plane plane2 = new Plane(Vector3.Forward, -4f);
+
+                                //Weltkoordinatenpunk finden
+                                Vector3 worldPos2 = Helpers.Unproject(screenPos, plane2);
+
+                                #region Box auf Hand
+                                //Position der Kugel setzen
+                                rightHand.Position = worldPos2;
+                                #endregion
+
+                                #region WEITER klick
+                                //Wenn sich die rechte Hand in der oberen, rechten Ecke befindet -> Klick auf WEITER
+                                if (normScreenPos.X >= 0.9f && normScreenPos.Y >= 0.9f)
+                                {
+                                    if (currentState == States.Bauphase1O)
                                     {
-                                        currentState = States.Camto2;
+                                        prewState = States.Bauphase1O;
+
+                                        //wenn Spieler2 über genügend Geld zum bauen verfügt, Bauphase Spieler 2
+                                        //Wenn Spieler2 mehr Geld besitzt fängt er die Schussphase2 an
+                                        if (spieler2.getMoney() >= level.getMinMoney() || spieler2.getMoney() > spieler1.getMoney())
+                                        {
+                                            currentState = States.Camto2;
+                                        }
+                                        //wenn Spieler2 nicht über genügend Geld zum bauen verfügt, und Spieler1 mehr Geld hat beginnt Schussphase1
+                                        else
+                                        {
+                                            currentState = States.Schussphase1;
+                                        }
                                     }
-                                    //wenn Spieler2 nicht über genügend Geld zum bauen verfügt, und Spieler1 mehr Geld hat beginnt Schussphase1
+                                    else if (currentState == States.Bauphase2O)
+                                    {
+                                        prewState = States.Bauphase2O;
+
+                                        //Wenn Spieler2 mehr Geld besitzt fängt er die Schussphase2 an
+                                        if (spieler2.getMoney() > spieler1.getMoney())
+                                        {
+                                            currentState = States.Schussphase2;
+                                        }
+                                        //sonst Spieler 1
+                                        else
+                                        {
+                                            currentState = States.Camto1;
+                                        }
+                                    }
                                     else
                                     {
-                                        currentState = States.Schussphase1;
+                                        return;
                                     }
                                 }
-                                else if (currentState == States.Bauphase2O)
-                                {
-                                    prewState = States.Bauphase2O;
-
-                                    //Wenn Spieler2 mehr Geld besitzt fängt er die Schussphase2 an
-                                    if (spieler2.getMoney() > spieler1.getMoney())
-                                    {
-                                        currentState = States.Schussphase2;
-                                    }
-                                    //sonst Spieler 1
-                                    else
-                                    {
-                                        currentState = States.Camto1;
-                                    }
-                                }
-                                else
-                                {
-                                    return;
-                                }
+                                #endregion
+                            
                             }
                             #endregion
 
+                            #region Detektion der linken Hand
+                            if (skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked)
+                            {
+                                //Position der linken Hand des Spielers in Bildschirmkoodinaten
+                                Vector2 screenPos = skeleton.Joints[JointType.HandLeft].ScreenPosition;
+                                Vector2 normScreenPos = new Vector2(screenPos.X, screenPos.Y);
+                                screenPos.X = screenPos.X * Scene.Game.Window.ClientBounds.Width;
+                                screenPos.Y *= Scene.Game.Window.ClientBounds.Height;
 
+                                //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
+                                Plane plane2 = new Plane(Vector3.Forward, -4f);
+
+                                //Weltkoordinatenpunk finden
+                                Vector3 worldPos2 = Helpers.Unproject(screenPos, plane2);
+
+                                #region Box auf Hand
+                                //Position der Kugel setzen
+                                leftHand.Position = worldPos2;
+                                #endregion
+                            }
+                            #endregion
+
+                            #region Detektion des Kopfes
+
+                            if (skeleton.Joints[JointType.Head].TrackingState == JointTrackingState.Tracked)
+                            {
+                                //Position des Kopfes des Spielers in Bildschirmkoodinaten
+                                Vector2 screenPos = skeleton.Joints[JointType.Head].ScreenPosition;
+                                Vector2 normScreenPos = new Vector2(screenPos.X, screenPos.Y);
+
+                                startObjects.MoveBackground(normScreenPos.X - 0.5f, normScreenPos.Y - 0.5f);
+                            }
+                            #endregion
                         }
                     }
+                    
                 }
             }
             #endregion
@@ -668,6 +703,7 @@ namespace Crazy_Castle_Crush
                                   Vector2.One,             //Textskallierung
                                   UI2DRenderer.HorizontalAlignment.Center, //Horizontal zentriert
                                   UI2DRenderer.VerticalAlignment.Bottom);  //am unteren Bildschirmrand ausrichten
+
         }
 
 

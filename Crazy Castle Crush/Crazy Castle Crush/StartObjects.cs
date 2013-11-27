@@ -9,12 +9,52 @@ namespace Crazy_Castle_Crush
 {
     class StartObjects
     {
+        BoxObject hintergrund;
+        Vector3 pos = new Vector3(0, 0, -11);
+
 
 
         public StartObjects(Scene scene)
         {
             this.scene = scene;
         }
+
+        public BoxObject RightHand()
+        {
+            RenderMaterial gruen = new RenderMaterial();
+            gruen.Diffuse = Color.Green.ToVector4();
+
+
+            BoxObject rightHand = new BoxObject(new Vector3(0, 0, 0), new Vector3(0.5f, 0.5f, 0f), 0f);
+            rightHand.RenderMaterial = gruen;
+            rightHand.RenderMaterial.Transparency = 0.3f;
+            
+            scene.Add(rightHand);
+            
+            return rightHand;
+        }
+
+        public BoxObject LeftHand()
+        {
+
+            RenderMaterial rot = new RenderMaterial();
+            rot.Diffuse = Color.Red.ToVector4();
+
+            BoxObject leftHand = new BoxObject(new Vector3(0, 0, 0), new Vector3(0.5f, 0.5f, 0f), 0f);
+            leftHand.RenderMaterial = rot;
+            leftHand.RenderMaterial.Transparency = 0.3f;
+
+            scene.Add(leftHand);
+
+            return leftHand;
+        }
+
+        public void showObjects(Vector3 position)
+        {
+
+
+        }
+
 
         public void LoadStartObjects(int level)
         {
@@ -31,9 +71,8 @@ namespace Crazy_Castle_Crush
         private void LoadBackground(string bildname)
         {
             RenderMaterial hintergrundsbild = new RenderMaterial();
-            Vector3 pos = new Vector3(0, 0, -11);
-            BoxObject hintergrund = new BoxObject(pos,
-                                        new Vector3(56, 10, 0),
+            hintergrund = new BoxObject(pos,
+                                        new Vector3(58, 12, 0),
                                         0f);
 
 
@@ -45,13 +84,24 @@ namespace Crazy_Castle_Crush
             scene.Add(hintergrund);
         }
 
-        private void LoadBox(Vector3 position, Vector3 dimension, float masse)
+        
+        public void MoveBackground(float xVerschiebung, float yVerschiebung)
+        {
+            Vector3 verschiebung = new Vector3(pos.X - 2 * xVerschiebung, pos.Y + 2 * yVerschiebung, pos.Z);
+            //hintergrund.MoveToPosition(verschiebung);
+            hintergrund.Position = verschiebung;
+
+        }
+ 
+        private BoxObject LoadBox(Vector3 position, Vector3 dimension, float masse)
         {
             //Erstellt ein Objekt in der Scene.
             BoxObject box = new BoxObject(position,             //Position
                                dimension,                          //Kantenlängen
                                masse);
             scene.Add(box);
+
+            return box;
             
         }
 
