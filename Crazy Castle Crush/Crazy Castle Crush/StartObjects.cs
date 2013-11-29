@@ -61,10 +61,10 @@ namespace Crazy_Castle_Crush
             
             //UI2DRenderer.GetPolygonTexture(mappingPoints, teest, ref textur);
             
-            Vector3 vector = new Vector3(xpos-3.7f, 0.2f, -6);
+            Vector3 vector = new Vector3(xpos+1.64f, 2.0f, -6);
 
             RenderMaterial bildobjekte = new RenderMaterial();
-            BoxObject blende = new BoxObject(vector, new Vector3(1, 3, 0), 0f);
+            BoxObject blende = new BoxObject(vector, new Vector3(5, 1, 0), 0f);
             bildobjekte.Texture = Core.Content.Load<Texture2D>(bild);
             bildobjekte.Diffuse = Color.White.ToVector4();
             blende.RenderMaterial = bildobjekte;

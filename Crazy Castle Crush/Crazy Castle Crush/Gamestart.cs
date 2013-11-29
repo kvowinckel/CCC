@@ -117,9 +117,9 @@ namespace Crazy_Castle_Crush
                     //Lädt Coint
                     LoadCoint();
 
-                    //Zeigt die Objekte die der Spieler wählen kann, benötigt Name des Bildes
-                    auswahlanzeige1 = startObjects.showObjects(level.getSpieler1Pos(), "hpic2");
-                    auswahlanzeige2 = startObjects.showObjects(level.getSpieler2Pos(), "hpic");
+                    //Zeigt das Baumenü mit den Objekten die der Spieler wählen kann, benötigt Name des Bildes
+                    auswahlanzeige1 = startObjects.showObjects(level.getSpieler1Pos(), "Baumenü");
+                    auswahlanzeige2 = startObjects.showObjects(level.getSpieler2Pos(), "Baumenü");
 
                     //Zeigt die Texturen die der Spieler wählen kann, benötigt Name des Bildes
                     auswahlanzeige11 = startObjects.showObjects(level.getSpieler1Pos(), "geld");
