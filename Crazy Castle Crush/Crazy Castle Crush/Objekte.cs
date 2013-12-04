@@ -30,27 +30,51 @@ namespace Crazy_Castle_Crush
 
         }
 
-        public BoxObject createObj(int auswahl)
+        public SceneObject createObj(int auswahl)
         {
-            if (auswahl == 1)
+            if (auswahl == 1)// Würfel
             {
                 return buildbox(new Vector3(0.5f, 0.5f, 0.5f));
             }
-            else
-            {
-                return buildbox(new Vector3(5f, 0.5f, 0.5f));
-            }
-        }
 
-        private BoxObject buildbox(Vector3 dimension)
+            else if (auswahl == 3) // Latte
+            {
+                return buildlatte();
+            }
+            else if (auswahl == 4)
+            {
+                return buildquader();
+            }
+            else return buildquader(); 
+            
+        }
+        
+
+        private BoxObject buildbox(Vector3 dimension) //Würfel
         {
             //Erstellt ein Objekt in der Scene.
-            BoxObject box = new BoxObject(new Vector3(0,10,-5f),             //Position
-                               dimension,                          //Kantenlängen
-                               1f);
+            BoxObject box = new BoxObject(new Vector3(0f,0f,0f),        //Position
+                               dimension,                               //Kantenlängen
+                               1f);                                     //Masse
             scene.Add(box);
 
             return box;
+        }
+        private BoxObject buildlatte() //Latte
+        {
+            BoxObject latte = new BoxObject(new Vector3(0, 0, 0), //Position
+                              new Vector3(4, 1, 1),               //Kantenlänge der Latte
+                              1f);                                //Masse
+            scene.Add(latte);   
+            return latte;                                       
+        }
+        private BoxObject buildquader()
+        {
+            BoxObject quader = new BoxObject(new Vector3(0, 0, 0),
+                               new Vector3(1f, 2f, 1f),
+                               1f);
+            scene.Add(quader);
+            return quader;
         }
 
         private Scene scene;

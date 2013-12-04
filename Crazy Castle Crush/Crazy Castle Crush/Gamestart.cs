@@ -48,7 +48,7 @@ namespace Crazy_Castle_Crush
         bool klick;                                         //Wenn Spieler quasi klickt (noch Leertaste)
         bool klick2;                                        //Hilfsvariable
         bool objInHand;                                     //solange das Objekt an der Hand ist
-        BoxObject aktuellesObj;                             //Objekt das gerade bearbeitet wird
+        SceneObject aktuellesObj;                             //Objekt das gerade bearbeitet wird
 
         //Benötigt für die einblendung von Auswahlmenu
         States objState = States.Start;
