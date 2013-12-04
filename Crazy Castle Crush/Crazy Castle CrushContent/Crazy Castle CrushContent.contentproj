@@ -79,28 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Baumenü.jpg">
-      <Name>Baumenü</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Epic Sky.jpg">
-      <Name>Epic Sky</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="MountainSky.png">
-      <Name>MountainSky</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="epic-mountain-landscape.jpg">
-      <Name>epic-mountain-landscape</Name>
+      <Name>Bau</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

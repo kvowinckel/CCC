@@ -12,12 +12,12 @@ namespace Crazy_Castle_Crush
     {
         BoxObject hintergrund;
         Vector3 pos = new Vector3(0, 0, -11);
-
-
-
-        public StartObjects(Scene scene)
+        bool lastR = false;
+        
+        public StartObjects(Scene scene, Levels level)
         {
             this.scene = scene;
+            this.level = level;
         }
 
         public BoxObject RightHand()
@@ -50,28 +50,66 @@ namespace Crazy_Castle_Crush
             return leftHand;
         }
 
-        public BoxObject showObjects(float xpos, string bild)
+        public BoxObject showObjects(string bild)
         {
-            //Rectangle blende = new Rectangle();
-            //Texture2D textur = new Texture2D(NOVA.Core.Graphics.GraphicsDevice,3,9);
-            //UI2DRenderer.PolygonShape teest = new UI2DRenderer.PolygonShape();
             
-            //List<Point> mappingPoints = new List<Point>(new Point[4] { new Point(0, 0), new Point(0, 1), new Point(1, 0), new Point(1, 1) });
-            //UI2DRenderer.FillRectangle(blende, textur, Color.Black);
-            
-            //UI2DRenderer.GetPolygonTexture(mappingPoints, teest, ref textur);
-            
-            Vector3 vector = new Vector3(xpos+1.64f, 2.0f, -6);
+            Vector3 vector = new Vector3(0, 2.0f, -6);
 
             RenderMaterial bildobjekte = new RenderMaterial();
-            BoxObject blende = new BoxObject(vector, new Vector3(5, 1, 0), 0f);
+            BoxObject blende = new BoxObject(vector, new Vector3(4, 0.8f, 0), 0f);
             bildobjekte.Texture = Core.Content.Load<Texture2D>(bild);
             bildobjekte.Diffuse = Color.White.ToVector4();
             blende.RenderMaterial = bildobjekte;
 
             scene.Add(blende);
+            //blende.Visible = false;
             return blende;
             
+        }
+
+        public void einausblender(BoxObject Ob, BoxObject Te, int state, float time)
+        {
+            // 1=ObjSp1  11=TexSp1  2=ObjSp2  22=TexSp2  0=else
+
+            if (state == 0)
+            {
+                rausblend(Ob, Ob.Position.X);
+                rausblend(Te, Te.Position.X);
+            }
+            if (state == 1)
+            {
+                reinblend(Ob, level.getSpieler1Pos());
+                rausblend(Te, level.getSpieler1Pos());
+            }
+            if (state == 11)
+            {
+                //overblend(Te, level.getSpieler1Pos());
+            }
+            if (state == 2)
+            {
+                reinblend(Ob, level.getSpieler2Pos());
+                rausblend(Te, level.getSpieler2Pos());
+            }
+            if (state == 22)
+            {
+                //overblend(Te, level.getSpieler2Pos());
+                rausblend(Te, level.getSpieler2Pos());
+            }
+
+
+        }
+
+        private void rausblend(BoxObject box, float x)
+        {
+            if (lastR == false) { box.Visible = false; }
+            box.Position = new Vector3(x, 2f, -6f);
+            lastR = true;
+        }
+        private void reinblend(BoxObject box, float x)
+        {
+            if (lastR) { box.Visible = true; }
+            box.Physics.Position = new Vector3(x, 2f, -6f);
+            lastR = false;
         }
 
 
@@ -103,11 +141,9 @@ namespace Crazy_Castle_Crush
             scene.Add(hintergrund);
         }
 
-        
         public void MoveBackground(float xVerschiebung, float yVerschiebung)
         {
             Vector3 verschiebung = new Vector3(pos.X - 2 * xVerschiebung, pos.Y + 2 * yVerschiebung, pos.Z);
-            //hintergrund.MoveToPosition(verschiebung);
             hintergrund.Position = verschiebung;
 
         }
@@ -125,5 +161,6 @@ namespace Crazy_Castle_Crush
         }
 
         private Scene scene;
+        private Levels level;
     }
 }

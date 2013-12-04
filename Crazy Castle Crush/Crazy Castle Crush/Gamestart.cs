@@ -36,17 +36,21 @@ namespace Crazy_Castle_Crush
         States currentState;                                //aktueller Zustand
         States prewState;                                   //vorheriger Zustand
         float Zeit1;                                        //Zeit nach State
+        float zeit;                                         //vergangende Zeit seit letztem State
         float PosX1;                                        //X-Pos nach State
         bool schussphasenDurch;                             //TRUE wenn beide Spieler ihre Schussphase hatten
         int firedWaffen;                                    //Anzahl der abgefeuerten Waffen in einer Schussphase
         bool detecting = false;                             //Kinect benötigt
         BoxObject rightHand;
         BoxObject leftHand;
-        BoxObject auswahlanzeige1;                          //zur Auswahl von Objekten 
-        BoxObject auswahlanzeige2;                          //zur Auswahl von Objekten 
-        BoxObject auswahlanzeige11;                         //zur Auswahl von Texturen
-        BoxObject auswahlanzeige12;                         //zur Auswahl von Texturen
+        BoxObject auswahlanzeigeO;                          //zur Auswahl von Objekten 
+        BoxObject auswahlanzeigeT;                          //zur Auswahl von Texturen 
         int auswahl;                                        //je nach Position der linken Hand erhält die Auswahl ihre Werte (für Objekt und Texturauswahl)
+
+        //Benötigt für die einblendung von Auswahlmenu
+        States objState = States.Start;
+        Auswahl Auswahl = new Auswahl();
+
         
         //Erstellt zwei Spieler und das erste Level
         Spieler spieler1 = new Spieler();
@@ -77,8 +81,10 @@ namespace Crazy_Castle_Crush
             cameraMovement = new CameraMovement(cam);
 
             //Objecte
-            startObjects = new StartObjects(Scene);
+            startObjects = new StartObjects(Scene, level);
             objekte = new Objekte(Scene);
+
+
 
             //Hände bekommen transparente Box
             rightHand = startObjects.RightHand();
@@ -90,12 +96,11 @@ namespace Crazy_Castle_Crush
 
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
-            //base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
-            UpdateCoint();
-
+            
+            
             switch (currentState)
             {
-                    
+                     
                 #region Menu
 		 
 	            case States.Menu: 
@@ -114,23 +119,14 @@ namespace Crazy_Castle_Crush
 
                     startObjects.LoadStartObjects(level.getLevel());
 
-                    //Lädt Coint
-                    LoadCoint();
+                    //Zeigt das Baumenü mit den Objekten und Texturen die der Spieler wählen kann, benötigt Name des Bildes
+                    auswahlanzeigeO = startObjects.showObjects("Bau");
+                    auswahlanzeigeT = startObjects.showObjects("hpic3");
 
-                    //Zeigt das Baumenü mit den Objekten die der Spieler wählen kann, benötigt Name des Bildes
-                    auswahlanzeige1 = startObjects.showObjects(level.getSpieler1Pos(), "Baumenü");
-                    auswahlanzeige2 = startObjects.showObjects(level.getSpieler2Pos(), "Baumenü");
-
-                    //Zeigt die Texturen die der Spieler wählen kann, benötigt Name des Bildes
-                    auswahlanzeige11 = startObjects.showObjects(level.getSpieler1Pos(), "geld");
-                    auswahlanzeige12 = startObjects.showObjects(level.getSpieler2Pos(), "hpic3");
-
-                    //Alle Anzeigen werden vorerst nicht angezeigt
-                    auswahlanzeige1.Visible = auswahlanzeige2.Visible = auswahlanzeige11.Visible = auswahlanzeige12.Visible = false;
-
-                    //setzt die Variable Zeit1 auf die Zeit und PosX1 auf die Position bevor er in den nächsten State wechselt
-                    Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds*1000;
+                    //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt
                     PosX1 = Scene.Camera.Position.X;
+                    Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
+                    aktuallisiereZeit(gameTime);
 
                     //danach Kamera an Spielerposition 1 bewegen
                     prewState = States.Start;
@@ -143,11 +139,9 @@ namespace Crazy_Castle_Crush
                 #region Camto1
                 //Camto1: Kamera wird an die Linke Position bewegt
                 case States.Camto1:
-                    
+                    aktuallisiereZeit(gameTime);
+
                     detecting = false;  //Kinect deaktiviert
-                                        
-                    //zeit ist die Zeit (in ms) die Seit State Start vergangen ist
-                    float zeit = (gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds*1000) - Zeit1;
 
                     //Variable wird für nächste Schussphasen zurückgesetzt
                     firedWaffen = 0;                        
@@ -159,6 +153,11 @@ namespace Crazy_Castle_Crush
                     //Wenn die Spielerposition 1 erreicht wurde startet die Bauphase/Schussphase
                     if (Scene.Camera.Position.X == level.getSpieler1Pos())
                     {
+                        //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
+                        PosX1 = Scene.Camera.Position.X;
+                        Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
+                        aktuallisiereZeit(gameTime);
+
                         //Wenn wir aus der Startphase kommen, -> Bauphase 1
                         if (prewState == States.Start)
                         {
@@ -170,7 +169,6 @@ namespace Crazy_Castle_Crush
                         else if (prewState == States.Bauphase2O)
                         {
                             prewState = States.Camto1;
-                            auswahlanzeige2.Visible = false;   //Objektauswahl ausblenden
                             currentState = States.Schussphase1;
                         }
 
@@ -204,25 +202,21 @@ namespace Crazy_Castle_Crush
                 #region Bauphase1 Objekte
                 //Bauphase, Spiele 1, Objekte erstellen
                 case States.Bauphase1O:
-                    
-                    objekte.Geldanzeige(spieler1);  //Blendet die Geldbetrag des Spielers ein
+                    aktuallisiereZeit(gameTime);
                     detecting = true;               //Kinect aktiv
+
                     
-                    //Zeigt die Objekte die der Spieler wählen kann                   
-                    auswahlanzeige1.Visible = true;
-
-
-                    //setzt die Variable Zeit1 auf die Zeit und PosX1 auf die Position bevor er in den nächsten State wechselt 
-                    Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000;
-                    PosX1 = Scene.Camera.Position.X;
-
                     #region Übergangsbedingungen
                     //wenn Spieler1 nicht mehr ausreichend Geld hat oder auf weiter geklickt hat...
                     //Klick auf weiter handelt die HandleInput Fkt ab
                     if (spieler1.getMoney() <= level.getMinMoney()/* || Klick auf weiter*/)
                     {
+                        //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
+                        PosX1 = Scene.Camera.Position.X;
+                        Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
+                        aktuallisiereZeit(gameTime);
+
                         prewState = States.Bauphase1O;
-                        auswahlanzeige1.Visible = false;   //Objektauswahl ausblenden
 
                         //wenn Spieler2 über genügend Geld zum bauen verfügt, Bauphase Spieler 2
                         //Wenn Spieler2 mehr Geld besitzt fängt er die Schussphase2 an
@@ -235,6 +229,7 @@ namespace Crazy_Castle_Crush
                         {
                             currentState = States.Schussphase1;
                         }
+                        
                     }
                     //Wird ein Objekt erstellt, wird in den Bauphase1T State gewechselt: Eventhandler wickelt dies ab!
                     #endregion
@@ -246,20 +241,14 @@ namespace Crazy_Castle_Crush
                 #region Bauphase1 Texturen
                 //Bauphase, Spiele 1, Objekte erstellen
                 case States.Bauphase1T:
-                    
-                    objekte.Geldanzeige(spieler1);          //Blendet die Geldbetrag des Spielers ein
-
-                    //Zeigt die Texturen die der Spieler wählen kann
-                    auswahlanzeige11.Visible = true;   
+                    aktuallisiereZeit(gameTime);
 
                 
                 
                     //noch leer
 
 
-                    //setzt die Variable Zeit1 auf die Zeit und PosX1 auf die Position bevor er in den nächsten State wechselt 
-                    Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000;
-                    PosX1 = Scene.Camera.Position.X;
+
 
                     //Übergang wird mit neuer Texture erzeugt
                     break;
@@ -269,11 +258,8 @@ namespace Crazy_Castle_Crush
                 #region Camto2
                 //Kamera wird an die Rechte Positon bewegt
                 case States.Camto2:
-                    
+                    aktuallisiereZeit(gameTime);
                     detecting = false;               //Kinect deaktiviert
-
-                    //zeit ist die Zeit (in ms) die Seit State Start vergangen ist
-                    zeit = (gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000) - Zeit1;
 
                     //Variable wird für nächste Schussphasen zurückgesetzt
                     firedWaffen = 0; 
@@ -285,6 +271,11 @@ namespace Crazy_Castle_Crush
                     //Wenn die Spielerposition 2 erreicht wurde startet die Bauphase/Schussphase
                     if (Scene.Camera.Position.X == level.getSpieler2Pos())
                     {
+                        //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
+                        PosX1 = Scene.Camera.Position.X;
+                        Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
+                        aktuallisiereZeit(gameTime);
+
                         //Wenn wir aus der Bauphase1 kommen -> Bauphase 2 (ohne Geld, aber mehr Geld als Sp1 Schussphase2)
                         if (prewState == States.Bauphase1O)
                         {
@@ -292,14 +283,12 @@ namespace Crazy_Castle_Crush
                             if (spieler2.getMoney() >= level.getMinMoney())
                             {
                                 prewState = States.Camto2;
-                                auswahlanzeige1.Visible = false;   //Objektauswahl ausblenden
                                 currentState = States.Bauphase2O;
                             }
                             //Spieler zwei hat nicht genug Geld aber mehr als Spieler1 -> Schussphase 2
                             else if (spieler2.getMoney() > spieler1.getMoney())
                             {
                                 prewState = States.Camto2;
-                                auswahlanzeige1.Visible = false;   //Objektauswahl ausblenden
                                 currentState = States.Bauphase2O;
                             }
                         }
@@ -320,26 +309,26 @@ namespace Crazy_Castle_Crush
                 #region Bauphase2 Objekte
                 //Bauphase, Spiele 1, Objekte erstellen
                 case States.Bauphase2O:
-                    
-                    objekte.Geldanzeige(spieler2);          //Blendet die Geldbetrag des Spielers ein
-                    detecting = true;               //Kinect aktiv
+                    aktuallisiereZeit(gameTime);
+                    detecting = true;                       //Kinect aktiv
 
-                    //Zeigt die Objekte die der Spieler wählen kann
-                    auswahlanzeige2.Visible = true;   
+
 
                     //noch leer
 
 
-                    //setzt die Variable Zeit1 auf die Zeit und PosX1 auf die Position bevor er in den nächsten State wechselt 
-                    Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000;
-                    PosX1 = Scene.Camera.Position.X;
+
 
                     #region Übergangsbedingungen
                     //wenn Spieler2 nicht mehr ausreichend Geld hat oder auf weiter geklickt hat...
                     //Klick auf weiter handelt die HandleInput Fkt ab
                     if (spieler1.getMoney() <= level.getMinMoney()/* || Klick auf weiter*/)
                     {
-                        auswahlanzeige2.Visible = false;   //Objektauswahl ausblenden
+                        //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
+                        PosX1 = Scene.Camera.Position.X;
+                        Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
+                        aktuallisiereZeit(gameTime);
+
                         prewState = States.Bauphase2O;
                         
 
@@ -366,18 +355,11 @@ namespace Crazy_Castle_Crush
                 #region Bauphase2 Texturen
                 //Bauphase, Spiele 1, Objekte erstellen
                 case States.Bauphase2T:
-                    
-                    objekte.Geldanzeige(spieler2);          //Blendet die Geldbetrag des Spielers ein
-
-                    //Zeigt die Texturen die der Spieler wählen kann
-                    auswahlanzeige12.Visible = true;
-
+                    aktuallisiereZeit(gameTime);
                     //noch leer
 
 
-                    //setzt die Variable Zeit1 auf die Zeit und PosX1 auf die Position bevor er in den nächsten State wechselt 
-                    Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000;
-                    PosX1 = Scene.Camera.Position.X;
+
 
                     //Übergang wird mit neuer Texture erzeugt
 
@@ -390,8 +372,7 @@ namespace Crazy_Castle_Crush
                 #region Schussphase1
                 //Schussphase des ersten Spielers
                 case States.Schussphase1:
-                    
-                    objekte.Geldanzeige(spieler1);          //Blendet die Geldbetrag des Spielers ein
+                    aktuallisiereZeit(gameTime);
                     detecting = true;               //Kinect aktiv
 
                     //noch leer
@@ -399,14 +380,17 @@ namespace Crazy_Castle_Crush
 
                     //firedWaffen += 1;                       //es wurde eine Weitere Waffe abgefeuert
 
-                    //setzt die Variable Zeit1 auf die Zeit und PosX1 auf die Position bevor er in den nächsten State wechselt
-                    Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000;
-                    PosX1 = Scene.Camera.Position.X;
+
 
                     #region Übergangsbedingungen
                     //Wenn alle Waffen abgefeuert wurden...
                     if (firedWaffen == spieler2.getWaffen())
                     {
+                        //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
+                        PosX1 = Scene.Camera.Position.X;
+                        Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
+                        aktuallisiereZeit(gameTime);
+
                         prewState = States.Schussphase1;
                         
 
@@ -434,22 +418,24 @@ namespace Crazy_Castle_Crush
                 #region Schussphase2
                 //Schussphase des zweiten Spielers
                 case States.Schussphase2:
-                    
-                    objekte.Geldanzeige(spieler2);          //Blendet die Geldbetrag des Spielers ein
+                    aktuallisiereZeit(gameTime);
                     detecting = true;               //Kinect aktiv
                     //noch leer
 
 
                     //firedWaffen += 1;                       //es wurde eine Weitere Waffe abgefeuert
 
-                    //setzt die Variable Zeit1 auf die Zeit und PosX1 auf die Position bevor er in den nächsten State wechselt
-                    Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000;
-                    PosX1 = Scene.Camera.Position.X;
+
 
                     #region Übergangsbedingungen
                     //Wenn alle Waffen abgefeuert wurden...
                     if (firedWaffen == spieler2.getWaffen())
                     {
+                        //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
+                        PosX1 = Scene.Camera.Position.X;
+                        Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
+                        aktuallisiereZeit(gameTime);
+
                         prewState = States.Schussphase2;
 
                         //Wenn die Schussphase durch ist, beginnt die Bauphase
@@ -487,6 +473,37 @@ namespace Crazy_Castle_Crush
                 #endregion
 
             }
+
+
+
+            #region Objekt-/ Texturauswahl ein-/ausblenden
+            if (currentState != States.Menu && currentState != States.Start && currentState != States.End)
+            {
+                if (currentState == States.Bauphase1O)
+                {
+                    startObjects.einausblender(auswahlanzeigeO, auswahlanzeigeT, 1, zeit);
+                }
+                if (currentState == States.Bauphase1T)
+                {
+                    startObjects.einausblender(auswahlanzeigeO, auswahlanzeigeT, 11, zeit);
+                }
+                if (currentState == States.Bauphase2O)
+                {
+                    startObjects.einausblender(auswahlanzeigeO, auswahlanzeigeT, 2, zeit);
+                }
+                if (currentState == States.Bauphase2T)
+                {
+                    startObjects.einausblender(auswahlanzeigeO, auswahlanzeigeT, 22, zeit);
+                }
+                else
+                {
+                    startObjects.einausblender(auswahlanzeigeO, auswahlanzeigeT, 0, zeit);
+                }
+            }
+
+
+
+            #endregion
 
             #region Kinect
             if (detecting)
@@ -526,11 +543,14 @@ namespace Crazy_Castle_Crush
                                 //Wenn sich die rechte Hand in der oberen, rechten Ecke befindet -> Klick auf WEITER
                                 if (normScreenPos.X >= 0.9f && normScreenPos.Y >= 0.9f)
                                 {
-                                    
+                                    //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
+                                    PosX1 = Scene.Camera.Position.X;
+                                    Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
+                                    aktuallisiereZeit(gameTime);
+
                                     if (currentState == States.Bauphase1O)
                                     {
                                         prewState = States.Bauphase1O;
-                                        auswahlanzeige1.Visible = false;   //Objektauswahl ausblenden
 
                                         //wenn Spieler2 über genügend Geld zum bauen verfügt, Bauphase Spieler 2
                                         //Wenn Spieler2 mehr Geld besitzt fängt er die Schussphase2 an
@@ -543,11 +563,11 @@ namespace Crazy_Castle_Crush
                                         {
                                             currentState = States.Schussphase1;
                                         }
+                                        
                                     }
                                     else if (currentState == States.Bauphase2O)
                                     {
                                         prewState = States.Bauphase2O;
-                                        auswahlanzeige2.Visible = false;   //Objektauswahl ausblenden
 
                                         //Wenn Spieler2 mehr Geld besitzt fängt er die Schussphase2 an
                                         if (spieler2.getMoney() > spieler1.getMoney())
@@ -559,6 +579,7 @@ namespace Crazy_Castle_Crush
                                         {
                                             currentState = States.Camto1;
                                         }
+                                        
                                     }
                                     else
                                     {
@@ -592,42 +613,7 @@ namespace Crazy_Castle_Crush
                                 #endregion
 
                                 #region Auswahl Textur/ Objekt
-                                //Wenn sich die linke Hand in der x-Achsen-Auszahlzone befindet
-                                if (normScreenPos.X <= 0.1f)
-                                {
-                                    if (normScreenPos.Y <= 3f/4) //höher als 6/8 (y geht von oben(0) nach unten(1)
-                                    {
-                                        if (normScreenPos.Y >= 5f / 8)
-                                        {
-                                            auswahl = 4;
-                                        }
-                                        else if (normScreenPos.Y <= 5f / 8 && normScreenPos.Y >= 0.5f)
-                                        {
-                                            auswahl = 3;
-                                        }
-                                        else if (normScreenPos.Y <= 0.5f && normScreenPos.Y >= 3f/8)
-                                        {
-                                            auswahl = 2;
-                                        }
-                                        else if (normScreenPos.Y <= 3f / 8 && normScreenPos.Y >= 1f / 4)
-                                        {
-                                            auswahl = 1;
-                                        }
-                                        else
-                                        {
-                                            auswahl = 0;
-                                        }
-
-                                    }
-                                    else
-                                    {
-                                        auswahl = 0;
-                                    }
-                                }
-                                else
-                                {
-                                    auswahl = 0;
-                                }
+                                auswahl = Auswahl.auswahl(normScreenPos);
 
                                 #endregion
                             }
@@ -652,6 +638,9 @@ namespace Crazy_Castle_Crush
             }
             #endregion
 
+
+            objState = currentState; //Am Ende jenden Updates wird der State angeglichen
+
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
         }
 
@@ -661,63 +650,18 @@ namespace Crazy_Castle_Crush
         public override void HandleInput(InputState input)
         {
 
-            #region Wenn Spieler auf Weiter Klickt (Hier noch mit Leertaste realisiert)
-            if (input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Space, PlayerIndex.One))
-            {
-                if (currentState == States.Bauphase1O)
-                {
-                    prewState = States.Bauphase1O;
-                    auswahlanzeige1.Visible = false;   //Objektauswahl ausblenden
-
-                    //wenn Spieler2 über genügend Geld zum bauen verfügt, Bauphase Spieler 2
-                    //Wenn Spieler2 mehr Geld besitzt fängt er die Schussphase2 an
-                    if (spieler2.getMoney() >= level.getMinMoney() || spieler2.getMoney() > spieler1.getMoney())
-                    {
-                        currentState = States.Camto2;
-                    }
-                    //wenn Spieler2 nicht über genügend Geld zum bauen verfügt, und Spieler1 mehr Geld hat beginnt Schussphase1
-                    else
-                    {
-                        currentState = States.Schussphase1;
-                    }
-                }
-                else if (currentState == States.Bauphase2O)
-                {
-                    prewState = States.Bauphase2O;
-                    auswahlanzeige2.Visible = false;   //Objektauswahl ausblenden
-
-                    //Wenn Spieler2 mehr Geld besitzt fängt er die Schussphase2 an
-                    if (spieler2.getMoney() > spieler1.getMoney())
-                    {
-                        currentState = States.Schussphase2;
-                    }
-                    //sonst Spieler 1
-                    else
-                    {
-                        currentState = States.Camto1;
-                    }
-                }
-                else
-                {
-                    return;
-                }
-
-            }
-            #endregion
-
             #region Wenn Spieler ein Objekt erzeugt hat (Hier noch mit O realisiert)
             if (input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.O, PlayerIndex.One))
             {
+
                 if (currentState == States.Bauphase1O)
                 {
                     prewState = States.Bauphase1O;
-                    auswahlanzeige1.Visible = false;   //Objektauswahl ausblenden
                     currentState = States.Bauphase1T;
                 }
                 if (currentState == States.Bauphase2O)
                 {
                     prewState = States.Bauphase2O;
-                    auswahlanzeige2.Visible = false;   //Objektauswahl ausblenden
                     currentState = States.Bauphase2T;
                 }
             }
@@ -726,16 +670,15 @@ namespace Crazy_Castle_Crush
             #region Wenn Spieler eine Texture erzeugt hat (Hier noch mit T realisiert)
             if (input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.T, PlayerIndex.One))
             {
+
                 if (currentState == States.Bauphase1T)
                 {
                     prewState = States.Bauphase1T;
-                    auswahlanzeige11.Visible = false;   //Texturauswahl ausblenden
                     currentState = States.Bauphase1O;
                 }
                 if (currentState == States.Bauphase2T)
                 {
                     prewState = States.Bauphase2T;
-                    auswahlanzeige12.Visible = false;   //Texturauswahl ausblenden
                     currentState = States.Bauphase2O;
                 }
             }
@@ -761,22 +704,23 @@ namespace Crazy_Castle_Crush
 
         public override void Draw(GameTime gameTime)
         {
+            #region State Anzeige
             string wobinich = "";
             if (currentState == States.Bauphase1O)
             {
-                wobinich = "Bau1 Obj";
+                wobinich = "Bau1 Obj"+ auswahl;
             }
             else if (currentState == States.Bauphase1T)
             {
-                wobinich = "Bau1 Tex";
+                wobinich = "Bau1 Tex"+ auswahl;
             }
             else if (currentState == States.Bauphase2O)
             {
-                wobinich = "Bau2 Obj";
+                wobinich = "Bau2 Obj"+ auswahl;
             }
             else if (currentState == States.Bauphase2T)
             {
-                wobinich = "Bau2 Tex";
+                wobinich = "Bau2 Tex" + auswahl;
             }
             else if (currentState == States.Camto1)
             {
@@ -808,39 +752,23 @@ namespace Crazy_Castle_Crush
             }
 
             Textanzeiger(wobinich);
+            #endregion 
 
+            #region Geldanzeige
+            if (currentState == States.Bauphase1O || currentState == States.Bauphase1T || currentState == States.Schussphase1)
+            {
+                objekte.Geldanzeige(spieler1);  //Blendet die Geldbetrag des Spielers ein
+            }
+            if (currentState == States.Bauphase2O || currentState == States.Bauphase2T || currentState == States.Schussphase2)
+            {
+                objekte.Geldanzeige(spieler2); //Blendet die Geldbetrag des Spielers ein
+            }
+            #endregion
 
             base.Draw(gameTime);
         }
 
-        private void LoadBox(Vector3 position, Vector3 dimension, float masse)
-        {
-            //Erstellt ein Objekt in der Scene.
-            BoxObject box = new BoxObject(position,             //Position
-                               dimension,                          //Kantenlängen
-                               masse);
-            Scene.Add(box);
-            
-        }
-
-
-
-        private void LoadCoint()
-        {/*
-            RenderMaterial gold = new RenderMaterial();
-            gold.Diffuse = Color.Gold.ToVector4();
-            coint.RenderMaterial = gold;
-            Scene.Add(coint);
-        */}
-
-        private void UpdateCoint()
-        {
-            
-            //coint.Position = new Vector3(Scene.Camera.Position.X, Scene.Camera.Position.Y, -5);
-        }
-
-
-       private void Textanzeiger(string aktuellerText)
+        private void Textanzeiger(string aktuellerText)
         {
 
             UI2DRenderer.WriteText(new Vector2(Scene.Camera.Position.X,Scene.Camera.Position.Y),            //Position
@@ -851,6 +779,11 @@ namespace Crazy_Castle_Crush
                                   UI2DRenderer.HorizontalAlignment.Center, //Horizontal zentriert
                                   UI2DRenderer.VerticalAlignment.Bottom);  //am unteren Bildschirmrand ausrichten
 
+        }
+
+        private void aktuallisiereZeit(GameTime gameTime)
+        {
+            zeit = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000 - Zeit1;
         }
 
 

@@ -114,6 +114,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Auswahl.cs" />
     <Compile Include="CameraMovement.cs" />
     <Compile Include="Gamestart.cs" />
     <Compile Include="Levels.cs" />
