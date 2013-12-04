@@ -30,11 +30,28 @@ namespace Crazy_Castle_Crush
 
         }
 
+        public BoxObject createObj(int auswahl)
+        {
+            if (auswahl == 1)
+            {
+                return buildbox(new Vector3(0.5f, 0.5f, 0.5f));
+            }
+            else
+            {
+                return buildbox(new Vector3(5f, 0.5f, 0.5f));
+            }
+        }
 
+        private BoxObject buildbox(Vector3 dimension)
+        {
+            //Erstellt ein Objekt in der Scene.
+            BoxObject box = new BoxObject(new Vector3(0,10,-5f),             //Position
+                               dimension,                          //Kantenlängen
+                               0f);
+            scene.Add(box);
 
-
-
-
+            return box;
+        }
 
         private Scene scene;
     }

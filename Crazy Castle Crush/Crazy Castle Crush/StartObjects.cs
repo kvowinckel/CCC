@@ -14,6 +14,7 @@ namespace Crazy_Castle_Crush
         Vector3 pos = new Vector3(0, 0, -11);
         bool lastR = false;
         
+        
         public StartObjects(Scene scene, Levels level)
         {
             this.scene = scene;
@@ -62,38 +63,35 @@ namespace Crazy_Castle_Crush
             blende.RenderMaterial = bildobjekte;
 
             scene.Add(blende);
-            //blende.Visible = false;
             return blende;
             
         }
 
-        public void einausblender(BoxObject Ob, BoxObject Te, int state, float time)
+        public void einausblender(BoxObject Ob, int state, float time)
         {
             // 1=ObjSp1  11=TexSp1  2=ObjSp2  22=TexSp2  0=else
-
+            
             if (state == 0)
             {
                 rausblend(Ob, Ob.Position.X);
-                rausblend(Te, Te.Position.X);
             }
             if (state == 1)
             {
                 reinblend(Ob, level.getSpieler1Pos());
-                rausblend(Te, level.getSpieler1Pos());
+                overblend(Ob, "Bau");
             }
             if (state == 11)
             {
-                //overblend(Te, level.getSpieler1Pos());
+                overblend(Ob, "hpic");
             }
             if (state == 2)
             {
                 reinblend(Ob, level.getSpieler2Pos());
-                rausblend(Te, level.getSpieler2Pos());
+                overblend(Ob, "Bau");
             }
             if (state == 22)
             {
-                //overblend(Te, level.getSpieler2Pos());
-                rausblend(Te, level.getSpieler2Pos());
+                overblend(Ob, "hpic");
             }
 
 
@@ -101,16 +99,29 @@ namespace Crazy_Castle_Crush
 
         private void rausblend(BoxObject box, float x)
         {
-            if (lastR == false) { box.Visible = false; }
-            box.Position = new Vector3(x, 2f, -6f);
+            if (lastR == false) { }//box.Visible = false; }
+            box.Position = new Vector3(x, 4f, -6f);
             lastR = true;
         }
         private void reinblend(BoxObject box, float x)
         {
-            if (lastR) { box.Visible = true; }
+            if (lastR) { }//box.Visible = true; }
             box.Physics.Position = new Vector3(x, 2f, -6f);
             lastR = false;
         }
+        
+        private void overblend(BoxObject box, string bild)
+        {
+            if (box.RenderMaterial.Texture.Name != bild)
+            {
+                RenderMaterial xmenu = new RenderMaterial();
+                xmenu.Texture = Core.Content.Load<Texture2D>(bild);
+                xmenu.Diffuse = Color.White.ToVector4();
+                box.RenderMaterial = xmenu;
+            }
+        }
+         
+
 
 
         public void LoadStartObjects(int level)
