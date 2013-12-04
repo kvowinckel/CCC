@@ -214,11 +214,15 @@ namespace Crazy_Castle_Crush
                     }
                     if (objInHand)
                     {
-                        aktuellesObj.Position = rightHand.Position;
+                        Vector3 rH = new Vector3(rightHand.Position.X, rightHand.Position.Y, -5f);
+                        aktuellesObj.Position = rH;
                     }
                     if (klick2 && objInHand == true)
                     {
+                        aktuellesObj.Physics.Mass = 1f;
                         objInHand = false;
+                        prewState = States.Bauphase1O;
+                        currentState = States.Bauphase1T;
                     }
                     
                     #region Übergangsbedingungen
@@ -246,7 +250,7 @@ namespace Crazy_Castle_Crush
                         }
                         
                     }
-                    //Wird ein Objekt erstellt, wird in den Bauphase1T State gewechselt: Eventhandler wickelt dies ab!
+                    //Wird ein Objekt erstellt, wird in den Bauphase1T State gewechselt
                     #endregion
 
                     break;
@@ -498,15 +502,15 @@ namespace Crazy_Castle_Crush
                 {
                     startObjects.einausblender(auswahlanzeige, 1, zeit);
                 }
-                if (currentState == States.Bauphase1T)
+                else if (currentState == States.Bauphase1T)
                 {
                     startObjects.einausblender(auswahlanzeige, 11, zeit);
                 }
-                if (currentState == States.Bauphase2O)
+                else if (currentState == States.Bauphase2O)
                 {
                     startObjects.einausblender(auswahlanzeige, 2, zeit);
                 }
-                if (currentState == States.Bauphase2T)
+                else if (currentState == States.Bauphase2T)
                 {
                     startObjects.einausblender(auswahlanzeige, 22, zeit);
                 }
@@ -746,10 +750,7 @@ namespace Crazy_Castle_Crush
             string wobinich = "";
             if (currentState == States.Bauphase1O)
             {
-                string b;
-                if (auswahlanzeige.Visible) { b = "JA"; }
-                else { b = "NEIN"; }
-                wobinich = "Bau1 Obj"+ auswahl + "," + auswahlanzeige.Position.X + b;
+                wobinich = "Bau1 Obj"+ auswahl;
             }
             else if (currentState == States.Bauphase1T)
             {

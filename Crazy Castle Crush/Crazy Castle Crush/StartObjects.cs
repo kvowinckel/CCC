@@ -99,12 +99,14 @@ namespace Crazy_Castle_Crush
 
         private void rausblend(BoxObject box, float x)
         {
+            //TODO: rausblenden
             if (lastR == false) { }//box.Visible = false; }
             box.Position = new Vector3(x, 4f, -6f);
             lastR = true;
         }
         private void reinblend(BoxObject box, float x)
         {
+            //TODO: einblenden
             if (lastR) { }//box.Visible = true; }
             box.Physics.Position = new Vector3(x, 2f, -6f);
             lastR = false;

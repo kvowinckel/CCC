@@ -45,9 +45,9 @@ namespace Crazy_Castle_Crush
         private BoxObject buildbox(Vector3 dimension)
         {
             //Erstellt ein Objekt in der Scene.
-            BoxObject box = new BoxObject(new Vector3(0,10,-5f),             //Position
+            BoxObject box = new BoxObject(new Vector3(0,-10,-6f),             //Position
                                dimension,                          //Kantenlängen
-                               1f);
+                               0f);
             scene.Add(box);
 
             return box;
