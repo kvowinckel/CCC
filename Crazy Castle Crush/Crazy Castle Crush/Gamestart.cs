@@ -46,6 +46,7 @@ namespace Crazy_Castle_Crush
         BoxObject auswahlanzeige;                           //zur Auswahl von Objekten 
         int auswahl;                                        //je nach Position der linken Hand erhält die Auswahl ihre Werte (für Objekt und Texturauswahl)
         bool klick;                                         //Wenn Spieler quasi klickt (noch Leertaste)
+        bool klick2;                                        //Hilfsvariable
         bool objInHand;                                     //solange das Objekt an der Hand ist
         BoxObject aktuellesObj;                             //Objekt das gerade bearbeitet wird
 
@@ -206,7 +207,7 @@ namespace Crazy_Castle_Crush
                     aktuallisiereZeit(gameTime);
                     detecting = true;               //Kinect aktiv
 
-                    if (klick && objInHand == false)
+                    if (klick && objInHand == false && auswahl!=0)
                     {
                         aktuellesObj = objekte.createObj(auswahl);
                         objInHand = true;
@@ -215,7 +216,7 @@ namespace Crazy_Castle_Crush
                     {
                         aktuellesObj.Position = rightHand.Position;
                     }
-                    if (klick && objInHand == true)
+                    if (klick2 && objInHand == true)
                     {
                         objInHand = false;
                     }
@@ -676,6 +677,16 @@ namespace Crazy_Castle_Crush
             }
             #endregion
 
+            #region Wenn Spieler Auswählt (Hier Leertaste)
+            if (input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.L, PlayerIndex.One))
+            {
+                klick2 = true;
+            }
+            else
+            {
+                klick2 = false;
+            }
+            #endregion
 
             #region Wenn Spieler ein Objekt erzeugt hat (Hier noch mit O realisiert)
             if (input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.O, PlayerIndex.One))

@@ -47,7 +47,7 @@ namespace Crazy_Castle_Crush
             //Erstellt ein Objekt in der Scene.
             BoxObject box = new BoxObject(new Vector3(0,10,-5f),             //Position
                                dimension,                          //Kantenlängen
-                               0f);
+                               1f);
             scene.Add(box);
 
             return box;
