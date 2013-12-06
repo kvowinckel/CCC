@@ -11,9 +11,9 @@ FBXHeaderExtension:  {
 		Year: 2013
 		Month: 12
 		Day: 06
-		Hour: 13
-		Minute: 16
-		Second: 57
+		Hour: 14
+		Minute: 57
+		Second: 45
 		Millisecond: 0
 	}
 	Creator: "FBX SDK/FBX Plugins build 20070228"
@@ -21,7 +21,7 @@ FBXHeaderExtension:  {
 		FlagPLE: 0
 	}
 }
-CreationTime: "2013-12-06 13:16:57:000"
+CreationTime: "2013-12-06 14:57:45:000"
 Creator: "Blender version 2.69 (sub 0)"
 
 ; Object definitions
@@ -1678,7 +1678,7 @@ Objects:  {
 		}
 		UseMipMap: 0
 		Filename: "Schwarz.png"
-		RelativeFilename: "..\Schwarz.png"
+		RelativeFilename: "Schwarz.png"
 	}
 	Texture: "Texture::Schwarz_png", "TextureVideoClip" {
 		Type: "TextureVideoClip"
@@ -1703,7 +1703,7 @@ Objects:  {
 		}
 		Media: "Video::Schwarz_png"
 		FileName: "Schwarz.png"
-		RelativeFilename: "..\Schwarz.png"
+		RelativeFilename: "Schwarz.png"
 		ModelUVTranslation: 0,0
 		ModelUVScaling: 1,1
 		Texture_Alpha_Source: "None"
