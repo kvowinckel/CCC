@@ -6,6 +6,7 @@ using NOVA.Scenery;
 using NOVA.Graphics;
 using Microsoft.Xna.Framework;
 using NOVA.UI;
+using NOVA;
 
 namespace Crazy_Castle_Crush
 {
@@ -30,6 +31,13 @@ namespace Crazy_Castle_Crush
                 lp = 2;
                 spieler.setMoney(spieler.getMoney() - 200); //Rohkosten abziehen
             }
+            else if (auswahl == 2)
+            {
+                ModelObject l = new ModelObject(Vector3.Zero, Quaternion.CreateFromYawPitchRoll(1.57f, 0, 0), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "L", 0f);
+                newobj = l;
+                lp = 2;
+                spieler.setMoney(spieler.getMoney() - 250);
+            }
             else if (auswahl == 3) // Latte
             {
                 newobj = buildbox(new Vector3(2f, 0.2f, 0.5f));
@@ -46,7 +54,6 @@ namespace Crazy_Castle_Crush
             {
                 newobj = buildbox(new Vector3(0.1f, 0.1f, 0.1f));
                 lp = 0;
-                spieler.setMoney(spieler.getMoney() - 300); //Rohkosten abziehen
             }
 
             scene.Add(newobj);
@@ -59,13 +66,13 @@ namespace Crazy_Castle_Crush
         {
             if (auswahl == 1)
             {
-                first.setMaterial("Papayrus");
+                first.setMaterial("MHolz");
                 first.increaseLP(2); //Lebenspunkte um 2 erhöhen
                 
             }
             else if (auswahl == 2)
             {
-                first.setMaterial("himmel");
+                first.setMaterial("MStein");
                 first.increaseLP(1); //Lebenspunkte um 1 erhöhen
                 
             }

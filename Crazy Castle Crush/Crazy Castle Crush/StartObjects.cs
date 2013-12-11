@@ -105,7 +105,7 @@ namespace Crazy_Castle_Crush
             if (state == 12)
             {
                 rausblend(changer, changer.Position.X);
-                overblend(Ob, "hpic");
+                overblend(Ob, "Material");
             }
             if (state == 2)
             {
@@ -122,7 +122,7 @@ namespace Crazy_Castle_Crush
             if (state == 22)
             {
                 rausblend(changer,changer.Position.X);
-                overblend(Ob, "hpic");
+                overblend(Ob, "Material");
             }
 
 
@@ -149,7 +149,7 @@ namespace Crazy_Castle_Crush
             {
                 RenderMaterial xmenu = new RenderMaterial();
                 xmenu.Texture = Core.Content.Load<Texture2D>(bild);
-                xmenu.Diffuse = Color.White.ToVector4();
+                xmenu.Diffuse = Color.Gray.ToVector4();
                 box.RenderMaterial = xmenu;
             }
         }
@@ -178,14 +178,14 @@ namespace Crazy_Castle_Crush
                 RevoluteJoint revolute = new RevoluteJoint(Kanonenhalterung.Physics, Kanonenrohr.Physics, new Vector3(-1.0941f, 0.5789f, -1.3587f), Vector3.Right);
                 revolute.Limit.IsActive = true;
                 revolute.Limit.MinimumAngle = -MathHelper.Pi;
-                revolute.Limit.MaximumAngle = 0;
+                revolute.Limit.MaximumAngle = 0;*/
 
                 ModelObject Welt = new ModelObject(new Vector3(0, -1.5f, -5f), Quaternion.CreateFromYawPitchRoll(0, -1.57f, 0), new Vector3(1, 1, 1), CollisionType.ExactMesh, " ", "Welt_xna", 0f);
                 Welt.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
-                scene.Add(Welt);*/
+                scene.Add(Welt);
                   
-                 
-                LoadBox(new Vector3(0, -1.5f, -5), new Vector3(46, 0.2f, 1), 0f);
+                //Box als alternative
+                //LoadBox(new Vector3(0, -1.5f, -5), new Vector3(46, 0.2f, 1), 0f);
 
                 //Lädt Spielhintergrund
                 LoadBackground("himmel");
