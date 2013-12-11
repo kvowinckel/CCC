@@ -6,53 +6,87 @@ using NOVA.Scenery;
 using NOVA.UI;
 using NOVA.Graphics;
 using Microsoft.Xna.Framework;
+using NOVA;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Crazy_Castle_Crush
 {
     class Objekte
     {
-        public Objekte(Scene scene)
+        private int lebenspunkte;
+        private RenderMaterial material;
+        private SceneObject objekt;
+
+        public Objekte(SceneObject Objekt, int Lebenspunkte, String Material)
         {
-            this.scene = scene;
+            objekt = Objekt;
+            lebenspunkte = Lebenspunkte;
+
+            setMaterial(Material);
         }
 
-        public void Geldanzeige(Spieler spieler)
+        public SceneObject getSceneObject()
         {
-            
-            string aktuellerText = "$" + spieler.getMoney();
-            UI2DRenderer.WriteText(new Vector2(scene.Camera.Position.X + 2, scene.Camera.Position.Y),           //Position
-                        aktuellerText,                                                                          //Anzuzeigender Text
-                        Color.Red,                                                                              //Textfarbe
-                        null,                                                                                   //Interne Schriftart verwenden
-                        Vector2.One,                                                                            //Textskallierung
-                        UI2DRenderer.HorizontalAlignment.Left,                                                  //Horizontal zentriert
-                        UI2DRenderer.VerticalAlignment.Top);                                                    //am unteren Bildschirmrand ausrichten
-
+            return objekt;
         }
 
-        public BoxObject createObj(int auswahl)
+        public Vector3 getPosition()
         {
-            if (auswahl == 1)
+            return objekt.Position;
+        }
+
+        public void setPosition(Vector3 vektor)
+        {
+            objekt.Position = vektor;
+        }
+
+        public void setMasse(float masse)
+        {
+            objekt.Physics.Mass = masse;
+        }
+
+        public int getLP()
+        {
+            return lebenspunkte;
+        }
+
+        public String getMaterial()
+        {
+            return material.ToString();
+        }
+
+        public void setMaterial(String bild)
+        {
+            if (bild.Equals("blank"))
             {
-                return buildbox(new Vector3(0.5f, 0.5f, 0.5f));
+                material = new RenderMaterial();
+                material.Diffuse = Color.Gray.ToVector4();
             }
             else
             {
-                return buildbox(new Vector3(5f, 0.5f, 0.5f));
+                material.Texture = Core.Content.Load<Texture2D>(bild);
+                material.Diffuse = Color.White.ToVector4();
             }
+            objekt.RenderMaterial = material;
         }
 
-        private BoxObject buildbox(Vector3 dimension)
+        public void decreaseLP(int minus)
         {
-            //Erstellt ein Objekt in der Scene.
-            BoxObject box = new BoxObject(new Vector3(0,-10,-6f),             //Position
-                               dimension,                          //Kantenlängen
-                               0f);
-            scene.Add(box);
-
-            return box;
+            lebenspunkte -= minus;
         }
 
-        private Scene scene;
+        public void decreaseLP()
+        {
+            lebenspunkte -= 1;
+        }
+
+        public void increaseLP(int plus)
+        {
+            lebenspunkte += plus;
+        }
+
+
+        
+
     }
 }

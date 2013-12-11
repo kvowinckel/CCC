@@ -75,7 +75,7 @@ namespace Crazy_Castle_Crush
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            backgroud = Core.Content.Load<Texture2D>("hpic2");
+            
 
             // TODO: use this.Content to load your game content here
         }

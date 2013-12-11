@@ -50,20 +50,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="14014.jpg.bmp">
-      <Name>hpic2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Wikinews-logo.png">
-      <Name>hpic3</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="himmel.JPG">
       <Name>himmel</Name>
       <Importer>TextureImporter</Importer>
@@ -80,6 +66,20 @@
   <ItemGroup>
     <Compile Include="Baumenü.jpg">
       <Name>Bau</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Papayrus.jpg">
+      <Name>Papayrus</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="pistole.jpg">
+      <Name>pist</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

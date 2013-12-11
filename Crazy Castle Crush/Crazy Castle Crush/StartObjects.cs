@@ -67,30 +67,59 @@ namespace Crazy_Castle_Crush
             
         }
 
-        public void einausblender(BoxObject Ob, int state, float time)
+        public BoxObject LoadObjWafC()
         {
-            // 1=ObjSp1  11=TexSp1  2=ObjSp2  22=TexSp2  0=else
+            BoxObject changer = LoadBox(new Vector3(0, 2.0f, -6), new Vector3(1, 0.8f, 0), 0f);
+            RenderMaterial bild = new RenderMaterial();
+            bild.Texture = Core.Content.Load<Texture2D>("pist");
+            bild.Diffuse = Color.White.ToVector4();
+            changer.RenderMaterial = bild;
+
+            //scene.Add(changer);
+            return changer;
+        }
+
+        public void einausblender(BoxObject Ob, BoxObject changer, int state, float time)
+        {
+            // 1=ObjSp1  11=WafSp1  12=TexSp1 2=ObjSp2  21=WafSp2  22=TexSp2  0=else
             
             if (state == 0)
             {
                 rausblend(Ob, Ob.Position.X);
+                rausblend(changer,changer.Position.X);
             }
             if (state == 1)
             {
                 reinblend(Ob, level.getSpieler1Pos());
-                overblend(Ob, "Bau");
+                reinblend(changer, level.getSpieler1Pos() + 3.5f);
+                overblend(Ob, "Bau"); //Anzeige soll Bauobjekte Anzeigen
+                overblend(changer,"pist"); //Rechts soll Waffe zum wechseln zum Waffenmenu angezeigt werden
             }
             if (state == 11)
             {
+                overblend(Ob, "pist"); //Anzeige soll Waffenauswahl anzeigen
+                overblend(changer,"Bau"); //Rechts soll Obj zum wechseln zum Objmenu angezeigt werden
+            }
+            if (state == 12)
+            {
+                rausblend(changer, changer.Position.X);
                 overblend(Ob, "hpic");
             }
             if (state == 2)
             {
+                reinblend(changer, level.getSpieler2Pos() + 3.5f);
                 reinblend(Ob, level.getSpieler2Pos());
-                overblend(Ob, "Bau");
+                overblend(Ob, "Bau"); //Anzeige soll Bauobjekte Anzeigen
+                overblend(changer,"pist"); //Rechts soll Waffe zum wechseln zum Waffenmenu angezeigt werden
+            }
+            if (state == 21)
+            {
+                overblend(Ob, "pist"); //Anzeige soll Waffenauswahl anzeigen
+                overblend(changer,"Bau"); //Rechts soll Obj zum wechseln zum Objmenu angezeigt werden
             }
             if (state == 22)
             {
+                rausblend(changer,changer.Position.X);
                 overblend(Ob, "hpic");
             }
 
