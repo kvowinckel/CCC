@@ -23,6 +23,17 @@ namespace Crazy_Castle_Crush
             this.level = level;
         }
 
+        public BoxObject Weiter()
+        {
+            RenderMaterial render = new RenderMaterial();
+            render.Texture = Core.Content.Load<Texture2D>("weiter2");
+            render.Diffuse = Color.White.ToVector4();
+            BoxObject weiter = LoadBox(new Vector3(-20,2,-2f), new Vector3(0.4f, 0.2f, 0), 0f);
+            weiter.RenderMaterial = render;
+
+            return weiter;
+        }
+
         public BoxObject RightHand()
         {
             RenderMaterial gruen = new RenderMaterial();

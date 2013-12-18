@@ -43,6 +43,7 @@ namespace Crazy_Castle_Crush
         bool detecting = false;                             //Kinect benötigt
         BoxObject rightHand;
         BoxObject leftHand;
+        BoxObject weiterSym;
         BoxObject auswahlanzeige;                           //zur Auswahl von Objekten 
         BoxObject objWafC;                                  //Objekt zum wechseln zwischen Waffen und Objekten
         bool showWaffe;                                  //Gibt an ob gerade die Waffen angezeigt werden sollen
@@ -99,6 +100,8 @@ namespace Crazy_Castle_Crush
             rightHand = startObjects.RightHand();
             leftHand = startObjects.LeftHand();
 
+            weiterSym = startObjects.Weiter();
+
             currentState = States.Menu;                                            //Anfangszustand
         }
 
@@ -149,7 +152,7 @@ namespace Crazy_Castle_Crush
                 //Camto1: Kamera wird an die Linke Position bewegt
                 case States.Camto1:
                     aktuallisiereZeit(gameTime);
-
+                    weiterSym.Visible = false;
                     detecting = false;  //Kinect deaktiviert
 
                     //Variable wird für nächste Schussphasen zurückgesetzt
@@ -213,6 +216,10 @@ namespace Crazy_Castle_Crush
                 case States.Bauphase1O:
                     aktuallisiereZeit(gameTime);
                     detecting = true;               //Kinect aktiv
+                    if (!weiterSym.Visible)
+                    {
+                        weiterSym.Visible = true;
+                    }
                     float pos;
 
                     #region Spieler &  Spielerposition
@@ -220,11 +227,13 @@ namespace Crazy_Castle_Crush
                     {
                         gamer = spieler1;
                         pos = level.getSpieler1Pos();
+                        weiterSym.Position = new Vector3(pos+1.13f, -0.7f, -2f);
                     }
                     else
                     {
                         gamer = spieler2;
                         pos = level.getSpieler2Pos();
+                        weiterSym.Position = new Vector3(pos + 1.13f, -0.7f, -2f);
                     }
                     #endregion
 
@@ -270,12 +279,14 @@ namespace Crazy_Castle_Crush
                     #region Waffe erzeugen und mit Hand positionieren
                     if (showWaffe)
                     {
-                        if (getObj && objInHand == false && auswahl != 0 && auswahl < 5)    //"klick" und die Waffe wurde noch nicht erstellt und linke hand befindet sich auf auswahlfeld
+                        if (klick && objInHand == false && auswahl != 0 && auswahl < 5)    //"klick" und die Waffe wurde noch nicht erstellt und linke hand befindet sich auf auswahlfeld
                         {
-                            objInHand = true;                                                   //soll jetzt der Hand folgen
-                            aktuelleWaffe = Objektverwaltung.createWaffe(auswahl, gamer, pos);  //aktuelles Objekt wird erzeugt
+                            //objInHand = true;                                                   //soll jetzt der Hand folgen
+                            
+                            aktuelleWaffe = Objektverwaltung.createWaffe(auswahl, gamer, rightHand.Position);  //aktuelles Objekt wird erzeugt
                         }
 
+                        /*
                         if (objInHand && showWaffe == false)            //Ausrichten der Waffe
                         {
                             Vector3 rH = new Vector3(rightHand.Position.X, rightHand.Position.Y, -5f); //Handvektor ohne Tiefenveränderung
@@ -289,7 +300,7 @@ namespace Crazy_Castle_Crush
                             rightHand.Visible = true;                   //Rechte Hand wird wieder angezeigt
                             klick = false;
                             objInHand = false;
-                        }
+                        }*/
 
                     }
                     
@@ -351,6 +362,7 @@ namespace Crazy_Castle_Crush
                 case States.Bauphase2T:
                     aktuallisiereZeit(gameTime);
                     Objektverwaltung.firstMaterial(aktuellesObj, auswahl);
+                    weiterSym.Visible = false;
 
                     if (currentState == States.Bauphase1T)
                     {
@@ -400,6 +412,7 @@ namespace Crazy_Castle_Crush
                 case States.Camto2:
                     aktuallisiereZeit(gameTime);
                     detecting = false;               //Kinect deaktiviert
+                    weiterSym.Visible = false;
 
                     //Variable wird für nächste Schussphasen zurückgesetzt
                     firedWaffen = 0; 
@@ -446,15 +459,13 @@ namespace Crazy_Castle_Crush
 
                 #endregion
 
-
-
-
                 #region Schussphasen
                 //Schussphasen
                 case States.Schussphase2:
                 case States.Schussphase1:
                     aktuallisiereZeit(gameTime);
                     detecting = true;               //Kinect aktiv
+                    weiterSym.Visible = false;
                     int xR;
 
                     if (currentState == States.Schussphase1)
@@ -546,7 +557,6 @@ namespace Crazy_Castle_Crush
 
                 #endregion
 
-
                 #region End
                 //Ende des Spiels
                 case States.End:
@@ -630,12 +640,10 @@ namespace Crazy_Castle_Crush
                             {
                                 //Position der rechten Hand des Spielers in Bildschirmkoodinaten
                                 Vector2 screenPos = skeleton.Joints[JointType.HandRight].ScreenPosition;
-                                Vector2 normScreenPos = new Vector2(screenPos.X, screenPos.Y);
-                                screenPos.X = screenPos.X * Scene.Game.Window.ClientBounds.Width;
-                                screenPos.Y *= Scene.Game.Window.ClientBounds.Height;
+                                Vector2 normScreenPos = new Vector2(screenPos.X/Scene.Game.Window.ClientBounds.Width, screenPos.Y/Scene.Game.Window.ClientBounds.Height);
 
                                 //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
-                                Plane plane2 = new Plane(Vector3.Forward, -4f);
+                                Plane plane2 = new Plane(Vector3.Forward, -1f);
 
                                 //Weltkoordinatenpunk finden
                                 Vector3 worldPos2 = Helpers.Unproject(screenPos, plane2);
@@ -713,9 +721,7 @@ namespace Crazy_Castle_Crush
                             {
                                 //Position der linken Hand des Spielers in Bildschirmkoodinaten
                                 Vector2 screenPos = skeleton.Joints[JointType.HandLeft].ScreenPosition;
-                                Vector2 normScreenPos = new Vector2(screenPos.X, screenPos.Y);
-                                screenPos.X = screenPos.X * Scene.Game.Window.ClientBounds.Width;
-                                screenPos.Y *= Scene.Game.Window.ClientBounds.Height;
+                                Vector2 normScreenPos = new Vector2(screenPos.X / Scene.Game.Window.ClientBounds.Width, screenPos.Y / Scene.Game.Window.ClientBounds.Height);
 
                                 //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
                                 Plane plane2 = new Plane(Vector3.Forward, -1f);
@@ -741,7 +747,7 @@ namespace Crazy_Castle_Crush
                             {
                                 //Position des Kopfes des Spielers in Bildschirmkoodinaten
                                 Vector2 screenPos = skeleton.Joints[JointType.Head].ScreenPosition;
-                                Vector2 normScreenPos = new Vector2(screenPos.X, screenPos.Y);
+                                Vector2 normScreenPos = new Vector2(screenPos.X / Scene.Game.Window.ClientBounds.Width, screenPos.Y / Scene.Game.Window.ClientBounds.Height);
 
                                 //Hintergrund bewegen
                                 startObjects.MoveBackground(normScreenPos.X - 0.5f, normScreenPos.Y - 0.5f);
@@ -820,7 +826,7 @@ namespace Crazy_Castle_Crush
            
             if (currentState == States.Bauphase1O)
             {
-                wobinich = "Bau1 Obj"+ auswahl;
+                wobinich = "Bau1 Obj"+ auswahl + "    " + weiterSym.Visible + weiterSym.Position;
             }
             else if (currentState == States.Bauphase1T)
             {

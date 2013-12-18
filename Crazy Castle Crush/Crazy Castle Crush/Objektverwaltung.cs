@@ -73,16 +73,15 @@ namespace Crazy_Castle_Crush
             return dasobj;
         }
 
-        public static Waffen createWaffe(int auswahl, Spieler spieler, float xPos)//TODO
+        public static Waffen createWaffe(int auswahl, Spieler spieler, Vector3 posi)//TODO
         {
             Controller newcon;
             RevoluteJoint revolute;
             Waffen dasobj;
-            Vector3 startort = new Vector3(xPos, 2, -5);
+            Vector3 startort = new Vector3(posi.X,posi.Y, -5f);
 
-            //if (auswahl == 1)
-            { //Kanone
-
+            if (auswahl == 1)//Kanone
+            {
                 Vector3 diff = new Vector3(0.095f, 0.1828f, 0);
                 ModelObject Kanonenrohr = new ModelObject(startort + diff, Quaternion.Identity, new Vector3(0.1f, 0.1f, 0.1f), CollisionType.ExactMesh, " ", "Kanonenrohr", 0.001f);
                 Kanonenrohr.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
@@ -97,6 +96,28 @@ namespace Crazy_Castle_Crush
                 newcon.Add(Kanonenhalterung);
 
                 revolute = new RevoluteJoint(Kanonenhalterung.Physics, Kanonenrohr.Physics, Kanonenhalterung.Position + new Vector3(0, 1, 0), Vector3.Backward);
+                /*revolute.Limit.IsActive = true;
+                revolute.Limit.MinimumAngle = -MathHelper.Pi;
+                revolute.Limit.MaximumAngle = 0;*/
+                scene.Physics.Add(revolute);
+
+                revolute.Motor.IsActive = true;
+                revolute.Motor.Settings.Mode = BEPUphysics.Constraints.TwoEntity.Motors.MotorMode.Servomechanism;
+                revolute.Motor.Settings.Servo.Goal = -MathHelper.Pi / 4;
+            }
+            else //TEMPORÄR
+            {
+                BoxObject Box = new BoxObject(startort, new Vector3(0.5f, 0.5f, 0.5f), 1f);
+                scene.Add(Box);
+
+                BoxObject Lat = new BoxObject(startort + new Vector3(0.25f, 0.25f, 0), new Vector3(1f, 0.2f, 0.5f), 0.5f);
+                scene.Add(Lat);
+
+                newcon = new Controller(new Vector3(0, 0, 0));
+                newcon.Add(Box);
+                newcon.Add(Lat);
+
+                revolute = new RevoluteJoint(Box.Physics, Lat.Physics, Box.Position + new Vector3(0, 1, 0), Vector3.Backward);
                 /*revolute.Limit.IsActive = true;
                 revolute.Limit.MinimumAngle = -MathHelper.Pi;
                 revolute.Limit.MaximumAngle = 0;*/
