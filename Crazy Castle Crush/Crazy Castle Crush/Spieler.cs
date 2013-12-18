@@ -10,7 +10,7 @@ namespace Crazy_Castle_Crush
         private int geld = 1000;    //Anfangsgehlt
         private int anzWaffen=1;
 
-        List<int> waffenIDs = new List<int>();
+        List<Waffen> waffen = new List<Waffen>();
 
 
         //Gibt an, wie viel Geld der Spieler hat
@@ -26,22 +26,22 @@ namespace Crazy_Castle_Crush
         }
 
         //Funktion fügt einer weitere Waffe hinzu
-        public void setWaffen(int waffenid)
+        public void setWaffen(Waffen waffe)
         {
             anzWaffen += 1;
-            waffenIDs.Add(waffenid);
+            waffen.Add(waffe);
         }
 
         //Funktion zieht eine Waffe ab
-        public void resetWaffen(int waffenid)
+        public void resetWaffen(Waffen waffe)
         {
             anzWaffen -= 1;
-            waffenIDs.Remove(waffenid);
+            waffen.Remove(waffe);
         }
 
-        public List<int> getList()
+        public List<Waffen> getList()
         {
-            return waffenIDs;
+            return waffen;
         }
 
         //Gibt die Anzahl der Waffen des Spielers an

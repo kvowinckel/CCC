@@ -7,24 +7,25 @@ using NOVA.Scenery;
 using NOVA;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using BEPUphysics.Constraints.SolverGroups;
 
 namespace Crazy_Castle_Crush
 {
     public class Waffen
     {
         private int lebenspunkte;
-        private RenderMaterial material;
-        private SceneObject waffe;
+        private Controller controller;
         private float schusswinkel;
         private float shootspeed;
+        private RevoluteJoint revolute;
 
-        public Waffen(SceneObject Waffe, int Lebenspunkte, String Material, float Schusswinkel, float ShootSpeed)
+        public Waffen(Controller Controller, RevoluteJoint Revolute, int Lebenspunkte, float Schusswinkel, float ShootSpeed)
         {
-            waffe = Waffe;
+            controller = Controller;
             lebenspunkte = Lebenspunkte;
             schusswinkel = Schusswinkel;
             shootspeed = ShootSpeed;
-            setMaterial(Material);
+            revolute = Revolute;
         }
 
         public void setWinkel(float Schusswinkel)
@@ -39,17 +40,17 @@ namespace Crazy_Castle_Crush
 
         public Vector3 getPosition()
         {
-            return waffe.Position;
+            return controller.Position;
         }
 
         public void setPosition(Vector3 vektor)
         {
-            waffe.MoveToPosition(vektor);
+            controller.Position = vektor;
         }
 
         public Objekte shoot()
         {
-            return Objektverwaltung.projektil(1, getSceneObject().Position, getWinkel());
+            return Objektverwaltung.projektil(1, getController().Position, getWinkel());
         }
 
         public int getLP()
@@ -57,18 +58,10 @@ namespace Crazy_Castle_Crush
             return lebenspunkte;
         }
 
-        public SceneObject getSceneObject()
+        public Controller getController()
         {
-            return waffe;
+            return controller;
         }
 
-        public void setMaterial(String bild)
-        {
-            material = new RenderMaterial();
-            material.Texture = Core.Content.Load<Texture2D>(bild);
-            material.Diffuse = Color.White.ToVector4();
-            
-            waffe.RenderMaterial = material;
-        }
     }
 }

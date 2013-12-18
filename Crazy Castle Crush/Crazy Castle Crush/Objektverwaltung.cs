@@ -7,6 +7,7 @@ using NOVA.Graphics;
 using Microsoft.Xna.Framework;
 using NOVA.UI;
 using NOVA;
+using BEPUphysics.Constraints.SolverGroups;
 
 namespace Crazy_Castle_Crush
 {
@@ -15,8 +16,6 @@ namespace Crazy_Castle_Crush
         static private Scene scene;
         static private Levels level;
         static int idnummer = 0;
-        static int waffenid = 0;
-        static int anzWaffen = 0;
 
         public static void setObjektverwaltung(Scene scene0, Levels level0)
         {
@@ -26,7 +25,7 @@ namespace Crazy_Castle_Crush
 
         private static List<Objekte> objListe = new List<Objekte>();
         private static List<SceneObject> umgebungsListe = new List<SceneObject>();
-        private static List<Waffen> waffenListe = new List<Waffen>();
+        //private static List<Waffen> waffenListe = new List<Waffen>();
 
         public static Objekte createObj(int auswahl, Spieler spieler, float xPos)
         {
@@ -74,22 +73,67 @@ namespace Crazy_Castle_Crush
             return dasobj;
         }
 
-        public static Waffen createWaffe(int auswahl, Spieler spieler, float xPos)//TODO
+        public static Waffen createWaffe(int auswahl, Spieler spieler, Vector3 posi)//TODO
         {
-            waffenid++;
-            anzWaffen++;
-            spieler.setWaffen(waffenid);    //Waffe wird Spieler zugeordnet
-            SceneObject newobj;
+            Controller newcon;
+            RevoluteJoint revolute;
             Waffen dasobj;
+            Vector3 startort = new Vector3(posi.X,posi.Y, -5f);
 
-            //if(auswahl==1){ TEMPORÄR BOX ALS WAFFE
-            newobj = buildbox(new Vector3(xPos, 2, -5f), Vector3.One);
+            if (auswahl == 1)//Kanone
+            {
+                Vector3 diff = new Vector3(0.095f, 0.1828f, 0);
+                ModelObject Kanonenrohr = new ModelObject(startort + diff, Quaternion.Identity, new Vector3(0.1f, 0.1f, 0.1f), CollisionType.ExactMesh, " ", "Kanonenrohr", 0.001f);
+                Kanonenrohr.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                scene.Add(Kanonenrohr);
+
+                ModelObject Kanonenhalterung = new ModelObject(startort, Quaternion.Identity, new Vector3(0.1f, 0.1f, 0.1f), CollisionType.ExactMesh, " ", "Kanonenhalterung", 1f);
+                Kanonenhalterung.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                scene.Add(Kanonenhalterung);
+
+                newcon = new Controller(new Vector3(0, 0, 0));// Neuer Controller an der Position 0/0/0
+                newcon.Add(Kanonenrohr);
+                newcon.Add(Kanonenhalterung);
+
+                revolute = new RevoluteJoint(Kanonenhalterung.Physics, Kanonenrohr.Physics, Kanonenhalterung.Position + new Vector3(0, 1, 0), Vector3.Backward);
+                /*revolute.Limit.IsActive = true;
+                revolute.Limit.MinimumAngle = -MathHelper.Pi;
+                revolute.Limit.MaximumAngle = 0;*/
+                scene.Physics.Add(revolute);
+
+                revolute.Motor.IsActive = true;
+                revolute.Motor.Settings.Mode = BEPUphysics.Constraints.TwoEntity.Motors.MotorMode.Servomechanism;
+                revolute.Motor.Settings.Servo.Goal = -MathHelper.Pi / 4;
+            }
+            else //TEMPORÄR
+            {
+                BoxObject Box = new BoxObject(startort, new Vector3(0.5f, 0.5f, 0.5f), 1f);
+                scene.Add(Box);
+
+                BoxObject Lat = new BoxObject(startort + new Vector3(0.25f, 0.25f, 0), new Vector3(1f, 0.2f, 0.5f), 0.5f);
+                scene.Add(Lat);
+
+                newcon = new Controller(new Vector3(0, 0, 0));
+                newcon.Add(Box);
+                newcon.Add(Lat);
+
+                revolute = new RevoluteJoint(Box.Physics, Lat.Physics, Box.Position + new Vector3(0, 1, 0), Vector3.Backward);
+                /*revolute.Limit.IsActive = true;
+                revolute.Limit.MinimumAngle = -MathHelper.Pi;
+                revolute.Limit.MaximumAngle = 0;*/
+                scene.Physics.Add(revolute);
+
+                revolute.Motor.IsActive = true;
+                revolute.Motor.Settings.Mode = BEPUphysics.Constraints.TwoEntity.Motors.MotorMode.Servomechanism;
+                revolute.Motor.Settings.Servo.Goal = -MathHelper.Pi / 4;
+            }
 
             //TODO z-Achse sperren
-            newobj.Tag = waffenid;
-            scene.Add(newobj);
-            dasobj = new Waffen(newobj, 1, "MStein", (float)Math.PI / 4, 5f);
-            waffenListe.Add(dasobj);
+
+            
+            scene.Add(newcon);
+            dasobj = new Waffen(newcon, revolute, 1, (float)Math.PI / 4, 5f);
+            spieler.setWaffen(dasobj);
             return dasobj;
 
         }
@@ -97,18 +141,7 @@ namespace Crazy_Castle_Crush
         public static Waffen getWaffe(Spieler spieler, int firedwappons)
         {
             //firedwappons = 0 ==> erste Waffe
-            int[] waffenids = spieler.getList().ToArray();
-            int Waffenid = waffenids[firedwappons];
-
-            foreach (Waffen w in waffenListe)
-            {
-                if (w.getSceneObject().Tag.Equals(Waffenid))
-                {
-                    return w;
-                }
-            }
-
-            return null;
+            return spieler.getList()[firedwappons];           
         }
 
         public static Objekte projektil(int id, Vector3 startpos, float winkel) //TODO
@@ -205,30 +238,24 @@ namespace Crazy_Castle_Crush
 
             objListe.RemoveAll(x => x.getLP() <= 0); //Löscht Objekte aus Liste
 
-            foreach (Waffen temp in waffenListe)
+            foreach (Waffen temp in spieler1.getList())
             {
                 if (temp.getLP() <= 0)
                 {
-                    scene.Remove(temp.getSceneObject());
-                    anzWaffen--;
-                    foreach (int ids in spieler1.getList())
-                    {
-                        if (temp.getSceneObject().Tag.Equals(ids))
-                        {
-                            spieler1.resetWaffen(ids);
-                        }
-                    }
-                    foreach (int ids in spieler2.getList())
-                    {
-                        if (temp.getSceneObject().Tag.Equals(ids))
-                        {
-                            spieler2.resetWaffen(ids);
-                        }
-                    }
-
+                    scene.Remove(temp.getController());
+                    spieler1.resetWaffen(temp);
                 }
             }
-            waffenListe.RemoveAll(x => x.getLP() <= 0);
+
+            foreach (Waffen temp in spieler2.getList())
+            {
+                if (temp.getLP() <= 0)
+                {
+                    scene.Remove(temp.getController());
+                    spieler2.resetWaffen(temp);
+                }
+            }
+           
         }
 
         public static void addToUmgebungsListe(SceneObject obj)
