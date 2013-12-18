@@ -180,7 +180,7 @@ namespace Crazy_Castle_Crush
                 revolute.Limit.MinimumAngle = -MathHelper.Pi;
                 revolute.Limit.MaximumAngle = 0;*/
 
-                ModelObject Welt = new ModelObject(new Vector3(0, -1.5f, -5f), Quaternion.CreateFromYawPitchRoll(0, -1.57f, 0), new Vector3(1, 1, 1), CollisionType.ExactMesh, " ", "Weltneu", 0f);
+                ModelObject Welt = new ModelObject(new Vector3(0, -1.5f, -5f), Quaternion.CreateFromYawPitchRoll(0, -1.57f, 0), new Vector3(1, 1, 1), CollisionType.ExactMesh, " ", "Welt_xna", 0f);
                 Welt.PhysicsMaterial.Bounciness = 0.2f;
                 Welt.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 scene.Add(Welt);
