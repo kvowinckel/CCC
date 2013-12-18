@@ -29,7 +29,7 @@ namespace Crazy_Castle_Crush
             gruen.Diffuse = Color.Green.ToVector4();
 
 
-            BoxObject rightHand = new BoxObject(new Vector3(0, 0, 0), new Vector3(0.5f, 0.5f, 0f), 0f);
+            BoxObject rightHand = new BoxObject(new Vector3(0, 0, 0), new Vector3(0.1f, 0.1f, 0f), 0f);
             rightHand.RenderMaterial = gruen;
             rightHand.RenderMaterial.Transparency = 0.3f;
             
@@ -44,7 +44,7 @@ namespace Crazy_Castle_Crush
             RenderMaterial rot = new RenderMaterial();
             rot.Diffuse = Color.Red.ToVector4();
 
-            BoxObject leftHand = new BoxObject(new Vector3(0, 0, 0), new Vector3(0.5f, 0.5f, 0f), 0f);
+            BoxObject leftHand = new BoxObject(new Vector3(0, 0, 0), new Vector3(0.1f, 0.1f, 0f), 0f);
             leftHand.RenderMaterial = rot;
             leftHand.RenderMaterial.Transparency = 0.3f;
 
@@ -154,32 +154,10 @@ namespace Crazy_Castle_Crush
             }
         }
          
-
-
-
         public void LoadStartObjects(int level)
         {
             if (level == 1)
             {
-                //Lädt Spieluntergrund
-                /*ModelObject Kanonenrohr = new ModelObject(new Vector3(0, -1.5f, -5), Quaternion.Identity, new Vector3(1, 1, 1), CollisionType.ExactMesh, " ", "Kanonenrohr", 1f);
-                Kanonenrohr.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
-                scene.Add(Kanonenrohr);                
-                ModelObject Kanonenhalterung = new ModelObject(new Vector3(0 + 0.0231f, -1.5f - 0.57428f, -6.37743f), Quaternion.Identity, new Vector3(1, 1, 1), CollisionType.ExactMesh, " ", "Kanonenhalterung", 1f);
-                Kanonenhalterung.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
-                scene.Add(Kanonenhalterung);
-
-                // Neuer Controller an der Position 0/0/0
-                Controller Kanone = new Controller(new Vector3(0, 0, 0));
-                scene.Add(Kanone);
-                Kanone.Add(Kanonenrohr);
-                Kanone.Add(Kanonenhalterung);
-
-                RevoluteJoint revolute = new RevoluteJoint(Kanonenhalterung.Physics, Kanonenrohr.Physics, new Vector3(-1.0941f, 0.5789f, -1.3587f), Vector3.Right);
-                revolute.Limit.IsActive = true;
-                revolute.Limit.MinimumAngle = -MathHelper.Pi;
-                revolute.Limit.MaximumAngle = 0;*/
-
                 ModelObject Welt = new ModelObject(new Vector3(0, -1.5f, -5f), Quaternion.CreateFromYawPitchRoll(0, -1.57f, 0), new Vector3(1, 1, 1), CollisionType.ExactMesh, " ", "Welt_xna", 0f);
                 Welt.PhysicsMaterial.Bounciness = 0.2f;
                 Welt.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);

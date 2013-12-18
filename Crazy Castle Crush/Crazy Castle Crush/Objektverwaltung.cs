@@ -83,11 +83,12 @@ namespace Crazy_Castle_Crush
             //if (auswahl == 1)
             { //Kanone
 
-                ModelObject Kanonenrohr = new ModelObject(startort + new Vector3(0.95f, 1.828f, 0), Quaternion.Identity, new Vector3(1, 1, 1), CollisionType.ExactMesh, " ", "Kanonenrohr", 0.001f);
+                Vector3 diff = new Vector3(0.095f, 0.1828f, 0);
+                ModelObject Kanonenrohr = new ModelObject(startort + diff, Quaternion.Identity, new Vector3(0.1f, 0.1f, 0.1f), CollisionType.ExactMesh, " ", "Kanonenrohr", 0.001f);
                 Kanonenrohr.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 scene.Add(Kanonenrohr);
 
-                ModelObject Kanonenhalterung = new ModelObject(startort, Quaternion.Identity, new Vector3(1, 1, 1), CollisionType.ExactMesh, " ", "Kanonenhalterung", 1f);
+                ModelObject Kanonenhalterung = new ModelObject(startort, Quaternion.Identity, new Vector3(0.1f, 0.1f, 0.1f), CollisionType.ExactMesh, " ", "Kanonenhalterung", 1f);
                 Kanonenhalterung.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 scene.Add(Kanonenhalterung);
 

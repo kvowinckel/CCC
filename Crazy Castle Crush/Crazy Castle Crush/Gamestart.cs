@@ -718,7 +718,7 @@ namespace Crazy_Castle_Crush
                                 screenPos.Y *= Scene.Game.Window.ClientBounds.Height;
 
                                 //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
-                                Plane plane2 = new Plane(Vector3.Forward, -4f);
+                                Plane plane2 = new Plane(Vector3.Forward, -1f);
 
                                 //Weltkoordinatenpunk finden
                                 Vector3 worldPos2 = Helpers.Unproject(screenPos, plane2);
