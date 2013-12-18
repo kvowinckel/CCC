@@ -45,12 +45,15 @@ namespace Crazy_Castle_Crush
         BoxObject leftHand;
         BoxObject auswahlanzeige;                           //zur Auswahl von Objekten 
         BoxObject objWafC;                                  //Objekt zum wechseln zwischen Waffen und Objekten
-        bool aktuellWaffe;                                  //Gibt an ob gerade die Waffen angezeigt werden sollen
+        bool showWaffe;                                  //Gibt an ob gerade die Waffen angezeigt werden sollen
         int auswahl;                                        //je nach Position der linken Hand erhält die Auswahl ihre Werte (für Objekt und Texturauswahl)
         bool klick;                                         //Wenn Spieler quasi klickt (noch Leertaste)
-        bool klick2;                                        //Hilfsvariable
+        bool shoot;                                         //Wenn Spieler schießt (noch S)
+        bool getObj;                                        //True wenn die Objektauswahl bestätigt wird
         bool objInHand;                                     //solange das Objekt an der Hand ist
         Objekte aktuellesObj;                               //Objekt das gerade bearbeitet wird
+        Waffen aktuelleWaffe;                                //Waffe die gerade bedient wird
+
 
         //Benötigt für die einblendung von Auswahlmenu
         States objState = States.Start;
@@ -60,12 +63,13 @@ namespace Crazy_Castle_Crush
         //Erstellt zwei Spieler und das erste Level
         Spieler spieler1 = new Spieler();
         Spieler spieler2 = new Spieler();
+        Spieler gamer;                                      //Zum zwischenspeichern des aktuellen Spielers
         Levels level = new Levels();
 
         //Initiallisiert die Klassen
         CameraMovement cameraMovement;
         StartObjects startObjects;
-        Objektverwaltung objektverwaltung;
+        
 
         #endregion
 
@@ -87,7 +91,7 @@ namespace Crazy_Castle_Crush
 
             //Objecte
             startObjects = new StartObjects(Scene, level);
-            objektverwaltung = new Objektverwaltung(Scene);
+            Objektverwaltung.setObjektverwaltung(Scene,level);
 
 
 
@@ -204,107 +208,188 @@ namespace Crazy_Castle_Crush
 
                 #endregion
 
-                #region Bauphase1 Objekte
-                //Bauphase, Spiele 1, Objekte erstellen
+                #region Objektemenüs
+                case States.Bauphase2O:
                 case States.Bauphase1O:
                     aktuallisiereZeit(gameTime);
                     detecting = true;               //Kinect aktiv
+                    float pos;
 
-                    #region Objekt erzeugen und mit Hand positionieren
-                    if (klick && objInHand == false && auswahl!=0 && auswahl < 5) //"klick" und das Objekt wurde noch nicht erstellt und linke hand befindet sich auf auswahlfeld
+                    #region Spieler &  Spielerposition
+                    if (currentState == States.Bauphase1O)
                     {
-                        aktuellesObj = objektverwaltung.createObj(auswahl, spieler1); //aktuelles Objekt wird erzeugt
-                        objInHand = true;                          //soll jetzt der Hand folgen
-                        klick = false;
+                        gamer = spieler1;
+                        pos = level.getSpieler1Pos();
                     }
-                    if (objInHand)
+                    else
                     {
-                        Vector3 rH = new Vector3(rightHand.Position.X, rightHand.Position.Y, -5f); //Handvektor ohne Tiefenveränderung
-                        aktuellesObj.setPosition(rH);                 //Objektposition wird auf Handgelegt
-                        rightHand.Visible = false;                  //Anzeige der rechten Hand deaktiviert
-                    }
-                    if (klick && objInHand == true)                //wenn sich ein Objekt in der Hand befindet und erneut geklickt wird
-                    {
-                        aktuellesObj.setMasse(1f);             //Objekt bekommt Masse
-                        objInHand = false;                          //Bekommt nicht mehr die Posiotion der hand -> fällt
-                        rightHand.Visible = true;                   //Rechte Hand wird wieder angezeigt
-                        klick = false;
-                        prewState = States.Bauphase1O;              //Statewechsel
-                        currentState = States.Bauphase1T;
+                        gamer = spieler2;
+                        pos = level.getSpieler2Pos();
                     }
                     #endregion
 
-                    #region Wechsel von der Objekt zur Waffenauswahl
-                    if (klick && objInHand == false && auswahl == 5 && aktuellWaffe == false) //"klick" und das Objekt wurde noch nicht erstellt und linke hand befindet sich auf auswahlfeld
+                    #region Objekt erzeugen und mit Hand positionieren
+                    if (!showWaffe)
                     {
-                        aktuellWaffe = true;
+                        if (getObj && objInHand == false && auswahl != 0 && auswahl < 5)    //"klick" und das Objekt wurde noch nicht erstellt und linke hand befindet sich auf auswahlfeld
+                        {
+                            objInHand = true;                                               //soll jetzt der Hand folgen
+                            aktuellesObj = Objektverwaltung.createObj(auswahl, gamer, pos); //aktuelles Objekt wird erzeugt
+                        }
+
+                        if (objInHand)//Ausrichten des Obj
+                        {
+                            Vector3 rH = new Vector3(rightHand.Position.X, rightHand.Position.Y, -5f); //Handvektor ohne Tiefenveränderung
+                            aktuellesObj.setPosition(rH);                 //Objektposition wird auf Handgelegt
+
+                            Objektverwaltung.orientObj(aktuellesObj, leftHand.Position.X, leftHand.Position.Y);
+
+                            rightHand.Visible = false;                  //Anzeige der rechten Hand deaktiviert
+                        }
+
+                        if (klick && objInHand == true)                //wenn sich ein Objekt in der Hand befindet und erneut geklickt wird
+                        {
+                            rightHand.Visible = true;                   //Rechte Hand wird wieder angezeigt
+                            klick = false;
+                            objInHand = false;                          //Bekommt nicht mehr die Posiotion der hand -> fällt
+
+                            if (currentState == States.Bauphase1O)
+                            {
+                                prewState = States.Bauphase1O;              //Statewechsel
+                                currentState = States.Bauphase1T;
+                            }
+                            else
+                            {
+                                prewState = States.Bauphase2O;
+                                currentState = States.Bauphase2T;
+                            }
+                        }
                     }
-                    else if (klick && objInHand == false && auswahl == 5 && aktuellWaffe)
+                    #endregion
+
+                    #region Waffe erzeugen und mit Hand positionieren
+                    if (showWaffe)
                     {
-                        aktuellWaffe = false;
+                        if (getObj && objInHand == false && auswahl != 0 && auswahl < 5)    //"klick" und die Waffe wurde noch nicht erstellt und linke hand befindet sich auf auswahlfeld
+                        {
+                            objInHand = true;                                                   //soll jetzt der Hand folgen
+                            aktuelleWaffe = Objektverwaltung.createWaffe(auswahl, gamer, pos);  //aktuelles Objekt wird erzeugt
+                        }
+
+                        if (objInHand && showWaffe == false)            //Ausrichten der Waffe
+                        {
+                            Vector3 rH = new Vector3(rightHand.Position.X, rightHand.Position.Y, -5f); //Handvektor ohne Tiefenveränderung
+                            aktuelleWaffe.setPosition(rH);              //Waffenposition wird auf Handgelegt
+
+                            rightHand.Visible = false;                  //Anzeige der rechten Hand deaktiviert
+                        }
+
+                        if (klick && objInHand)                         //wenn sich ein Objekt in der Hand befindet und erneut geklickt wird
+                        {
+                            rightHand.Visible = true;                   //Rechte Hand wird wieder angezeigt
+                            klick = false;
+                            objInHand = false;
+                        }
+
+                    }
+                    
+                    #endregion
+
+                    #region Wechsel von der Objekt zur Waffenauswahl
+                    if (objInHand == false && auswahl == 5 && showWaffe == false) //"klick" und das Objekt wurde noch nicht erstellt und linke hand befindet sich auf auswahlfeld
+                    {
+                        showWaffe = true;
+                    }
+                    else if (klick && objInHand == false && auswahl == 5 && showWaffe)
+                    {
+                        showWaffe = false;
                     }
                     #endregion
                     
                     #region Übergangsbedingungen
-                    //wenn Spieler1 nicht mehr ausreichend Geld hat oder auf weiter geklickt hat...
-                    //Klick auf weiter handelt die HandleInput Fkt ab
-                    if (spieler1.getMoney() <= level.getMinMoney() && currentState == States.Bauphase1O && objInHand == false/* || Klick auf weiter*/)
+                    //Wenn Spieler nicht ausreichend Geld hat (oder auf weiter Klickt => in Kinect realisiert)
+                    if (gamer.getMoney() < level.getMinMoney() && objInHand == false)
                     {
-                        //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
                         PosX1 = Scene.Camera.Position.X;
                         Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
                         aktuallisiereZeit(gameTime);
 
-                        prewState = States.Bauphase1O;
-
-                        //wenn Spieler2 über genügend Geld zum bauen verfügt, Bauphase Spieler 2
-                        //Wenn Spieler2 mehr Geld besitzt fängt er die Schussphase2 an
-                        if (spieler2.getMoney() >= level.getMinMoney() || spieler2.getMoney() > spieler1.getMoney())
+                        if (currentState == States.Bauphase1O)
                         {
-                            currentState = States.Camto2;
+                            prewState = States.Bauphase1O;
+                            if (spieler2.getMoney() < level.getMinMoney() && spieler2.getMoney() < spieler1.getMoney())
+                            {
+                                currentState = States.Schussphase1;
+                            }
+                            else
+                            {
+                                currentState = States.Camto2;
+                            }
                         }
-                        //wenn Spieler2 nicht über genügend Geld zum bauen verfügt, und Spieler1 mehr Geld hat beginnt Schussphase1
-                        else
+                        else //Bauphase2O
                         {
-                            currentState = States.Schussphase1;
+                            prewState = States.Bauphase2O;
+                            if (spieler1.getMoney() < spieler2.getMoney())
+                            {
+                                currentState = States.Schussphase2;
+                            }
+                            else
+                            {
+                                currentState = States.Camto1;
+                            }
                         }
-                        
                     }
-                    //Wird ein Objekt erstellt, wird in den Bauphase1T State gewechselt
                     #endregion
-
+                    
                     break;
 
                 #endregion
 
-                #region Bauphase1 Texturen
+                #region Texturenmenüs
                 //Bauphase, Spiele 1, Objekte erstellen
                 case States.Bauphase1T:
+                case States.Bauphase2T:
                     aktuallisiereZeit(gameTime);
+                    Objektverwaltung.firstMaterial(aktuellesObj, auswahl);
 
-                    objektverwaltung.firstMaterial(aktuellesObj, auswahl);
+                    if (currentState == States.Bauphase1T)
+                    {
+                        gamer = spieler1;
+                    }
+                    else 
+                    {
+                        gamer = spieler2;
+                    }
 
                     if (klick) //Übergang wird mit klick erzeugt
                     {
                         #region Kosten dem Spieler abziehen
-                        if (auswahl == 1)
+                        if (aktuellesObj.getMaterial() == "MHolz")
                         { } //kostenlos
-                        else if (auswahl == 2)
+                        else if (aktuellesObj.getMaterial() == "MStein")
                         {
-                            spieler1.setMoney(spieler1.getMoney() - 50);
+                            gamer.setMoney(spieler1.getMoney() - 50);
                         }
                         else if (auswahl == 3)
                         {
-                            spieler1.setMoney(spieler1.getMoney() - 100);
+                            gamer.setMoney(spieler1.getMoney() - 100);
                         }
                         else if (auswahl == 4)
                         {
-                            spieler1.setMoney(spieler1.getMoney() - 200);
+                            gamer.setMoney(spieler1.getMoney() - 200);
                         }
                         #endregion
 
-                        prewState = States.Bauphase1T;
-                        currentState = States.Bauphase1O;
+                        if (currentState == States.Bauphase1T)
+                        {
+                            prewState = States.Bauphase1T;
+                            currentState = States.Bauphase1O;
+                        }
+                        else
+                        {
+                            prewState = States.Bauphase2T;
+                            currentState = States.Bauphase2O;
+                        }
                     }
                     break;
 
@@ -344,7 +429,7 @@ namespace Crazy_Castle_Crush
                             else if (spieler2.getMoney() > spieler1.getMoney())
                             {
                                 prewState = States.Camto2;
-                                currentState = States.Bauphase2O;
+                                currentState = States.Schussphase2;
                             }
                         }
                         //Wenn wir aus der Schussphase1 kommen, muss Schussphase 2 starten 
@@ -361,149 +446,96 @@ namespace Crazy_Castle_Crush
 
                 #endregion
 
-                #region Bauphase2 Objekte
-                //Bauphase, Spiele 1, Objekte erstellen
-                case States.Bauphase2O:
-                    aktuallisiereZeit(gameTime);
-                    detecting = true;                       //Kinect aktiv
 
 
 
-                    //noch leer
-
-
-
-
-                    #region Übergangsbedingungen
-                    //wenn Spieler2 nicht mehr ausreichend Geld hat oder auf weiter geklickt hat...
-                    //Klick auf weiter handelt die HandleInput Fkt ab
-                    if (spieler1.getMoney() <= level.getMinMoney() && currentState == States.Bauphase2O && objInHand == false/* || Klick auf weiter*/)
-                    {
-                        //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
-                        PosX1 = Scene.Camera.Position.X;
-                        Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
-                        aktuallisiereZeit(gameTime);
-
-                        prewState = States.Bauphase2O;
-                        
-
-                        //Wenn Spieler2 mehr Geld besitzt fängt er die Schussphase2 an
-                        if (spieler2.getMoney() > spieler1.getMoney())
-                        {
-                            currentState = States.Schussphase2;
-                        }
-                        //sonst Spieler 1
-                        else
-                        {
-                            currentState = States.Camto1;
-                        }
-                    }
-                    //Wird ein Objekt erstellt, wird in den Bauphase2T State gewechselt: Eventhandler wickelt dies ab!
-                    #endregion
-
-
-
-                    break;
-
-                #endregion
-
-                #region Bauphase2 Texturen
-                //Bauphase, Spiele 1, Objekte erstellen
-                case States.Bauphase2T:
-                    aktuallisiereZeit(gameTime);
-                    //noch leer
-
-
-
-
-                    //Übergang wird mit neuer Texture erzeugt
-
-
-
-                    break;
-
-                #endregion
-
-                #region Schussphase1
-                //Schussphase des ersten Spielers
+                #region Schussphasen
+                //Schussphasen
+                case States.Schussphase2:
                 case States.Schussphase1:
                     aktuallisiereZeit(gameTime);
                     detecting = true;               //Kinect aktiv
+                    int xR;
 
-                    //noch leer
-                    
-
-                    //firedWaffen += 1;                       //es wurde eine Weitere Waffe abgefeuert
-
-
-
-                    #region Übergangsbedingungen
-                    //Wenn alle Waffen abgefeuert wurden...
-                    if (firedWaffen == spieler2.getWaffen())
+                    if (currentState == States.Schussphase1)
                     {
-                        //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
-                        PosX1 = Scene.Camera.Position.X;
-                        Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
-                        aktuallisiereZeit(gameTime);
+                        gamer = spieler1;
+                        xR = 1;
+                    }
+                    else
+                    {
+                        gamer = spieler2;
+                        xR = -1;
+                    }
 
-                        prewState = States.Schussphase1;
+                    if (gamer.getWaffen() != 0)
+                    {
+                        aktuelleWaffe = Objektverwaltung.getWaffe(gamer, firedWaffen);
+
+
+
+                        aktuelleWaffe.setWinkel(0.75f /*TODO Winkel durch Handbewegung einstellen*/);
+
+                        if (shoot && objInHand==false)
+                        {
+                            aktuellesObj = aktuelleWaffe.shoot();
+                            objInHand = true;
+                        }
+
+                        if (objInHand)
+                        {
+                            float x = (float)Math.Cos(aktuelleWaffe.getWinkel()) * xR;
+                            float y = (float)Math.Sin(aktuelleWaffe.getWinkel());
+                            float scale = 1;
+                            //aktuellesObj.getSceneObject().Physics.AngularVelocity = new Vector3(x, y, -5.0f);
+                            var direction =  new Vector3(x,y, 0);
+                            direction = direction * scale;
+                            aktuellesObj.getSceneObject().Physics.ApplyLinearImpulse(ref direction);
+                        }
                         
-
-                        //Wenn die Schussphase durch ist, beginnt die Bauphase
-                        if (schussphasenDurch)
-                        {
-                            schussphasenDurch = false;
-                            currentState = States.Bauphase1O;
-                        }
-                        //Ist die Schussphase nicht durch, gehen wir in Schussphase 2
-                        else
-                        {
-                            schussphasenDurch = true;           //nach der Schussphase2 ist die Schussphase beendet
-                            currentState = States.Camto2;
-                        }
                     }
-
-                    #endregion
-
-
-                    break;
-
-                #endregion
-
-                #region Schussphase2
-                //Schussphase des zweiten Spielers
-                case States.Schussphase2:
-                    aktuallisiereZeit(gameTime);
-                    detecting = true;               //Kinect aktiv
-                    //noch leer
-
-
-                    //firedWaffen += 1;                       //es wurde eine Weitere Waffe abgefeuert
-
-
 
                     #region Übergangsbedingungen
                     //Wenn alle Waffen abgefeuert wurden...
-                    if (firedWaffen == spieler2.getWaffen())
+                    if (firedWaffen == gamer.getWaffen())
                     {
                         //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
                         PosX1 = Scene.Camera.Position.X;
                         Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
                         aktuallisiereZeit(gameTime);
 
-                        prewState = States.Schussphase2;
-
                         //Wenn die Schussphase durch ist, beginnt die Bauphase
                         if (schussphasenDurch)
                         {
-                            schussphasenDurch = false;
-                            currentState = States.Camto1;
+                            if (currentState == States.Schussphase1)
+                            {
+                                prewState = States.Schussphase1;
+                                schussphasenDurch = false;
+                                currentState = States.Bauphase1O;
+                            }
+                            else
+                            {
+                                prewState = States.Schussphase2;
+                                schussphasenDurch = false;
+                                currentState = States.Camto1;
+                            }
                         }
-                        //Ist die Schussphase nicht durch, gehen wir in Schussphase 1
+
+                        //Sonst in die andere Schussphase wechseln
                         else
                         {
-                            schussphasenDurch = true;           //nach der Schussphase1 ist die Schussphase beendet
-                            currentState = States.Camto1;
+                            if (currentState == States.Schussphase1)
+                            {
+                                prewState = States.Schussphase1;
+                                schussphasenDurch = true;           //nach der Schussphase2 ist die Schussphase beendet
+                                currentState = States.Camto2;
+                            }
+                            else
+                            {
+                                prewState = States.Schussphase2;
+                                schussphasenDurch = true;           //nach der Schussphase1 ist die Schussphase beendet
+                                currentState = States.Camto1;
+                            }
                         }
                     }
 
@@ -513,6 +545,7 @@ namespace Crazy_Castle_Crush
                     break;
 
                 #endregion
+
 
                 #region End
                 //Ende des Spiels
@@ -527,7 +560,9 @@ namespace Crazy_Castle_Crush
 
                 #endregion
 
+                
             }
+
 
 
 
@@ -536,7 +571,7 @@ namespace Crazy_Castle_Crush
             {
                 if (currentState == States.Bauphase1O)
                 {
-                    if (aktuellWaffe)
+                    if (showWaffe)
                     {
                         startObjects.einausblender(auswahlanzeige, objWafC, 11, zeit);
                     }
@@ -547,12 +582,12 @@ namespace Crazy_Castle_Crush
                 }
                 else if (currentState == States.Bauphase1T)
                 {
-                    aktuellWaffe = false;
+                    showWaffe = false;
                     startObjects.einausblender(auswahlanzeige, objWafC, 12, zeit);
                 }
                 else if (currentState == States.Bauphase2O)
                 {
-                    if (aktuellWaffe)
+                    if (showWaffe)
                     {
                         startObjects.einausblender(auswahlanzeige, objWafC, 21, zeit);
                     }
@@ -563,7 +598,7 @@ namespace Crazy_Castle_Crush
                 }
                 else if (currentState == States.Bauphase2T)
                 {
-                    aktuellWaffe = false;
+                    showWaffe = false;
                     startObjects.einausblender(auswahlanzeige, objWafC, 22, zeit);
                 }
                 else
@@ -610,9 +645,17 @@ namespace Crazy_Castle_Crush
                                 rightHand.Position = worldPos2;
                                 #endregion
 
+                                #region getObj
+                                if (normScreenPos.X >= 0.2f && normScreenPos.X <= 0.8f && normScreenPos.Y <= 0.1f)
+                                {
+                                    getObj = true;
+                                }
+                                else {getObj = false; }
+                                #endregion
+
                                 #region WEITER klick
                                 //Wenn sich die rechte Hand in der oberen, rechten Ecke befindet & KLICK -> Klick auf WEITER
-                                if (normScreenPos.X >= 0.9f && normScreenPos.Y >= 0.9f && klick)
+                                if (normScreenPos.X >= 0.9f && normScreenPos.Y >= 0.9f)
                                 {
                                     //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
                                     PosX1 = Scene.Camera.Position.X;
@@ -659,6 +702,8 @@ namespace Crazy_Castle_Crush
                                 }
                                 #endregion
 
+                                
+
                             }
                             #endregion
 
@@ -692,15 +737,19 @@ namespace Crazy_Castle_Crush
 
                             //Hintergrundsbild verschieben
                             #region Detektion des Kopfes
-
                             if (skeleton.Joints[JointType.Head].TrackingState == JointTrackingState.Tracked)
                             {
                                 //Position des Kopfes des Spielers in Bildschirmkoodinaten
                                 Vector2 screenPos = skeleton.Joints[JointType.Head].ScreenPosition;
                                 Vector2 normScreenPos = new Vector2(screenPos.X, screenPos.Y);
 
+                                //Hintergrund bewegen
                                 startObjects.MoveBackground(normScreenPos.X - 0.5f, normScreenPos.Y - 0.5f);
+                                
+
+
                             }
+                            
                             #endregion
 
                         }
@@ -718,7 +767,10 @@ namespace Crazy_Castle_Crush
 
             objState = currentState; //Am Ende jenden Updates wird der State angeglichen
 
+            Objektverwaltung.refreshObj(spieler1,spieler2); //Entfernt Objekte ohne LP
+         
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
+      
         }
 
 
@@ -739,10 +791,15 @@ namespace Crazy_Castle_Crush
             #endregion
 
             #region Wenn Spieler eine Waffe abgefeuert hat (Hier noch mit S realisiert)
-            if (input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.S, PlayerIndex.One))
+            if (input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.S, PlayerIndex.One))
             {
-                firedWaffen = 1;
+                shoot=true;
             }
+            else
+            {
+                shoot = false;
+            }
+
             #endregion
 
 
@@ -760,13 +817,14 @@ namespace Crazy_Castle_Crush
         {
             #region State Anzeige
             string wobinich = "";
+           
             if (currentState == States.Bauphase1O)
             {
                 wobinich = "Bau1 Obj"+ auswahl;
             }
             else if (currentState == States.Bauphase1T)
             {
-                wobinich = "Bau1 Tex"+ auswahl;
+                wobinich = "Bau1 Tex" + auswahl + aktuellesObj.getMaterial();
             }
             else if (currentState == States.Bauphase2O)
             {
@@ -811,11 +869,11 @@ namespace Crazy_Castle_Crush
             #region Geldanzeige
             if (currentState == States.Bauphase1O || currentState == States.Bauphase1T || currentState == States.Schussphase1)
             {
-                objektverwaltung.Geldanzeige(spieler1);  //Blendet die Geldbetrag des Spielers ein
+                Objektverwaltung.Geldanzeige(spieler1);  //Blendet die Geldbetrag des Spielers ein
             }
             if (currentState == States.Bauphase2O || currentState == States.Bauphase2T || currentState == States.Schussphase2)
             {
-                objektverwaltung.Geldanzeige(spieler2); //Blendet die Geldbetrag des Spielers ein
+                Objektverwaltung.Geldanzeige(spieler2); //Blendet die Geldbetrag des Spielers ein
             }
             #endregion
 

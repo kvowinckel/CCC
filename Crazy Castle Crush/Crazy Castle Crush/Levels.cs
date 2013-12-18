@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Crazy_Castle_Crush
 {
-    class Levels
+    public class Levels
     {
         private int levelnr = 1;            //Das erste Level
         private float Sp1Pos = -20;         //Position Sp1 im ersten Level

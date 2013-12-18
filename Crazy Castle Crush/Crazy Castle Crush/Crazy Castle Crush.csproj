@@ -126,6 +126,7 @@
     <Compile Include="CCCGame.cs" />
     <Compile Include="Spieler.cs" />
     <Compile Include="StartObjects.cs" />
+    <Compile Include="Waffen.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
