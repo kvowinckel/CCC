@@ -44,11 +44,13 @@ namespace Crazy_Castle_Crush
         BoxObject rightHand;
         BoxObject leftHand;
         BoxObject auswahlanzeige;                           //zur Auswahl von Objekten 
+        BoxObject objWafC;                                  //Objekt zum wechseln zwischen Waffen und Objekten
+        bool aktuellWaffe;                                  //Gibt an ob gerade die Waffen angezeigt werden sollen
         int auswahl;                                        //je nach Position der linken Hand erhält die Auswahl ihre Werte (für Objekt und Texturauswahl)
         bool klick;                                         //Wenn Spieler quasi klickt (noch Leertaste)
         bool klick2;                                        //Hilfsvariable
         bool objInHand;                                     //solange das Objekt an der Hand ist
-        SceneObject aktuellesObj;                             //Objekt das gerade bearbeitet wird
+        Objekte aktuellesObj;                               //Objekt das gerade bearbeitet wird
 
         //Benötigt für die einblendung von Auswahlmenu
         States objState = States.Start;
@@ -63,7 +65,7 @@ namespace Crazy_Castle_Crush
         //Initiallisiert die Klassen
         CameraMovement cameraMovement;
         StartObjects startObjects;
-        Objekte objekte;
+        Objektverwaltung objektverwaltung;
 
         #endregion
 
@@ -85,7 +87,7 @@ namespace Crazy_Castle_Crush
 
             //Objecte
             startObjects = new StartObjects(Scene, level);
-            objekte = new Objekte(Scene);
+            objektverwaltung = new Objektverwaltung(Scene);
 
 
 
@@ -124,6 +126,7 @@ namespace Crazy_Castle_Crush
 
                     //Zeigt das Baumenü mit den Objekten und Texturen die der Spieler wählen kann, benötigt Name des Bildes
                     auswahlanzeige = startObjects.showObjects("Bau");
+                    objWafC = startObjects.LoadObjWafC();
 
                     //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt
                     PosX1 = Scene.Camera.Position.X;
@@ -207,24 +210,45 @@ namespace Crazy_Castle_Crush
                     aktuallisiereZeit(gameTime);
                     detecting = true;               //Kinect aktiv
 
-                    if (klick && objInHand == false && auswahl!=0)
+                    #region Objekt erzeugen und mit Hand positionieren
+                    if (klick && objInHand == false && auswahl!=0 && auswahl < 5) //"klick" und das Objekt wurde noch nicht erstellt und linke hand befindet sich auf auswahlfeld
                     {
-                        aktuellesObj = objekte.createObj(auswahl);
-                        objInHand = true;
+                        aktuellesObj = objektverwaltung.createObj(auswahl, spieler1); //aktuelles Objekt wird erzeugt
+                        objInHand = true;                          //soll jetzt der Hand folgen
+                        klick = false;
                     }
                     if (objInHand)
                     {
-                        aktuellesObj.Position = rightHand.Position;
+                        Vector3 rH = new Vector3(rightHand.Position.X, rightHand.Position.Y, -5f); //Handvektor ohne Tiefenveränderung
+                        aktuellesObj.setPosition(rH);                 //Objektposition wird auf Handgelegt
+                        rightHand.Visible = false;                  //Anzeige der rechten Hand deaktiviert
                     }
-                    if (klick2 && objInHand == true)
+                    if (klick && objInHand == true)                //wenn sich ein Objekt in der Hand befindet und erneut geklickt wird
                     {
-                        objInHand = false;
+                        aktuellesObj.setMasse(1f);             //Objekt bekommt Masse
+                        objInHand = false;                          //Bekommt nicht mehr die Posiotion der hand -> fällt
+                        rightHand.Visible = true;                   //Rechte Hand wird wieder angezeigt
+                        klick = false;
+                        prewState = States.Bauphase1O;              //Statewechsel
+                        currentState = States.Bauphase1T;
                     }
+                    #endregion
+
+                    #region Wechsel von der Objekt zur Waffenauswahl
+                    if (klick && objInHand == false && auswahl == 5 && aktuellWaffe == false) //"klick" und das Objekt wurde noch nicht erstellt und linke hand befindet sich auf auswahlfeld
+                    {
+                        aktuellWaffe = true;
+                    }
+                    else if (klick && objInHand == false && auswahl == 5 && aktuellWaffe)
+                    {
+                        aktuellWaffe = false;
+                    }
+                    #endregion
                     
                     #region Übergangsbedingungen
                     //wenn Spieler1 nicht mehr ausreichend Geld hat oder auf weiter geklickt hat...
                     //Klick auf weiter handelt die HandleInput Fkt ab
-                    if (spieler1.getMoney() <= level.getMinMoney()/* || Klick auf weiter*/)
+                    if (spieler1.getMoney() <= level.getMinMoney() && currentState == States.Bauphase1O && objInHand == false/* || Klick auf weiter*/)
                     {
                         //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
                         PosX1 = Scene.Camera.Position.X;
@@ -246,7 +270,7 @@ namespace Crazy_Castle_Crush
                         }
                         
                     }
-                    //Wird ein Objekt erstellt, wird in den Bauphase1T State gewechselt: Eventhandler wickelt dies ab!
+                    //Wird ein Objekt erstellt, wird in den Bauphase1T State gewechselt
                     #endregion
 
                     break;
@@ -258,14 +282,30 @@ namespace Crazy_Castle_Crush
                 case States.Bauphase1T:
                     aktuallisiereZeit(gameTime);
 
-                
-                
-                    //noch leer
+                    objektverwaltung.firstMaterial(aktuellesObj, auswahl);
 
+                    if (klick) //Übergang wird mit klick erzeugt
+                    {
+                        #region Kosten dem Spieler abziehen
+                        if (auswahl == 1)
+                        { } //kostenlos
+                        else if (auswahl == 2)
+                        {
+                            spieler1.setMoney(spieler1.getMoney() - 50);
+                        }
+                        else if (auswahl == 3)
+                        {
+                            spieler1.setMoney(spieler1.getMoney() - 100);
+                        }
+                        else if (auswahl == 4)
+                        {
+                            spieler1.setMoney(spieler1.getMoney() - 200);
+                        }
+                        #endregion
 
-
-
-                    //Übergang wird mit neuer Texture erzeugt
+                        prewState = States.Bauphase1T;
+                        currentState = States.Bauphase1O;
+                    }
                     break;
 
                 #endregion
@@ -337,7 +377,7 @@ namespace Crazy_Castle_Crush
                     #region Übergangsbedingungen
                     //wenn Spieler2 nicht mehr ausreichend Geld hat oder auf weiter geklickt hat...
                     //Klick auf weiter handelt die HandleInput Fkt ab
-                    if (spieler1.getMoney() <= level.getMinMoney()/* || Klick auf weiter*/)
+                    if (spieler1.getMoney() <= level.getMinMoney() && currentState == States.Bauphase2O && objInHand == false/* || Klick auf weiter*/)
                     {
                         //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
                         PosX1 = Scene.Camera.Position.X;
@@ -496,23 +536,39 @@ namespace Crazy_Castle_Crush
             {
                 if (currentState == States.Bauphase1O)
                 {
-                    startObjects.einausblender(auswahlanzeige, 1, zeit);
+                    if (aktuellWaffe)
+                    {
+                        startObjects.einausblender(auswahlanzeige, objWafC, 11, zeit);
+                    }
+                    else
+                    {
+                        startObjects.einausblender(auswahlanzeige, objWafC, 1, zeit);
+                    }
                 }
-                if (currentState == States.Bauphase1T)
+                else if (currentState == States.Bauphase1T)
                 {
-                    startObjects.einausblender(auswahlanzeige, 11, zeit);
+                    aktuellWaffe = false;
+                    startObjects.einausblender(auswahlanzeige, objWafC, 12, zeit);
                 }
-                if (currentState == States.Bauphase2O)
+                else if (currentState == States.Bauphase2O)
                 {
-                    startObjects.einausblender(auswahlanzeige, 2, zeit);
+                    if (aktuellWaffe)
+                    {
+                        startObjects.einausblender(auswahlanzeige, objWafC, 21, zeit);
+                    }
+                    else
+                    {
+                        startObjects.einausblender(auswahlanzeige, objWafC, 2, zeit);
+                    }
                 }
-                if (currentState == States.Bauphase2T)
+                else if (currentState == States.Bauphase2T)
                 {
-                    startObjects.einausblender(auswahlanzeige, 22, zeit);
+                    aktuellWaffe = false;
+                    startObjects.einausblender(auswahlanzeige, objWafC, 22, zeit);
                 }
                 else
                 {
-                    startObjects.einausblender(auswahlanzeige, 0, zeit);
+                    startObjects.einausblender(auswahlanzeige, objWafC, 0, zeit);
                 }
             }
 
@@ -555,8 +611,8 @@ namespace Crazy_Castle_Crush
                                 #endregion
 
                                 #region WEITER klick
-                                //Wenn sich die rechte Hand in der oberen, rechten Ecke befindet -> Klick auf WEITER
-                                if (normScreenPos.X >= 0.9f && normScreenPos.Y >= 0.9f)
+                                //Wenn sich die rechte Hand in der oberen, rechten Ecke befindet & KLICK -> Klick auf WEITER
+                                if (normScreenPos.X >= 0.9f && normScreenPos.Y >= 0.9f && klick)
                                 {
                                     //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
                                     PosX1 = Scene.Camera.Position.X;
@@ -578,7 +634,7 @@ namespace Crazy_Castle_Crush
                                         {
                                             currentState = States.Schussphase1;
                                         }
-                                        
+
                                     }
                                     else if (currentState == States.Bauphase2O)
                                     {
@@ -594,7 +650,7 @@ namespace Crazy_Castle_Crush
                                         {
                                             currentState = States.Camto1;
                                         }
-                                        
+
                                     }
                                     else
                                     {
@@ -602,7 +658,7 @@ namespace Crazy_Castle_Crush
                                     }
                                 }
                                 #endregion
-                            
+
                             }
                             #endregion
 
@@ -649,11 +705,16 @@ namespace Crazy_Castle_Crush
 
                         }
                     }
-                    
+
                 }
+            }
+            else
+            {
+                
             }
             #endregion
 
+            
 
             objState = currentState; //Am Ende jenden Updates wird der State angeglichen
 
@@ -674,51 +735,6 @@ namespace Crazy_Castle_Crush
             else
             {
                 klick = false;
-            }
-            #endregion
-
-            #region Wenn Spieler Auswählt (Hier Leertaste)
-            if (input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.L, PlayerIndex.One))
-            {
-                klick2 = true;
-            }
-            else
-            {
-                klick2 = false;
-            }
-            #endregion
-
-            #region Wenn Spieler ein Objekt erzeugt hat (Hier noch mit O realisiert)
-            if (input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.O, PlayerIndex.One))
-            {
-
-                if (currentState == States.Bauphase1O)
-                {
-                    prewState = States.Bauphase1O;
-                    currentState = States.Bauphase1T;
-                }
-                if (currentState == States.Bauphase2O)
-                {
-                    prewState = States.Bauphase2O;
-                    currentState = States.Bauphase2T;
-                }
-            }
-            #endregion
-
-            #region Wenn Spieler eine Texture erzeugt hat (Hier noch mit T realisiert)
-            if (input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.T, PlayerIndex.One))
-            {
-
-                if (currentState == States.Bauphase1T)
-                {
-                    prewState = States.Bauphase1T;
-                    currentState = States.Bauphase1O;
-                }
-                if (currentState == States.Bauphase2T)
-                {
-                    prewState = States.Bauphase2T;
-                    currentState = States.Bauphase2O;
-                }
             }
             #endregion
 
@@ -746,10 +762,7 @@ namespace Crazy_Castle_Crush
             string wobinich = "";
             if (currentState == States.Bauphase1O)
             {
-                string b;
-                if (auswahlanzeige.Visible) { b = "JA"; }
-                else { b = "NEIN"; }
-                wobinich = "Bau1 Obj"+ auswahl + "," + auswahlanzeige.Position.X + b;
+                wobinich = "Bau1 Obj"+ auswahl;
             }
             else if (currentState == States.Bauphase1T)
             {
@@ -798,11 +811,11 @@ namespace Crazy_Castle_Crush
             #region Geldanzeige
             if (currentState == States.Bauphase1O || currentState == States.Bauphase1T || currentState == States.Schussphase1)
             {
-                objekte.Geldanzeige(spieler1);  //Blendet die Geldbetrag des Spielers ein
+                objektverwaltung.Geldanzeige(spieler1);  //Blendet die Geldbetrag des Spielers ein
             }
             if (currentState == States.Bauphase2O || currentState == States.Bauphase2T || currentState == States.Schussphase2)
             {
-                objekte.Geldanzeige(spieler2); //Blendet die Geldbetrag des Spielers ein
+                objektverwaltung.Geldanzeige(spieler2); //Blendet die Geldbetrag des Spielers ein
             }
             #endregion
 

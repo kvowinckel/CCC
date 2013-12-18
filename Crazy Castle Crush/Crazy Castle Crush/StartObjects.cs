@@ -69,31 +69,60 @@ namespace Crazy_Castle_Crush
             
         }
 
-        public void einausblender(BoxObject Ob, int state, float time)
+        public BoxObject LoadObjWafC()
         {
-            // 1=ObjSp1  11=TexSp1  2=ObjSp2  22=TexSp2  0=else
+            BoxObject changer = LoadBox(new Vector3(0, 2.0f, -6), new Vector3(1, 0.8f, 0), 0f);
+            RenderMaterial bild = new RenderMaterial();
+            bild.Texture = Core.Content.Load<Texture2D>("pist");
+            bild.Diffuse = Color.White.ToVector4();
+            changer.RenderMaterial = bild;
+
+            //scene.Add(changer);
+            return changer;
+        }
+
+        public void einausblender(BoxObject Ob, BoxObject changer, int state, float time)
+        {
+            // 1=ObjSp1  11=WafSp1  12=TexSp1 2=ObjSp2  21=WafSp2  22=TexSp2  0=else
             
             if (state == 0)
             {
                 rausblend(Ob, Ob.Position.X);
+                rausblend(changer,changer.Position.X);
             }
             if (state == 1)
             {
                 reinblend(Ob, level.getSpieler1Pos());
-                overblend(Ob, "Bau");
+                reinblend(changer, level.getSpieler1Pos() + 3.5f);
+                overblend(Ob, "Bau"); //Anzeige soll Bauobjekte Anzeigen
+                overblend(changer,"pist"); //Rechts soll Waffe zum wechseln zum Waffenmenu angezeigt werden
             }
             if (state == 11)
             {
-                overblend(Ob, "hpic");
+                overblend(Ob, "pist"); //Anzeige soll Waffenauswahl anzeigen
+                overblend(changer,"Bau"); //Rechts soll Obj zum wechseln zum Objmenu angezeigt werden
+            }
+            if (state == 12)
+            {
+                rausblend(changer, changer.Position.X);
+                overblend(Ob, "Material");
             }
             if (state == 2)
             {
+                reinblend(changer, level.getSpieler2Pos() + 3.5f);
                 reinblend(Ob, level.getSpieler2Pos());
-                overblend(Ob, "Bau");
+                overblend(Ob, "Bau"); //Anzeige soll Bauobjekte Anzeigen
+                overblend(changer,"pist"); //Rechts soll Waffe zum wechseln zum Waffenmenu angezeigt werden
+            }
+            if (state == 21)
+            {
+                overblend(Ob, "pist"); //Anzeige soll Waffenauswahl anzeigen
+                overblend(changer,"Bau"); //Rechts soll Obj zum wechseln zum Objmenu angezeigt werden
             }
             if (state == 22)
             {
-                overblend(Ob, "hpic");
+                rausblend(changer,changer.Position.X);
+                overblend(Ob, "Material");
             }
 
 
@@ -101,12 +130,14 @@ namespace Crazy_Castle_Crush
 
         private void rausblend(BoxObject box, float x)
         {
+            //TODO: rausblenden
             if (lastR == false) { }//box.Visible = false; }
             box.Position = new Vector3(x, 4f, -6f);
             lastR = true;
         }
         private void reinblend(BoxObject box, float x)
         {
+            //TODO: einblenden
             if (lastR) { }//box.Visible = true; }
             box.Physics.Position = new Vector3(x, 2f, -6f);
             lastR = false;
@@ -118,7 +149,7 @@ namespace Crazy_Castle_Crush
             {
                 RenderMaterial xmenu = new RenderMaterial();
                 xmenu.Texture = Core.Content.Load<Texture2D>(bild);
-                xmenu.Diffuse = Color.White.ToVector4();
+                xmenu.Diffuse = Color.Gray.ToVector4();
                 box.RenderMaterial = xmenu;
             }
         }
@@ -147,14 +178,14 @@ namespace Crazy_Castle_Crush
                 RevoluteJoint revolute = new RevoluteJoint(Kanonenhalterung.Physics, Kanonenrohr.Physics, new Vector3(-1.0941f, 0.5789f, -1.3587f), Vector3.Right);
                 revolute.Limit.IsActive = true;
                 revolute.Limit.MinimumAngle = -MathHelper.Pi;
-                revolute.Limit.MaximumAngle = 0;
+                revolute.Limit.MaximumAngle = 0;*/
 
                 ModelObject Welt = new ModelObject(new Vector3(0, -1.5f, -5f), Quaternion.CreateFromYawPitchRoll(0, -1.57f, 0), new Vector3(1, 1, 1), CollisionType.ExactMesh, " ", "Welt_xna", 0f);
                 Welt.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
-                scene.Add(Welt);*/
+                scene.Add(Welt);
                   
-                 
-                LoadBox(new Vector3(0, -1.5f, -5), new Vector3(46, 0.2f, 1), 0f);
+                //Box als alternative
+                //LoadBox(new Vector3(0, -1.5f, -5), new Vector3(46, 0.2f, 1), 0f);
 
                 //Lädt Spielhintergrund
                 LoadBackground("himmel");

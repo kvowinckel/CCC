@@ -50,20 +50,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="14014.jpg.bmp">
-      <Name>hpic2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Wikinews-logo.png">
-      <Name>hpic3</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="himmel.JPG">
       <Name>himmel</Name>
       <Importer>TextureImporter</Importer>
@@ -80,6 +66,20 @@
   <ItemGroup>
     <Compile Include="Baumenü.jpg">
       <Name>Bau</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Papayrus.jpg">
+      <Name>Papayrus</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="pistole.jpg">
+      <Name>pist</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -109,6 +109,7 @@
       <Name>L</Name>
       <Importer>FbxImporter</Importer>
       <Processor>ModelProcessor</Processor>
+      <ProcessorParameters_Scale>0.1</ProcessorParameters_Scale>
     </Compile>
     <Compile Include="Pyramide.fbx">
       <Name>Pyramide</Name>
@@ -119,7 +120,7 @@
       <Name>Welt_xna</Name>
       <Importer>FbxImporter</Importer>
       <Processor>ModelProcessor</Processor>
-      <ProcessorParameters_Scale>2</ProcessorParameters_Scale>
+      <ProcessorParameters_Scale>1.6</ProcessorParameters_Scale>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -141,12 +142,19 @@
       <Processor>TextureProcessor</Processor>
     </Compile>
     <Compile Include="WoodRough_small.jpg">
-      <Name>WoodRough_small</Name>
+      <Name>MHolz</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
     <Compile Include="Ziegel.jpg">
-      <Name>Ziegel</Name>
+      <Name>MStein</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Materialmenü.jpg">
+      <Name>Material</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

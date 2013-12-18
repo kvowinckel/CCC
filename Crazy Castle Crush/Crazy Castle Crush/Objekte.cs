@@ -6,77 +6,87 @@ using NOVA.Scenery;
 using NOVA.UI;
 using NOVA.Graphics;
 using Microsoft.Xna.Framework;
+using NOVA;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Crazy_Castle_Crush
 {
     class Objekte
     {
-        public Objekte(Scene scene)
+        private int lebenspunkte;
+        private RenderMaterial material;
+        private SceneObject objekt;
+
+        public Objekte(SceneObject Objekt, int Lebenspunkte, String Material)
         {
-            this.scene = scene;
+            objekt = Objekt;
+            lebenspunkte = Lebenspunkte;
+
+            setMaterial(Material);
         }
 
-        public void Geldanzeige(Spieler spieler)
+        public SceneObject getSceneObject()
         {
-            
-            string aktuellerText = "$" + spieler.getMoney();
-            UI2DRenderer.WriteText(new Vector2(scene.Camera.Position.X + 2, scene.Camera.Position.Y),           //Position
-                        aktuellerText,                                                                          //Anzuzeigender Text
-                        Color.Red,                                                                              //Textfarbe
-                        null,                                                                                   //Interne Schriftart verwenden
-                        Vector2.One,                                                                            //Textskallierung
-                        UI2DRenderer.HorizontalAlignment.Left,                                                  //Horizontal zentriert
-                        UI2DRenderer.VerticalAlignment.Top);                                                    //am unteren Bildschirmrand ausrichten
-
+            return objekt;
         }
 
-        public SceneObject createObj(int auswahl)
+        public Vector3 getPosition()
         {
-            if (auswahl == 1)// Würfel
-            {
-                return buildbox(new Vector3(0.5f, 0.5f, 0.5f));
-            }
-
-            else if (auswahl == 3) // Latte
-            {
-                return buildlatte();
-            }
-            else if (auswahl == 4)
-            {
-                return buildquader();
-            }
-            else return buildquader(); 
-            
+            return objekt.Position;
         }
+
+        public void setPosition(Vector3 vektor)
+        {
+            objekt.Position = vektor;
+        }
+
+        public void setMasse(float masse)
+        {
+            objekt.Physics.Mass = masse;
+        }
+
+        public int getLP()
+        {
+            return lebenspunkte;
+        }
+
+        public String getMaterial()
+        {
+            return material.ToString();
+        }
+
+        public void setMaterial(String bild)
+        {
+            if (bild.Equals("blank"))
+            {
+                material = new RenderMaterial();
+                material.Diffuse = Color.Gray.ToVector4();
+            }
+            else
+            {
+                material.Texture = Core.Content.Load<Texture2D>(bild);
+                material.Diffuse = Color.White.ToVector4();
+            }
+            objekt.RenderMaterial = material;
+        }
+
+        public void decreaseLP(int minus)
+        {
+            lebenspunkte -= minus;
+        }
+
+        public void decreaseLP()
+        {
+            lebenspunkte -= 1;
+        }
+
+        public void increaseLP(int plus)
+        {
+            lebenspunkte += plus;
+        }
+
+
         
 
-        private BoxObject buildbox(Vector3 dimension) //Würfel
-        {
-            //Erstellt ein Objekt in der Scene.
-            BoxObject box = new BoxObject(new Vector3(0f,0f,0f),        //Position
-                               dimension,                               //Kantenlängen
-                               1f);                                     //Masse
-            scene.Add(box);
-
-            return box;
-        }
-        private BoxObject buildlatte() //Latte
-        {
-            BoxObject latte = new BoxObject(new Vector3(0, 0, 0), //Position
-                              new Vector3(4, 1, 1),               //Kantenlänge der Latte
-                              1f);                                //Masse
-            scene.Add(latte);   
-            return latte;                                       
-        }
-        private BoxObject buildquader()
-        {
-            BoxObject quader = new BoxObject(new Vector3(0, 0, 0),
-                               new Vector3(1f, 2f, 1f),
-                               1f);
-            scene.Add(quader);
-            return quader;
-        }
-
-        private Scene scene;
     }
 }
