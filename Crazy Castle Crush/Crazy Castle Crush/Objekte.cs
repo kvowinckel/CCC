@@ -11,11 +11,12 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Crazy_Castle_Crush
 {
-    class Objekte
+    public class Objekte
     {
         private int lebenspunkte;
         private RenderMaterial material;
         private SceneObject objekt;
+        private string materialString;
 
         public Objekte(SceneObject Objekt, int Lebenspunkte, String Material)
         {
@@ -37,7 +38,7 @@ namespace Crazy_Castle_Crush
 
         public void setPosition(Vector3 vektor)
         {
-            objekt.Position = vektor;
+            objekt.MoveToPosition(vektor);
         }
 
         public void setMasse(float masse)
@@ -52,11 +53,13 @@ namespace Crazy_Castle_Crush
 
         public String getMaterial()
         {
-            return material.ToString();
+            return materialString;
         }
 
         public void setMaterial(String bild)
         {
+            materialString = bild;
+
             if (bild.Equals("blank"))
             {
                 material = new RenderMaterial();

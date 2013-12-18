@@ -10,96 +10,176 @@ using NOVA;
 
 namespace Crazy_Castle_Crush
 {
-    class Objektverwaltung
+    static public class Objektverwaltung
     {
-        public Objektverwaltung(Scene scene)
+        static private Scene scene;
+        static private Levels level;
+        static int idnummer = 0;
+        static int waffenid = 0;
+        static int anzWaffen = 0;
+
+        public static void setObjektverwaltung(Scene scene0, Levels level0)
         {
-            this.scene = scene;
+            scene = scene0;
+            level = level0;
         }
 
-        private List<Objekte> objListe = new List<Objekte>();
+        private static List<Objekte> objListe = new List<Objekte>();
+        private static List<SceneObject> umgebungsListe = new List<SceneObject>();
+        private static List<Waffen> waffenListe = new List<Waffen>();
 
-        public Objekte createObj(int auswahl, Spieler spieler)
+        public static Objekte createObj(int auswahl, Spieler spieler, float xPos)
         {
+            idnummer++;
+            Vector3 startort = new Vector3(xPos, 2, -5);
             SceneObject newobj;
             Objekte dasobj;
-            int lp;
 
             if (auswahl == 1)//Würfel
             {
-                newobj = buildbox(new Vector3(0.5f, 0.5f, 0.5f));
-                lp = 2;
-                spieler.setMoney(spieler.getMoney() - 200); //Rohkosten abziehen
+                newobj = buildbox(startort, new Vector3(0.5f, 0.5f, 0.5f));
+                spieler.setMoney(spieler.getMoney() - 150); //Rohkosten abziehen
+                newobj.Physics.Mass = 1f;
             }
             else if (auswahl == 2)
             {
-                ModelObject l = new ModelObject(Vector3.Zero, Quaternion.CreateFromYawPitchRoll(1.57f, 0, 0), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "L", 0f);
+                ModelObject l = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1,2,0),(float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "L", 1f);
                 newobj = l;
-                lp = 2;
-                spieler.setMoney(spieler.getMoney() - 250);
+                spieler.setMoney(spieler.getMoney() - 200);
             }
             else if (auswahl == 3) // Latte
             {
-                newobj = buildbox(new Vector3(2f, 0.2f, 0.5f));
-                lp = 1;
-                spieler.setMoney(spieler.getMoney() - 100); //Rohkosten abziehen
+                newobj = buildbox(startort, new Vector3(2f, 0.2f, 0.5f));
+                spieler.setMoney(spieler.getMoney() - 200); //Rohkosten abziehen
+                newobj.Physics.Mass = 1f;
             }
-            else if (auswahl == 4)
+            else if (auswahl == 4) //Pyramide
             {
-                newobj = buildbox(new Vector3(0.5f, 1f, 0.5f));
-                lp = 2;
-                spieler.setMoney(spieler.getMoney() - 300); //Rohkosten abziehen
+                ModelObject p = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1, 2, 0), (float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "Pyramide", 1f);
+                newobj = p;
+                spieler.setMoney(spieler.getMoney() - 200);
             }
             else
             {
-                newobj = buildbox(new Vector3(0.1f, 0.1f, 0.1f));
-                lp = 0;
+                newobj = buildbox(startort, new Vector3(0.1f, 0.1f, 0.1f));
             }
 
+            //TODO z-Achse sperren
+            newobj.Physics.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
+            newobj.Tag = idnummer;
+            newobj.PhysicsMaterial.Bounciness = 0.2f;
             scene.Add(newobj);
-            dasobj = new Objekte(newobj, lp, "blank");
+            dasobj = new Objekte(newobj, 1, "blank");
             objListe.Add(dasobj); //Liste hinzufügen
             return dasobj;
         }
 
-        public void firstMaterial(Objekte first, int auswahl)
+        public static Waffen createWaffe(int auswahl, Spieler spieler, float xPos)//TODO
         {
+            waffenid++;
+            anzWaffen++;
+            spieler.setWaffen(waffenid);    //Waffe wird Spieler zugeordnet
+            SceneObject newobj;
+            Waffen dasobj;
+
+            //if(auswahl==1){ TEMPORÄR BOX ALS WAFFE
+            newobj = buildbox(new Vector3(xPos, 2, -5f), Vector3.One);
+
+            //TODO z-Achse sperren
+            newobj.Tag = waffenid;
+            scene.Add(newobj);
+            dasobj = new Waffen(newobj, 1, "MStein", (float)Math.PI / 4, 5f);
+            waffenListe.Add(dasobj);
+            return dasobj;
+
+        }
+
+        public static Waffen getWaffe(Spieler spieler, int firedwappons)
+        {
+            //firedwappons = 0 ==> erste Waffe
+            int[] waffenids = spieler.getList().ToArray();
+            int Waffenid = waffenids[firedwappons];
+
+            foreach (Waffen w in waffenListe)
+            {
+                if (w.getSceneObject().Tag.Equals(Waffenid))
+                {
+                    return w;
+                }
+            }
+
+            return null;
+        }
+
+        public static Objekte projektil(int id, Vector3 startpos, float winkel) //TODO
+        {
+            SceneObject newobj;
+            Objekte dasobj;
+
+            if (id == 1) 
+            {
+                newobj = buildbox(startpos, Vector3.One);
+            }
+            else
+            {
+                newobj = buildbox(startpos, Vector3.One);
+            }
+
+            dasobj = new Objekte(newobj, 0, "blank");
+
+            return dasobj;
+        }
+
+        public static void orientObj(Objekte obj, float linkeHX, float linkeHY)
+        {
+            
+            Vector2 rechteH = new Vector2(obj.getPosition().X, obj.getPosition().Y);
+            Vector2 zero = new Vector2(0, 1);
+            Vector2 ausrichtung = new Vector2(rechteH.X - linkeHX, rechteH.Y - linkeHY);
+            ausrichtung.Normalize();
+
+            double radian = Math.Atan2(ausrichtung.Y, ausrichtung.X);
+
+
+            obj.getSceneObject().Orientation = Quaternion.CreateFromAxisAngle(new Vector3(0,0,1),(float)radian);
+        }
+
+        public static void firstMaterial(Objekte first, int auswahl)
+        {
+            first.getSceneObject().Physics.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Discrete;
+            
             if (auswahl == 1)
             {
-                first.setMaterial("MHolz");
-                first.increaseLP(2); //Lebenspunkte um 2 erhöhen
-                
+                first.setMaterial("MHolz");                
             }
             else if (auswahl == 2)
             {
                 first.setMaterial("MStein");
-                first.increaseLP(1); //Lebenspunkte um 1 erhöhen
+                first.increaseLP(1); 
                 
             }
             else if (auswahl == 3)
             {
                 first.setMaterial("Papayrus");
-                first.increaseLP(2); //Lebenspunkte um 2 erhöhen
+                first.increaseLP(2); 
                 
             }
             else if (auswahl == 4)
             {
                 first.setMaterial("himmel");
-                first.increaseLP(0); //Lebenspunkte nicht erhöhen
-                
             }
         }
 
-        private BoxObject buildbox(Vector3 dimension)
+        private static BoxObject buildbox(Vector3 startort, Vector3 dimension)
         {
-            BoxObject box = new BoxObject(new Vector3(0, 0, 0), //Position
+            BoxObject box = new BoxObject(startort, //Position
                     dimension,               //Kantenlänge der Latte
-                    0f);
+                    1f);
 
             return box;
         }
 
-        public void Geldanzeige(Spieler spieler)
+        public static void Geldanzeige(Spieler spieler)
         {
 
             string aktuellerText = "$" + spieler.getMoney();
@@ -113,6 +193,48 @@ namespace Crazy_Castle_Crush
 
         }
 
-        private Scene scene;
+        public static void refreshObj(Spieler spieler1, Spieler spieler2)
+        {
+            foreach (Objekte temp in objListe)
+            {
+                if (temp.getLP() <= 0)
+                {
+                    scene.Remove(temp.getSceneObject()); //Löscht Objekte aus Scene
+                }
+            }
+
+            objListe.RemoveAll(x => x.getLP() <= 0); //Löscht Objekte aus Liste
+
+            foreach (Waffen temp in waffenListe)
+            {
+                if (temp.getLP() <= 0)
+                {
+                    scene.Remove(temp.getSceneObject());
+                    anzWaffen--;
+                    foreach (int ids in spieler1.getList())
+                    {
+                        if (temp.getSceneObject().Tag.Equals(ids))
+                        {
+                            spieler1.resetWaffen(ids);
+                        }
+                    }
+                    foreach (int ids in spieler2.getList())
+                    {
+                        if (temp.getSceneObject().Tag.Equals(ids))
+                        {
+                            spieler2.resetWaffen(ids);
+                        }
+                    }
+
+                }
+            }
+            waffenListe.RemoveAll(x => x.getLP() <= 0);
+        }
+
+        public static void addToUmgebungsListe(SceneObject obj)
+        {
+            umgebungsListe.Add(obj);
+        }
+
     }
 }

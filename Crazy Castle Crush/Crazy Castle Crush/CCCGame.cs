@@ -55,8 +55,8 @@ namespace Crazy_Castle_Crush
                 PlayerIndex.One,
 
                 //PLATZIERUNG new GamePlay()
-
-                new Gamestart()
+                new Menu()
+                //new Gamestart()
                 );
 
             m_nova.Game.Window.AllowUserResizing = true;

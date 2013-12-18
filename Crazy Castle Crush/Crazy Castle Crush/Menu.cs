@@ -18,7 +18,7 @@ using NOVA.Utilities;
 using NOVA;
 using NOVA.Graphics;
 
-/*
+
 namespace Crazy_Castle_Crush
 {
     public class Menu : MenuScreen
@@ -41,13 +41,12 @@ namespace Crazy_Castle_Crush
 
         void PlaySelected(object sender, PlayerIndexEventArgs e)
         {
-            LoadingScreen.Load(Core.ScreenManager, true, e.PlayerIndex, new Level1()); //erstes Level wird geladen
+            LoadingScreen.Load(Core.ScreenManager, true, e.PlayerIndex, new Gamestart()); //erstes Level wird geladen
         }
 
         void OptionsSelected(object sender, PlayerIndexEventArgs e)
         {
-            LoadingScreen.Load(Core.ScreenManager, true, e.PlayerIndex, new OptionsMenu()); //Optionsmenu wird geladen
+            //LoadingScreen.Load(Core.ScreenManager, true, e.PlayerIndex, new OptionsMenu()); //Optionsmenu wird geladen
         }
     }
 }
-*/
