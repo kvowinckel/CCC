@@ -16,7 +16,7 @@ namespace Crazy_Castle_Crush
         {
             camera.Position = new Vector3(
                 getXMovement(zeit, dauer, Ausgangsposition, Zielposition),
-                0,
+                1,
                 getZMovement(zeit, dauer) * 0.8f);
 
             Matrix cameraRotation = Matrix.CreateRotationX(0) * Matrix.CreateRotationY(0);

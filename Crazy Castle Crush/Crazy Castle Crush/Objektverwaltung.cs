@@ -36,26 +36,28 @@ namespace Crazy_Castle_Crush
 
             if (auswahl == 1)//Würfel
             {
-                newobj = buildbox(startort, new Vector3(0.5f, 0.5f, 0.5f));
+                newobj = buildbox(startort, new Vector3(0.3f, 0.3f, 0.3f));
                 spieler.setMoney(spieler.getMoney() - 150); //Rohkosten abziehen
                 newobj.Physics.Mass = 1f;
             }
             else if (auswahl == 2)
             {
-                ModelObject l = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1,2,0),(float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "L", 1f);
+                ModelObject l = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1,2,0),(float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "L", 2f);
                 newobj = l;
                 spieler.setMoney(spieler.getMoney() - 200);
             }
             else if (auswahl == 3) // Latte
             {
-                newobj = buildbox(startort, new Vector3(2f, 0.2f, 0.5f));
+                newobj = buildbox(startort, new Vector3(1.2f, 0.1f, 0.3f));
                 spieler.setMoney(spieler.getMoney() - 200); //Rohkosten abziehen
-                newobj.Physics.Mass = 1f;
+                newobj.Physics.Mass = 2f;
             }
             else if (auswahl == 4) //Pyramide
             {
-                ModelObject p = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1, 2, 0), (float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "Pyramide", 1f);
-                newobj = p;
+                newobj = buildbox(startort, new Vector3(0.3f, 0.6f, 0.3f));
+                newobj.Physics.Mass = 2f;
+                /*ModelObject p = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1, 2, 0), (float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "Pyramide", 1f);
+                newobj = p;*/
                 spieler.setMoney(spieler.getMoney() - 200);
             }
             else
@@ -170,8 +172,26 @@ namespace Crazy_Castle_Crush
             Vector2 zero = new Vector2(0, 1);
             Vector2 ausrichtung = new Vector2(rechteH.X - linkeHX, rechteH.Y - linkeHY);
             ausrichtung.Normalize();
+            //Diskrete Drehung von Objekten ( wird nur durch Höhe der linken Hand bestimmt)
+            double radian = 0;
+            if (linkeHY <= 0.9)
+            {
+                radian = Math.PI/4;
+            }
+            if (1.1 >= linkeHY && linkeHY > 0.9)
+            {
+                radian = 0;
+            }
+            if (1.25 >= linkeHY && linkeHY > 1.1)
+            {
+                radian = 3 * Math.PI / 4;
+            }
+            if (linkeHY > 1.25)
+            {
+                radian = Math.PI / 2;
 
-            double radian = Math.Atan2(ausrichtung.Y, ausrichtung.X);
+            }
+
 
 
             obj.getSceneObject().Orientation = Quaternion.CreateFromAxisAngle(new Vector3(0,0,1),(float)radian);

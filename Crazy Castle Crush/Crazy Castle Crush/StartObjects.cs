@@ -150,7 +150,7 @@ namespace Crazy_Castle_Crush
         {
             //TODO: einblenden
             if (lastR) { }//box.Visible = true; }
-            box.Physics.Position = new Vector3(x, 2f, -6f);
+            box.Physics.Position = new Vector3(x, 3f, -6f);
             lastR = false;
         }
         
