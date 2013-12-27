@@ -36,7 +36,7 @@ namespace Crazy_Castle_Crush
 
             if (auswahl == 1)//Würfel
             {
-                newobj = buildbox(startort, new Vector3(0.3f, 0.3f, 0.3f));
+                newobj = buildbox(startort, new Vector3(0.4f, 0.4f, 0.4f));
                 spieler.setMoney(spieler.getMoney() - 150); //Rohkosten abziehen
                 newobj.Physics.Mass = 1f;
             }
@@ -48,13 +48,13 @@ namespace Crazy_Castle_Crush
             }
             else if (auswahl == 3) // Latte
             {
-                newobj = buildbox(startort, new Vector3(1.2f, 0.1f, 0.3f));
+                newobj = buildbox(startort, new Vector3(1.2f, 0.1f, 0.4f));
                 spieler.setMoney(spieler.getMoney() - 200); //Rohkosten abziehen
                 newobj.Physics.Mass = 2f;
             }
-            else if (auswahl == 4) //Pyramide
+            else if (auswahl == 4) // Quader       das kommentierte ist die //Pyramide
             {
-                newobj = buildbox(startort, new Vector3(0.3f, 0.6f, 0.3f));
+                newobj = buildbox(startort, new Vector3(0.8f, 0.4f, 0.4f));
                 newobj.Physics.Mass = 2f;
                 /*ModelObject p = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1, 2, 0), (float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "Pyramide", 1f);
                 newobj = p;*/
