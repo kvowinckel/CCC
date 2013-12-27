@@ -54,6 +54,7 @@ namespace Crazy_Castle_Crush
         bool objInHand;                                     //solange das Objekt an der Hand ist
         Objekte aktuellesObj;                               //Objekt das gerade bearbeitet wird
         Waffen aktuelleWaffe;                                //Waffe die gerade bedient wird
+        
 
 
         //Benötigt für die einblendung von Auswahlmenu
@@ -634,16 +635,18 @@ namespace Crazy_Castle_Crush
                         if (skeleton.TrackingState == SkeletonTrackingState.Tracked && skeleton.Joints.Count != 0)
                         {
                             //Box auf Hand, Klick auf Weiter
-                            #region Detektion der rechten Hand
+                           #region Detektion der rechten Hand
 
                             if (skeleton.Joints[JointType.HandRight].TrackingState == JointTrackingState.Tracked)
                             {
                                 //Position der rechten Hand des Spielers in Bildschirmkoodinaten
                                 Vector2 screenPos = skeleton.Joints[JointType.HandRight].ScreenPosition;
-                                Vector2 normScreenPos = new Vector2(screenPos.X/Scene.Game.Window.ClientBounds.Width, screenPos.Y/Scene.Game.Window.ClientBounds.Height);
+                                Vector2 normScreenPos = new Vector2(screenPos.X, screenPos.Y);
+                                screenPos.X = screenPos.X * Scene.Game.Window.ClientBounds.Width;
+                                screenPos.Y *= Scene.Game.Window.ClientBounds.Height;
 
                                 //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
-                                Plane plane2 = new Plane(Vector3.Forward, -1f);
+                                Plane plane2 = new Plane(Vector3.Forward, -4f);
 
                                 //Weltkoordinatenpunk finden
                                 Vector3 worldPos2 = Helpers.Unproject(screenPos, plane2);
@@ -721,7 +724,9 @@ namespace Crazy_Castle_Crush
                             {
                                 //Position der linken Hand des Spielers in Bildschirmkoodinaten
                                 Vector2 screenPos = skeleton.Joints[JointType.HandLeft].ScreenPosition;
-                                Vector2 normScreenPos = new Vector2(screenPos.X / Scene.Game.Window.ClientBounds.Width, screenPos.Y / Scene.Game.Window.ClientBounds.Height);
+                                Vector2 normScreenPos = new Vector2(screenPos.X, screenPos.Y);
+                                screenPos.X = screenPos.X * Scene.Game.Window.ClientBounds.Width;
+                                screenPos.Y *= Scene.Game.Window.ClientBounds.Height;
 
                                 //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
                                 Plane plane2 = new Plane(Vector3.Forward, -1f);
@@ -739,6 +744,7 @@ namespace Crazy_Castle_Crush
 
                                 #endregion
                             }
+                           
                             #endregion
 
                             //Hintergrundsbild verschieben
