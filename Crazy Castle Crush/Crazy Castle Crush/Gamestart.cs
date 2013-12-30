@@ -287,7 +287,7 @@ namespace Crazy_Castle_Crush
                             aktuelleWaffe = Objektverwaltung.createWaffe(auswahl, gamer, rightHand.Position);  //aktuelles Objekt wird erzeugt
                         }
 
-                        /*
+                        
                         if (objInHand && showWaffe == false)            //Ausrichten der Waffe
                         {
                             Vector3 rH = new Vector3(rightHand.Position.X, rightHand.Position.Y, -5f); //Handvektor ohne Tiefenveränderung
@@ -301,7 +301,7 @@ namespace Crazy_Castle_Crush
                             rightHand.Visible = true;                   //Rechte Hand wird wieder angezeigt
                             klick = false;
                             objInHand = false;
-                        }*/
+                        }
 
                     }
                     

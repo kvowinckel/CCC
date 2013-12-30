@@ -19,9 +19,9 @@ namespace Crazy_Castle_Crush
         private float shootspeed;
         private RevoluteJoint revolute;
 
-        public Waffen(Controller Controller, RevoluteJoint Revolute, int Lebenspunkte, float Schusswinkel, float ShootSpeed)
+        public Waffen( RevoluteJoint Revolute, int Lebenspunkte, float Schusswinkel, float ShootSpeed) //Controller rausgenommen 
         {
-            controller = Controller;
+            //controller = Controller;
             lebenspunkte = Lebenspunkte;
             schusswinkel = Schusswinkel;
             shootspeed = ShootSpeed;

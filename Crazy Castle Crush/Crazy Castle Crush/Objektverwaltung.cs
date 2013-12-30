@@ -93,9 +93,9 @@ namespace Crazy_Castle_Crush
                 Kanonenhalterung.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 scene.Add(Kanonenhalterung);
 
-                newcon = new Controller(new Vector3(0, 0, 0));// Neuer Controller an der Position 0/0/0
-                newcon.Add(Kanonenrohr);
-                newcon.Add(Kanonenhalterung);
+               // newcon = new Controller(new Vector3(0, 0, 0));// Neuer Controller an der Position 0/0/0
+               // newcon.Add(Kanonenrohr);
+               // newcon.Add(Kanonenhalterung);
 
                 revolute = new RevoluteJoint(Kanonenhalterung.Physics, Kanonenrohr.Physics, Kanonenhalterung.Position + new Vector3(0, 1, 0), Vector3.Backward);
                 /*revolute.Limit.IsActive = true;
@@ -109,17 +109,18 @@ namespace Crazy_Castle_Crush
             }
             else //TEMPORÄR
             {
-                BoxObject Box = new BoxObject(startort, new Vector3(0.5f, 0.5f, 0.5f), 1f);
+                BoxObject Box = new BoxObject(startort, new Vector3(0.3f, 0.3f, 0.3f), 50f);
                 scene.Add(Box);
 
-                BoxObject Lat = new BoxObject(startort + new Vector3(0.25f, 0.25f, 0), new Vector3(1f, 0.2f, 0.5f), 0.5f);
+                BoxObject Lat = new BoxObject(startort + new Vector3(0 , 0.35f , 0), new Vector3(0.35f, 0.1f, 0.1f), 0.5f);
                 scene.Add(Lat);
 
-                newcon = new Controller(new Vector3(0, 0, 0));
-                newcon.Add(Box);
-                newcon.Add(Lat);
+                //newcon = new Controller(new Vector3(0, 0, 0));
+                
+                //newcon.Add(Lat);
+                
 
-                revolute = new RevoluteJoint(Box.Physics, Lat.Physics, Box.Position + new Vector3(0, 1, 0), Vector3.Backward);
+                revolute = new RevoluteJoint(Box.Physics, Lat.Physics, Box.Position + new Vector3(0, 0.32f, 0), Vector3.Backward);
                 /*revolute.Limit.IsActive = true;
                 revolute.Limit.MinimumAngle = -MathHelper.Pi;
                 revolute.Limit.MaximumAngle = 0;*/
@@ -127,14 +128,15 @@ namespace Crazy_Castle_Crush
 
                 revolute.Motor.IsActive = true;
                 revolute.Motor.Settings.Mode = BEPUphysics.Constraints.TwoEntity.Motors.MotorMode.Servomechanism;
-                revolute.Motor.Settings.Servo.Goal = -MathHelper.Pi / 4;
+                revolute.Motor.Settings.Servo.Goal = MathHelper.Pi / 6;
+                
             }
 
             //TODO z-Achse sperren
 
             
-            scene.Add(newcon);
-            dasobj = new Waffen(newcon, revolute, 1, (float)Math.PI / 4, 5f);
+            //scene.Add(newcon);
+            dasobj = new Waffen(revolute, 1, (float)Math.PI / 4, 5f);
             spieler.setWaffen(dasobj);
             return dasobj;
 
