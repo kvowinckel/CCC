@@ -22,6 +22,7 @@ namespace Crazy_Castle_Crush
             Matrix cameraRotation = Matrix.CreateRotationX(0) * Matrix.CreateRotationY(0);
             camera.Orientation = Quaternion.CreateFromRotationMatrix(cameraRotation);
         }
+       
 
         //Erzeut eine Bewegung von Start zum Zielpunkt. Benötigt runTime und exeTime, Zeit in der die Bewegung ausgeführt werden soll
         //Das ganze mit einer Sin-Funktion versehen, damit eine Beschleunigung und abbremsung der Kamera realisiert wird

@@ -19,18 +19,25 @@ namespace Crazy_Castle_Crush
         private float shootspeed;
         private RevoluteJoint revolute;
 
-        public Waffen( RevoluteJoint Revolute, int Lebenspunkte, float Schusswinkel, float ShootSpeed) //Controller rausgenommen 
+        public Waffen( Controller Kontroller, RevoluteJoint Revolute, int Lebenspunkte, float Schusswinkel, float ShootSpeed) //Controller rausgenommen 
         {
-            //controller = Controller;
+            controller = Kontroller;
             lebenspunkte = Lebenspunkte;
             schusswinkel = Schusswinkel;
             shootspeed = ShootSpeed;
             revolute = Revolute;
+            
         }
 
-        public void setWinkel(float Schusswinkel)
+        public void setWinkel(float rHandY)
         {
-            schusswinkel = Schusswinkel;
+            
+            rHandY = rHandY / 1.6f; // Schusswinkel hängt nur mit Höhe der rechten Hand zusammen
+
+            schusswinkel = rHandY * 3.1415f/2; // mit float math.pi ersetzen!!!
+            
+            revolute.Motor.Settings.Servo.Goal = schusswinkel;//stellt Motor auf Winkel ein
+            
         }
 
         public float getWinkel()
@@ -38,30 +45,39 @@ namespace Crazy_Castle_Crush
             return schusswinkel;
         }
 
-        public Vector3 getPosition()
+       /* public Vector3 getPosition()
         {
-            return controller.Position;
+            
         }
-
-        public void setPosition(Vector3 vektor)
+       */
+       public void setPosition(Vector3 vektor)
         {
             controller.Position = vektor;
+            
+          // controller.Orientation = quad = new Quaternion( new Vector3(0,0,1),0f);
+           
+           
         }
-
-        public Objekte shoot()
-        {
-            return Objektverwaltung.projektil(1, getController().Position, getWinkel());
-        }
+       public Vector3 getPosition()
+       {
+           return controller.Position;
+          
+       }
+            
+       
+       
 
         public int getLP()
         {
             return lebenspunkte;
         }
 
+      
+
         public Controller getController()
         {
             return controller;
         }
-
+       
     }
 }

@@ -93,9 +93,9 @@ namespace Crazy_Castle_Crush
                 Kanonenhalterung.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 scene.Add(Kanonenhalterung);
 
-               // newcon = new Controller(new Vector3(0, 0, 0));// Neuer Controller an der Position 0/0/0
-               // newcon.Add(Kanonenrohr);
-               // newcon.Add(Kanonenhalterung);
+                newcon = new Controller(new Vector3(0, 0, 0));// Neuer Controller an der Position 0/0/0
+                newcon.Add(Kanonenrohr);
+                newcon.Add(Kanonenhalterung);
 
                 revolute = new RevoluteJoint(Kanonenhalterung.Physics, Kanonenrohr.Physics, Kanonenhalterung.Position + new Vector3(0, 1, 0), Vector3.Backward);
                 /*revolute.Limit.IsActive = true;
@@ -109,16 +109,16 @@ namespace Crazy_Castle_Crush
             }
             else //TEMPORÄR
             {
-                BoxObject Box = new BoxObject(startort, new Vector3(0.3f, 0.3f, 0.3f), 50f);
+                BoxObject Box = new BoxObject(startort, new Vector3(0.4f, 0.25f, 0.3f), 0.001f);
                 scene.Add(Box);
 
-                BoxObject Lat = new BoxObject(startort + new Vector3(0 , 0.35f , 0), new Vector3(0.35f, 0.1f, 0.1f), 0.5f);
+                BoxObject Lat = new BoxObject(startort + new Vector3(0 , 0.35f , 0), new Vector3(0.35f, 0.1f, 0.1f), 0.00001f);
                 scene.Add(Lat);
 
-                //newcon = new Controller(new Vector3(0, 0, 0));
-                
-                //newcon.Add(Lat);
-                
+                newcon = new Controller(startort);
+                newcon.Add(Box);
+                newcon.Add(Lat);
+                scene.Add(newcon);
 
                 revolute = new RevoluteJoint(Box.Physics, Lat.Physics, Box.Position + new Vector3(0, 0.32f, 0), Vector3.Backward);
                 /*revolute.Limit.IsActive = true;
@@ -136,7 +136,7 @@ namespace Crazy_Castle_Crush
 
             
             //scene.Add(newcon);
-            dasobj = new Waffen(revolute, 1, (float)Math.PI / 4, 5f);
+            dasobj = new Waffen( newcon, revolute, 1, (float)Math.PI / 4, 5f);
             spieler.setWaffen(dasobj);
             return dasobj;
 
@@ -145,8 +145,10 @@ namespace Crazy_Castle_Crush
         public static Waffen getWaffe(Spieler spieler, int firedwappons)
         {
             //firedwappons = 0 ==> erste Waffe
-            return spieler.getList()[firedwappons];           
+          
+             return spieler.getList()[firedwappons]; // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!           
         }
+       
 
         public static Objekte projektil(int id, Vector3 startpos, float winkel) //TODO
         {

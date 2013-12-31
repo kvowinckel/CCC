@@ -7,7 +7,7 @@ namespace Crazy_Castle_Crush
 {
     public class Spieler
     {
-        private int geld = 1000;    //Anfangsgehlt
+        private int geld = 1000;    //Anfangsgeld
         private int anzWaffen=1;
 
         List<Waffen> waffen = new List<Waffen>();

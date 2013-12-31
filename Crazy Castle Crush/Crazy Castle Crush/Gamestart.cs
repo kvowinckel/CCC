@@ -39,7 +39,7 @@ namespace Crazy_Castle_Crush
         float zeit;                                         //vergangende Zeit seit letztem State
         float PosX1;                                        //X-Pos nach State
         bool schussphasenDurch;                             //TRUE wenn beide Spieler ihre Schussphase hatten
-        int firedWaffen;                                    //Anzahl der abgefeuerten Waffen in einer Schussphase
+        int firedWaffen=0;                                    //Anzahl der abgefeuerten Waffen in einer Schussphase
         bool detecting = false;                             //Kinect benötigt
         BoxObject rightHand;
         BoxObject leftHand;
@@ -54,6 +54,7 @@ namespace Crazy_Castle_Crush
         bool objInHand;                                     //solange das Objekt an der Hand ist
         Objekte aktuellesObj;                               //Objekt das gerade bearbeitet wird
         Waffen aktuelleWaffe;                                //Waffe die gerade bedient wird
+        CameraObject cam;
         
 
 
@@ -85,7 +86,7 @@ namespace Crazy_Castle_Crush
             Scene.Physics.ForceUpdater.Gravity = new Vector3(0,-9.81f,0);            //Definierte Schwerkraft
 
             //Kamera
-            CameraObject cam = new CameraObject(new Vector3(0,0,0),                 //Position
+            cam = new CameraObject(new Vector3(0,0,0),                 //Position
                                                 new Vector3(0,-1,-5));              //Blickpunkt
             Scene.Add(cam);
             Scene.Camera=cam;
@@ -280,27 +281,39 @@ namespace Crazy_Castle_Crush
                     #region Waffe erzeugen und mit Hand positionieren
                     if (showWaffe)
                     {
-                        if (klick && objInHand == false && auswahl != 0 && auswahl < 5)    //"klick" und die Waffe wurde noch nicht erstellt und linke hand befindet sich auf auswahlfeld
+
+
+                        if (getObj && objInHand == false && auswahl != 0 && auswahl < 5)    //"klick" und die Waffe wurde noch nicht erstellt und linke hand befindet sich auf auswahlfeld
                         {
-                            //objInHand = true;                                                   //soll jetzt der Hand folgen
-                            
+                            objInHand = true;                                                   //soll jetzt der Hand folgen
+
                             aktuelleWaffe = Objektverwaltung.createWaffe(auswahl, gamer, rightHand.Position);  //aktuelles Objekt wird erzeugt
+                            if (spieler1 == gamer)
+                            {
+                                spieler1.setWaffen(aktuelleWaffe);                                          //Waffe der Waffenliste des Spieler hinzufügen
+                            }
+                            else
+                            {
+                                spieler2.setWaffen(aktuelleWaffe);
+                            }
                         }
 
                         
-                        if (objInHand && showWaffe == false)            //Ausrichten der Waffe
+                        if (objInHand && showWaffe == true)                                              //Ausrichten der Waffe
                         {
-                            Vector3 rH = new Vector3(rightHand.Position.X, rightHand.Position.Y, -5f); //Handvektor ohne Tiefenveränderung
-                            aktuelleWaffe.setPosition(rH);              //Waffenposition wird auf Handgelegt
-
-                            rightHand.Visible = false;                  //Anzeige der rechten Hand deaktiviert
+                            Vector3 rH = new Vector3(rightHand.Position.X, rightHand.Position.Y, -5f);  //Handvektor ohne Tiefenveränderung
+                            aktuelleWaffe.setPosition(rH);                                              //Waffenposition wird auf Handgelegt
+                            
+                            rightHand.Visible = false;                                                  //Anzeige der rechten Hand deaktiviert
+                            
                         }
 
-                        if (klick && objInHand)                         //wenn sich ein Objekt in der Hand befindet und erneut geklickt wird
+                        if (klick && objInHand)                                                         //wenn sich ein Objekt in der Hand befindet und erneut geklickt wird
                         {
-                            rightHand.Visible = true;                   //Rechte Hand wird wieder angezeigt
+                            rightHand.Visible = true;                                                   //Rechte Hand wird wieder angezeigt
                             klick = false;
                             objInHand = false;
+                            
                         }
 
                     }
@@ -308,7 +321,7 @@ namespace Crazy_Castle_Crush
                     #endregion
 
                     #region Wechsel von der Objekt zur Waffenauswahl
-                    if (objInHand == false && auswahl == 5 && showWaffe == false) //"klick" und das Objekt wurde noch nicht erstellt und linke hand befindet sich auf auswahlfeld
+                    if (klick&&objInHand == false && auswahl == 5 && showWaffe == false) //"klick" und das Objekt wurde noch nicht erstellt und linke hand befindet sich auf auswahlfeld
                     {
                         showWaffe = true;
                     }
@@ -479,31 +492,31 @@ namespace Crazy_Castle_Crush
                         gamer = spieler2;
                         xR = -1;
                     }
-
+                    //shoot Funktion TODO: "auslagern"
                     if (gamer.getWaffen() != 0)
-                    {
+                    {   
                         aktuelleWaffe = Objektverwaltung.getWaffe(gamer, firedWaffen);
+                        aktuelleWaffe.setWinkel(rightHand.Position.Y);
 
-
-
-                        aktuelleWaffe.setWinkel(0.75f /*TODO Winkel durch Handbewegung einstellen*/);
-
-                        if (shoot && objInHand==false)
+                        if (klick==true)
                         {
-                            aktuellesObj = aktuelleWaffe.shoot();
-                            objInHand = true;
+                           float schusswinkel,x,y,velocity;
+                           Vector3 spawnpoint = new Vector3 ( rightHand.Position.X,rightHand.Position.Y, rightHand.Position.Z); //Spawnposition nur Vorübergehend sollte am Objekt sein!
+                           SphereObject bullet = new SphereObject(spawnpoint, 0.1f, 10, 10, 0.05f);
+                           Vector3 shootdirection = new Vector3();
+                           Scene.Add(bullet);
+                           
+                           schusswinkel = aktuelleWaffe.getWinkel();
+                           x=(float)Math.Cos(schusswinkel);
+                           y=(float)Math.Sin(schusswinkel);
+                           shootdirection = new Vector3(x,y,0);
+                           velocity = leftHand.Position.Y * 7f;
+                           bullet.Physics.LinearVelocity = shootdirection * velocity;
+                           
+                            firedWaffen++; 
                         }
 
-                        if (objInHand)
-                        {
-                            float x = (float)Math.Cos(aktuelleWaffe.getWinkel()) * xR;
-                            float y = (float)Math.Sin(aktuelleWaffe.getWinkel());
-                            float scale = 1;
-                            //aktuellesObj.getSceneObject().Physics.AngularVelocity = new Vector3(x, y, -5.0f);
-                            var direction =  new Vector3(x,y, 0);
-                            direction = direction * scale;
-                            aktuellesObj.getSceneObject().Physics.ApplyLinearImpulse(ref direction);
-                        }
+                        
                         
                     }
 
