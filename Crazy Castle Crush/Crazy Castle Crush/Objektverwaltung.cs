@@ -168,6 +168,12 @@ namespace Crazy_Castle_Crush
 
             return dasobj;
         }
+        /*public void bulletCollided(SphereObject bullet,CollisionArgs e)
+        {
+
+
+
+        }*/
 
         public static void orientObj(Objekte obj, float linkeHX, float linkeHY)
         {
@@ -250,6 +256,7 @@ namespace Crazy_Castle_Crush
 
         }
 
+
         public static void refreshObj(Spieler spieler1, Spieler spieler2)
         {
             foreach (Objekte temp in objListe)
@@ -281,6 +288,7 @@ namespace Crazy_Castle_Crush
             }
            
         }
+       
 
         public static void addToUmgebungsListe(SceneObject obj)
         {

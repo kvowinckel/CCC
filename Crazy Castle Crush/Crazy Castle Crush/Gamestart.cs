@@ -12,6 +12,8 @@ using NOVA;
 using NOVA.Graphics;
 
 
+
+
 namespace Crazy_Castle_Crush
 {
     public class Gamestart : GameplayScreen
@@ -54,7 +56,9 @@ namespace Crazy_Castle_Crush
         bool objInHand;                                     //solange das Objekt an der Hand ist
         Objekte aktuellesObj;                               //Objekt das gerade bearbeitet wird
         Waffen aktuelleWaffe;                                //Waffe die gerade bedient wird
-        CameraObject cam;
+        CameraObject cam;                                   //camera
+        SphereObject bullet;                                  //Geschoss  
+        bool bulletInAir;
         
 
 
@@ -83,7 +87,7 @@ namespace Crazy_Castle_Crush
             //Kinect initialisieren
             Scene.InitKinect();
 
-            Scene.Physics.ForceUpdater.Gravity = new Vector3(0,-9.81f,0);            //Definierte Schwerkraft
+            Scene.Physics.ForceUpdater.Gravity = new Vector3(0,-5.0f,0);            //Definierte Schwerkraft
 
             //Kamera
             cam = new CameraObject(new Vector3(0,0,0),                 //Position
@@ -477,6 +481,8 @@ namespace Crazy_Castle_Crush
                 //Schussphasen
                 case States.Schussphase2:
                 case States.Schussphase1:
+
+                    
                     aktuallisiereZeit(gameTime);
                     detecting = true;               //Kinect aktiv
                     weiterSym.Visible = false;
@@ -492,7 +498,7 @@ namespace Crazy_Castle_Crush
                         gamer = spieler2;
                         xR = -1;
                     }
-                    //shoot Funktion TODO: "auslagern"
+                    #region Schussfunktion //shoot Funktion TODO: "auslagern"
                     if (gamer.getWaffen() != 0)
                     {   
                         aktuelleWaffe = Objektverwaltung.getWaffe(gamer, firedWaffen);
@@ -502,7 +508,7 @@ namespace Crazy_Castle_Crush
                         {
                            float schusswinkel,x,y,velocity;
                            Vector3 spawnpoint = new Vector3 ( rightHand.Position.X,rightHand.Position.Y, rightHand.Position.Z); //Spawnposition nur Vorübergehend sollte am Objekt sein!
-                           SphereObject bullet = new SphereObject(spawnpoint, 0.1f, 10, 10, 0.05f);
+                           bullet = new SphereObject(spawnpoint, 0.1f, 10, 10, 0.05f);
                            Vector3 shootdirection = new Vector3();
                            Scene.Add(bullet);
                            
@@ -510,15 +516,30 @@ namespace Crazy_Castle_Crush
                            x=(float)Math.Cos(schusswinkel);
                            y=(float)Math.Sin(schusswinkel);
                            shootdirection = new Vector3(x,y,0);
-                           velocity = leftHand.Position.Y * 7f;
+                           velocity = leftHand.Position.Y * 10f;
                            bullet.Physics.LinearVelocity = shootdirection * velocity;
+                           firedWaffen++;
+                           bulletInAir = true;
                            
-                            firedWaffen++; 
+                           
                         }
-
+        
                         
                         
                     }
+                    if (bulletInAir)
+                    {
+                        cameraMovement.chaseBullet(bullet.Position, cam.Position);
+
+                        
+
+
+                        
+
+
+                    }
+                    
+                    #endregion
 
                     #region Übergangsbedingungen
                     //Wenn alle Waffen abgefeuert wurden...

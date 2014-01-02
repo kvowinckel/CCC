@@ -22,8 +22,18 @@ namespace Crazy_Castle_Crush
             Matrix cameraRotation = Matrix.CreateRotationX(0) * Matrix.CreateRotationY(0);
             camera.Orientation = Quaternion.CreateFromRotationMatrix(cameraRotation);
         }
-       
+        //Verfolgt das Geschoss 
+        public void chaseBullet(Vector3 positionBullet, Vector3 startposition)
+        {
+            float rotationAngle;
+            rotationAngle = (float)Math.Atan((positionBullet.X - startposition.X) / (positionBullet.Z - startposition.Z));
+            Matrix cameraRotation = Matrix.CreateRotationX(0) * Matrix.CreateRotationY(rotationAngle);
+            camera.Orientation = Quaternion.CreateFromRotationMatrix(cameraRotation);//Richtet Focus auf das Geschoss 
+            camera.Position = new Vector3(positionBullet.X, positionBullet.Y, startposition.Z*positionBullet.X/startposition.X);//Bewegt die Kamera mit dem Geschoss mit
 
+        }
+         
+        
         //Erzeut eine Bewegung von Start zum Zielpunkt. Benötigt runTime und exeTime, Zeit in der die Bewegung ausgeführt werden soll
         //Das ganze mit einer Sin-Funktion versehen, damit eine Beschleunigung und abbremsung der Kamera realisiert wird
         static private float getXMovement(float runTime, int exeTime, float startXPos, float zielXPos)
