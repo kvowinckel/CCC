@@ -24,6 +24,7 @@ namespace Crazy_Castle_Crush
         Texture2D backgroud;
 
         NOVAEngine m_nova;
+        Song buildTheme;
 
 
 
@@ -75,6 +76,7 @@ namespace Crazy_Castle_Crush
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            buildTheme = Content.Load<Song>("buildTheme");
             
 
             // TODO: use this.Content to load your game content here
@@ -101,6 +103,10 @@ namespace Crazy_Castle_Crush
                 this.Exit();
 
 
+            if (MediaPlayer.State != MediaState.Playing)
+            {
+                MediaPlayer.Play(buildTheme);
+            }
 
 
             base.Update(gameTime);
