@@ -29,7 +29,7 @@ namespace Crazy_Castle_Crush
             rotationAngle = (float)Math.Atan((positionBullet.X - startposition.X) / (positionBullet.Z - startposition.Z));
             Matrix cameraRotation = Matrix.CreateRotationX(0) * Matrix.CreateRotationY(rotationAngle);
             camera.Orientation = Quaternion.CreateFromRotationMatrix(cameraRotation);//Richtet Focus auf das Geschoss 
-            camera.Position = new Vector3(positionBullet.X, positionBullet.Y, startposition.Z*positionBullet.X/startposition.X);//Bewegt die Kamera mit dem Geschoss mit
+            camera.Position = new Vector3(positionBullet.X, positionBullet.Y, startposition.Z);//Bewegt die Kamera mit dem Geschoss mit
 
         }
          

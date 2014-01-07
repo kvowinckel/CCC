@@ -59,7 +59,9 @@ namespace Crazy_Castle_Crush
         CameraObject cam;                                   //camera
         SphereObject bullet;                                  //Geschoss  
         bool bulletInAir;
-        
+        Vector2 screenPos;                                    //normierte Position der Hände
+
+
 
 
         //Benötigt für die einblendung von Auswahlmenu
@@ -329,7 +331,7 @@ namespace Crazy_Castle_Crush
                     {
                         showWaffe = true;
                     }
-                    else if (klick && objInHand == false && auswahl == 5 && showWaffe)
+                    else if (klick && objInHand == false &&  auswahl == 5 && showWaffe)
                     {
                         showWaffe = false;
                     }
@@ -502,12 +504,12 @@ namespace Crazy_Castle_Crush
                     if (gamer.getWaffen() != 0)
                     {   
                         aktuelleWaffe = Objektverwaltung.getWaffe(gamer, firedWaffen);
-                        aktuelleWaffe.setWinkel(rightHand.Position.Y);
+                        aktuelleWaffe.setWinkel(rightHand.Position.Y);//Setzt Winkel der Kanone in Waffen
 
                         if (klick==true)
                         {
                            float schusswinkel,x,y,velocity;
-                           Vector3 spawnpoint = new Vector3 ( rightHand.Position.X,rightHand.Position.Y, rightHand.Position.Z); //Spawnposition nur Vorübergehend sollte am Objekt sein!
+                           Vector3 spawnpoint = new Vector3 ( rightHand.Position.X+1,rightHand.Position.Y-1, rightHand.Position.Z); //Spawnposition nur Vorübergehend sollte am Objekt sein!
                            bullet = new SphereObject(spawnpoint, 0.1f, 10, 10, 0.05f);
                            Vector3 shootdirection = new Vector3();
                            Scene.Add(bullet);
@@ -516,8 +518,21 @@ namespace Crazy_Castle_Crush
                            x=(float)Math.Cos(schusswinkel);
                            y=(float)Math.Sin(schusswinkel);
                            shootdirection = new Vector3(x,y,0);
-                           velocity = leftHand.Position.Y * 10f;
-                           bullet.Physics.LinearVelocity = shootdirection * velocity;
+                           if (gamer == spieler1)
+                           {
+                               velocity = leftHand.Position.Y * 10f;
+                               bullet.Physics.LinearVelocity = shootdirection * velocity;
+
+
+                           }
+                           else
+                           {
+                               velocity = leftHand.Position.Y * 10f;
+                               shootdirection.X = shootdirection.X * (-1f);
+                               bullet.Physics.LinearVelocity = shootdirection * velocity;
+                           }
+
+
                            firedWaffen++;
                            bulletInAir = true;
                            
@@ -527,14 +542,15 @@ namespace Crazy_Castle_Crush
                         
                         
                     }
+                    
+                    
                     if (bulletInAir)
                     {
+                        
                         cameraMovement.chaseBullet(bullet.Position, cam.Position);
-
+                        bullet.Collided += new EventHandler<CollisionArgs>(bulletCollidedHandler);
                         
-
-
-                        
+                       
 
 
                     }
@@ -757,7 +773,7 @@ namespace Crazy_Castle_Crush
                             if (skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked)
                             {
                                 //Position der linken Hand des Spielers in Bildschirmkoodinaten
-                                Vector2 screenPos = skeleton.Joints[JointType.HandLeft].ScreenPosition;
+                                screenPos = skeleton.Joints[JointType.HandLeft].ScreenPosition;
                                 Vector2 normScreenPos = new Vector2(screenPos.X, screenPos.Y);
                                 screenPos.X = screenPos.X * Scene.Game.Window.ClientBounds.Width;
                                 screenPos.Y *= Scene.Game.Window.ClientBounds.Height;
@@ -821,7 +837,20 @@ namespace Crazy_Castle_Crush
 
 
 
+        #region collisionHandler
+        void bulletCollidedHandler(object sender, CollisionArgs e)
+        {
+            
+            bulletInAir = false;
+            cameraMovement.move(zeit, 3000, PosX1, level.getSpieler1Pos());
+           // sender.decreaseLP(1);
 
+
+
+            
+
+        }
+        #endregion
         public override void HandleInput(InputState input)
         {
 

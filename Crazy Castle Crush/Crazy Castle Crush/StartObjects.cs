@@ -84,7 +84,7 @@ namespace Crazy_Castle_Crush
         {
             BoxObject changer = LoadBox(new Vector3(0, 2.0f, -6), new Vector3(1, 0.8f, 0), 0f);
             RenderMaterial bild = new RenderMaterial();
-            bild.Texture = Core.Content.Load<Texture2D>("pist");
+            bild.Texture = Core.Content.Load<Texture2D>("ChangerDummy");
             bild.Diffuse = Color.White.ToVector4();
             changer.RenderMaterial = bild;
 
@@ -106,11 +106,11 @@ namespace Crazy_Castle_Crush
                 reinblend(Ob, level.getSpieler1Pos());
                 reinblend(changer, level.getSpieler1Pos() + 3.5f);
                 overblend(Ob, "Bau"); //Anzeige soll Bauobjekte Anzeigen
-                overblend(changer,"pist"); //Rechts soll Waffe zum wechseln zum Waffenmenu angezeigt werden
+                overblend(changer,"ChangerDummy"); //Rechts soll Waffe zum wechseln zum Waffenmenu angezeigt werden
             }
             if (state == 11)
             {
-                overblend(Ob, "pist"); //Anzeige soll Waffenauswahl anzeigen
+                overblend(Ob, "WaffenMenüDummy"); //Anzeige soll Waffenauswahl anzeigen
                 overblend(changer,"Bau"); //Rechts soll Obj zum wechseln zum Objmenu angezeigt werden
             }
             if (state == 12)

@@ -145,8 +145,10 @@ namespace Crazy_Castle_Crush
         public static Waffen getWaffe(Spieler spieler, int firedwappons)
         {
             //firedwappons = 0 ==> erste Waffe
-          
-             return spieler.getList()[firedwappons]; // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!           
+
+             return spieler.getList()[firedwappons];  // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!    
+            
+            // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!           
         }
        
 
