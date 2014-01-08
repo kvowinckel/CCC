@@ -11,13 +11,12 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Crazy_Castle_Crush
 {
-    public class Objekte
+    public class Objekte:SceneObject
     {
         private int lebenspunkte;
         private RenderMaterial material;
-        private SceneObject objekt;
         private string materialString;
-
+        new SceneObject objekt;
         public Objekte(SceneObject Objekt, int Lebenspunkte, String Material)
         {
             objekt = Objekt;

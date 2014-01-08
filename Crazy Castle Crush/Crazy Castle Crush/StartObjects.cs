@@ -172,6 +172,7 @@ namespace Crazy_Castle_Crush
                 ModelObject Welt = new ModelObject(new Vector3(0, -1.5f, -5f), Quaternion.CreateFromYawPitchRoll(0, -1.57f, 0), new Vector3(1, 1, 1), CollisionType.ExactMesh, " ", "Welt_xna", 0f);
                 Welt.PhysicsMaterial.Bounciness = 0.2f;
                 Welt.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                Welt.Name = "Welt";
                 scene.Add(Welt);
                 Objektverwaltung.addToUmgebungsListe(Welt);
                   

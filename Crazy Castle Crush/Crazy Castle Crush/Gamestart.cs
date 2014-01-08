@@ -10,6 +10,10 @@ using NOVA.ScreenManagement;
 using NOVA.Utilities;
 using NOVA;
 using NOVA.Graphics;
+using ProjectMercury;
+using ProjectMercury.Emitters;
+using ProjectMercury.Modifiers;
+using ProjectMercury.Controllers;
 
 
 
@@ -112,7 +116,7 @@ namespace Crazy_Castle_Crush
 
             currentState = States.Menu;                                            //Anfangszustand
         }
-
+        
 
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
@@ -221,6 +225,7 @@ namespace Crazy_Castle_Crush
 
                 #region Objektemenüs
                 case States.Bauphase2O:
+
                 case States.Bauphase1O:
                     aktuallisiereZeit(gameTime);
                     detecting = true;               //Kinect aktiv
@@ -229,6 +234,7 @@ namespace Crazy_Castle_Crush
                         weiterSym.Visible = true;
                     }
                     float pos;
+                    
 
                     #region Spieler &  Spielerposition
                     if (currentState == States.Bauphase1O)
@@ -510,10 +516,10 @@ namespace Crazy_Castle_Crush
                         {
                            float schusswinkel,x,y,velocity;
                            Vector3 spawnpoint = new Vector3 ( rightHand.Position.X+1,rightHand.Position.Y-1, rightHand.Position.Z); //Spawnposition nur Vorübergehend sollte am Objekt sein!
-                           bullet = new SphereObject(spawnpoint, 0.1f, 10, 10, 0.05f);
+                           bullet = new SphereObject(new Vector3(aktuelleWaffe.getPosition().X, aktuelleWaffe.getPosition().Y,rightHand.Position.Z), 0.1f, 10, 10, 0.05f);
                            Vector3 shootdirection = new Vector3();
                            Scene.Add(bullet);
-                           
+                            
                            schusswinkel = aktuelleWaffe.getWinkel();
                            x=(float)Math.Cos(schusswinkel);
                            y=(float)Math.Sin(schusswinkel);
@@ -546,9 +552,68 @@ namespace Crazy_Castle_Crush
                     
                     if (bulletInAir)
                     {
-                        
+                       
                         cameraMovement.chaseBullet(bullet.Position, cam.Position);
-                        bullet.Collided += new EventHandler<CollisionArgs>(bulletCollidedHandler);
+                        
+                        bullet.Collided +=new EventHandler<CollisionArgs>(bulletCollidedHandler);
+
+                        //Partikel Effekte FUNKTIONIERT NOCH NICHT
+                        ParticleEffect effect = new ParticleEffect()
+                        {
+                            Emitters = new EmitterCollection()
+                                {   
+                                    new SphereEmitter
+                                    {
+                                        Name="Flame",
+                                        Budget = 100,
+                                        Term = 0.5f,
+                                        ReleaseQuantity = 8,
+                                        Enabled = true,
+                                        ReleaseSpeed = new Range(5f,5f),
+                                        ReleaseColour = new ColourRange
+                                        {
+                                            Red = new Range(0.9f,1f),
+                                            Green = new Range(0.5f,0.5f),
+                                            Blue = new Range(0f,0f),
+                                        },
+                                        ReleaseOpacity = new Range(1f,1f),
+                                        ReleaseScale = new Range(2f,2f),
+                                        ReleaseRotation = new RotationRange
+                                        {
+                                            Pitch = new Range(0f,0f),
+                                            Yaw = new Range(0f,0f),
+                                            Roll = new Range(-3.14f,3.14f),
+                                        },
+                                        ParticleTexture = Core.Content.Load<Texture2D>("Flames"),
+                                        BlendMode = EmitterBlendMode.Add,
+                                        Radius = 3f,
+                                        Shell = true,
+                                        Radiate = true,                        
+                                        BillboardStyle = ProjectMercury.BillboardStyle.Spherical,
+                                        Modifiers = new ModifierCollection
+                                        {
+                                            new OpacityInterpolator2
+                                            {
+                                                InitialOpacity = 0.5f,                                
+                                                FinalOpacity = 0f,
+                                            },
+                                            new RotationModifier
+                                            {
+                                                RotationRate = new Vector3(0,0,1)
+                                            }
+                                        },
+                                        Controllers = new ControllerPipeline
+                                        {
+                                            new CooldownController
+                                            {
+                                                CooldownPeriod = 0.02f,
+                                            },
+                                        }
+                                    }
+                                }
+                        };
+
+                        ParticleObject particle = new ParticleObject(bullet.Position, effect);
                         
                        
 
@@ -838,17 +903,29 @@ namespace Crazy_Castle_Crush
 
 
         #region collisionHandler
+
         void bulletCollidedHandler(object sender, CollisionArgs e)
         {
-            
-            bulletInAir = false;
-            cameraMovement.move(zeit, 3000, PosX1, level.getSpieler1Pos());
-           // sender.decreaseLP(1);
+            bullet.Collided -= new EventHandler<CollisionArgs>(bulletCollidedHandler);
 
+            object scn = this.Scene.Find("Welt" + e.Collider.ID);
+            if (e.Collider == scn)//level.GetType() == e.Collider.GetType())
+            {
+                if (this.Scene.SceneObjects.Contains(bullet))
+                {
 
-
-            
-
+                    bulletInAir = false;
+                    Scene.Remove(bullet);
+                    cameraMovement.move(zeit, 3000, PosX1, level.getSpieler1Pos()); //TODO Kamera fahrt noch ändern
+                }
+            }
+            if (e.Collider is Objekte)
+            {
+                ((Objekte)e.Collider).decreaseLP();
+                Scene.Remove(bullet);
+                cameraMovement.move(zeit, 3000, PosX1, level.getSpieler1Pos());//TODO Kamera fahr noch ändern
+                bulletInAir = false;
+            }
         }
         #endregion
         public override void HandleInput(InputState input)

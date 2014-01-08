@@ -110,10 +110,10 @@ namespace Crazy_Castle_Crush
             else //TEMPORÄR
             {
                 BoxObject Box = new BoxObject(startort, new Vector3(0.4f, 0.25f, 0.3f), 0.001f);
-                scene.Add(Box);
+                scene.Add(Box);//Standbox
 
                 BoxObject Lat = new BoxObject(startort + new Vector3(0 , 0.35f , 0), new Vector3(0.35f, 0.1f, 0.1f), 0.00001f);
-                scene.Add(Lat);
+                scene.Add(Lat);//KanonenRohr
 
                 newcon = new Controller(startort);
                 newcon.Add(Box);
@@ -141,18 +141,19 @@ namespace Crazy_Castle_Crush
             return dasobj;
 
         }
-
+        
         public static Waffen getWaffe(Spieler spieler, int firedwappons)
         {
             //firedwappons = 0 ==> erste Waffe
-
-             return spieler.getList()[firedwappons];  // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!    
+           
+             return spieler.getList()[firedwappons]; 
+            // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!    
             
             // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!           
         }
        
 
-        public static Objekte projektil(int id, Vector3 startpos, float winkel) //TODO
+        public static Objekte projektil(int id, Vector3 startpos, float winkel) //TODO WIRD NICHT VERWENDET
         {
             SceneObject newobj;
             Objekte dasobj;
