@@ -14,6 +14,7 @@ using ProjectMercury;
 using ProjectMercury.Emitters;
 using ProjectMercury.Modifiers;
 using ProjectMercury.Controllers;
+using Microsoft.Kinect.Toolkit.Interaction;
 
 
 
@@ -48,6 +49,10 @@ namespace Crazy_Castle_Crush
         int firedWaffen=0;                                    //Anzahl der abgefeuerten Waffen in einer Schussphase
         bool detecting = false;                             //Kinect benötigt
         BoxObject rightHand;
+        Vector2 rHv2s;                                      //rechte Hand als Vector 2 in ScreenPos
+        Vector2 rHv2w;                                      //rechte Hand als Vector 2 in WorldPos
+        Vector2 lHv2s;                                      //linke Hand als Vector 2 in ScreenPos
+        Vector2 lHv2w;                                      //linke Hand als Vector 2 in WorldPos
         BoxObject leftHand;
         BoxObject weiterSym;
         BoxObject auswahlanzeige;                           //zur Auswahl von Objekten 
@@ -514,33 +519,36 @@ namespace Crazy_Castle_Crush
 
                         if (klick==true)
                         {
-                           float schusswinkel,x,y,velocity;
-                           Vector3 spawnpoint = new Vector3 ( rightHand.Position.X+1,rightHand.Position.Y-1, rightHand.Position.Z); //Spawnposition nur Vorübergehend sollte am Objekt sein!
-                           bullet = new SphereObject(new Vector3(aktuelleWaffe.getPosition().X, aktuelleWaffe.getPosition().Y,rightHand.Position.Z), 0.1f, 10, 10, 0.05f);
-                           Vector3 shootdirection = new Vector3();
-                           Scene.Add(bullet);
+                            float schusswinkel;
+                            float x;
+                            float y;
+                            float velocity;
+                            Vector3 spawnpoint = new Vector3 (rightHand.Position.X+1,rightHand.Position.Y-1, rightHand.Position.Z); //Spawnposition nur Vorübergehend sollte am Objekt sein!
+                            bullet = new SphereObject(new Vector3(aktuelleWaffe.getPosition().X, aktuelleWaffe.getPosition().Y,rightHand.Position.Z), 0.1f, 10, 10, 0.05f);
+                            Vector3 shootdirection = new Vector3();
+                            Scene.Add(bullet);
                             
-                           schusswinkel = aktuelleWaffe.getWinkel();
-                           x=(float)Math.Cos(schusswinkel);
-                           y=(float)Math.Sin(schusswinkel);
-                           shootdirection = new Vector3(x,y,0);
-                           if (gamer == spieler1)
-                           {
-                               velocity = leftHand.Position.Y * 10f;
-                               bullet.Physics.LinearVelocity = shootdirection * velocity;
+                            schusswinkel = aktuelleWaffe.getWinkel();
+                            x=(float)Math.Cos(schusswinkel);
+                            y=(float)Math.Sin(schusswinkel);
+                            shootdirection = new Vector3(x,y,0);
+                            if (gamer == spieler1)
+                            {
+                                velocity = leftHand.Position.Y * 10f;
+                                bullet.Physics.LinearVelocity = shootdirection * velocity;
 
 
-                           }
-                           else
-                           {
-                               velocity = leftHand.Position.Y * 10f;
-                               shootdirection.X = shootdirection.X * (-1f);
-                               bullet.Physics.LinearVelocity = shootdirection * velocity;
-                           }
+                            }
+                            else
+                            {
+                                velocity = leftHand.Position.Y * 10f;
+                                shootdirection.X = shootdirection.X * (-1f);
+                                bullet.Physics.LinearVelocity = shootdirection * velocity;
+                            }
 
 
-                           firedWaffen++;
-                           bulletInAir = true;
+                            firedWaffen++;
+                            bulletInAir = true;
                            
                            
                         }
@@ -757,6 +765,7 @@ namespace Crazy_Castle_Crush
                                 //Position der rechten Hand des Spielers in Bildschirmkoodinaten
                                 Vector2 screenPosR = skeleton.Joints[JointType.HandRight].ScreenPosition;
                                 Vector2 normScreenPosR = new Vector2(screenPosR.X, screenPosR.Y);
+                                rHv2s = normScreenPosR;
                                 normScreenPosR.X /= (float)Core.Width;
                                 normScreenPosR.Y /= (float)Core.Height;
                                 /*
@@ -831,7 +840,7 @@ namespace Crazy_Castle_Crush
                                 }
                                 #endregion
 
-                                
+                                klick = skeleton.HandPointers[1].HandEventType == InteractionHandEventType.Grip;
 
                             }
                             #endregion
@@ -843,6 +852,7 @@ namespace Crazy_Castle_Crush
                                 //Position der linken Hand des Spielers in Bildschirmkoodinaten
                                 Vector2 screenPosL = skeleton.Joints[JointType.HandLeft].ScreenPosition;
                                 Vector2 normScreenPosL = new Vector2(screenPosL.X, screenPosL.Y);
+                                lHv2s = normScreenPosL;
                                 normScreenPosL.X /= (float)Core.Width;
                                 normScreenPosL.Y /= (float)Core.Height;
                                 /*
@@ -937,7 +947,8 @@ namespace Crazy_Castle_Crush
 
         public override void HandleInput(InputState input)
         {
-
+            
+            /*
             #region Wenn Spieler Auswählt (Hier Leertaste)
             if (input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.Space, PlayerIndex.One))
             {
@@ -947,7 +958,7 @@ namespace Crazy_Castle_Crush
             {
                 klick = false;
             }
-            #endregion
+            #endregion*/
 
             #region Wenn Spieler eine Waffe abgefeuert hat (Hier noch mit S realisiert)
             if (input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.S, PlayerIndex.One))
@@ -1039,7 +1050,7 @@ namespace Crazy_Castle_Crush
             #region Handpos
             if (currentState == States.Bauphase1O || currentState == States.Bauphase1T || currentState == States.Bauphase2O || currentState == States.Bauphase2T)
             {
-                //DOING
+                Handkreise(rHv2s, lHv2s);
             }
             #endregion
 
@@ -1049,7 +1060,6 @@ namespace Crazy_Castle_Crush
 
         private void Textanzeiger(string aktuellerText)
         {
-
             UI2DRenderer.WriteText(new Vector2(Scene.Camera.Position.X,Scene.Camera.Position.Y),            //Position
                                   aktuellerText,                    //Anzuzeigender Text
                                   Color.Black,                   //Textfarbe
@@ -1057,7 +1067,15 @@ namespace Crazy_Castle_Crush
                                   Vector2.One,             //Textskallierung
                                   UI2DRenderer.HorizontalAlignment.Center, //Horizontal zentriert
                                   UI2DRenderer.VerticalAlignment.Bottom);  //am unteren Bildschirmrand ausrichten
+        }
 
+        private void Handkreise(Vector2 posL, Vector2 posR)
+        {
+            Point centerL = new Point((int)posL.X,(int)posL.Y);
+            UI2DRenderer.DrawCircle(centerL, 20, Color.Green);
+
+            Point centerR = new Point((int)posR.X, (int)posR.Y);
+            UI2DRenderer.DrawCircle(centerR, 20, Color.Red);
         }
 
         private void aktuallisiereZeit(GameTime gameTime)
