@@ -750,29 +750,32 @@ namespace Crazy_Castle_Crush
                         if (skeleton.TrackingState == SkeletonTrackingState.Tracked && skeleton.Joints.Count != 0)
                         {
                             //Box auf Hand, Klick auf Weiter
-                           #region Detektion der rechten Hand
+                            #region Detektion der rechten Hand
 
                             if (skeleton.Joints[JointType.HandRight].TrackingState == JointTrackingState.Tracked)
                             {
                                 //Position der rechten Hand des Spielers in Bildschirmkoodinaten
-                                Vector2 screenPos = skeleton.Joints[JointType.HandRight].ScreenPosition;
-                                Vector2 normScreenPos = new Vector2(screenPos.X, screenPos.Y);
+                                Vector2 screenPosR = skeleton.Joints[JointType.HandRight].ScreenPosition;
+                                Vector2 normScreenPosR = new Vector2(screenPosR.X, screenPosR.Y);
+                                normScreenPosR.X /= (float)Core.Width;
+                                normScreenPosR.Y /= (float)Core.Height;
+                                /*
                                 screenPos.X = screenPos.X * Scene.Game.Window.ClientBounds.Width;
                                 screenPos.Y *= Scene.Game.Window.ClientBounds.Height;
-
+                                */
                                 //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
                                 Plane plane2 = new Plane(Vector3.Forward, -4f);
 
                                 //Weltkoordinatenpunk finden
-                                Vector3 worldPos2 = Helpers.Unproject(screenPos, plane2);
+                                Vector3 worldPos2R = Helpers.Unproject(screenPosR, plane2, false);
 
                                 #region Box auf Hand
                                 //Position der Kugel setzen
-                                rightHand.Position = worldPos2;
+                                rightHand.Position = worldPos2R;
                                 #endregion
 
                                 #region getObj
-                                if (normScreenPos.X >= 0.2f && normScreenPos.X <= 0.8f && normScreenPos.Y <= 0.1f)
+                                if (normScreenPosR.X >= 0.2f && normScreenPosR.X <= 0.8f && normScreenPosR.Y <= 0.1f)
                                 {
                                     getObj = true;
                                 }
@@ -781,7 +784,7 @@ namespace Crazy_Castle_Crush
 
                                 #region WEITER klick
                                 //Wenn sich die rechte Hand in der oberen, rechten Ecke befindet & KLICK -> Klick auf WEITER
-                                if (normScreenPos.X >= 0.9f && normScreenPos.Y >= 0.9f)
+                                if (normScreenPosR.X >= 0.9f && normScreenPosR.Y >= 0.9f)
                                 {
                                     //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
                                     PosX1 = Scene.Camera.Position.X;
@@ -838,24 +841,27 @@ namespace Crazy_Castle_Crush
                             if (skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked)
                             {
                                 //Position der linken Hand des Spielers in Bildschirmkoodinaten
-                                screenPos = skeleton.Joints[JointType.HandLeft].ScreenPosition;
-                                Vector2 normScreenPos = new Vector2(screenPos.X, screenPos.Y);
+                                Vector2 screenPosL = skeleton.Joints[JointType.HandLeft].ScreenPosition;
+                                Vector2 normScreenPosL = new Vector2(screenPosL.X, screenPosL.Y);
+                                normScreenPosL.X /= (float)Core.Width;
+                                normScreenPosL.Y /= (float)Core.Height;
+                                /*
                                 screenPos.X = screenPos.X * Scene.Game.Window.ClientBounds.Width;
                                 screenPos.Y *= Scene.Game.Window.ClientBounds.Height;
-
+                                */
                                 //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
-                                Plane plane2 = new Plane(Vector3.Forward, -1f);
+                                Plane plane2 = new Plane(Vector3.Forward, -4f);
 
                                 //Weltkoordinatenpunk finden
-                                Vector3 worldPos2 = Helpers.Unproject(screenPos, plane2);
+                                Vector3 worldPos2L = Helpers.Unproject(screenPosL, plane2, false);
 
                                 #region Box auf Hand
                                 //Position der Kugel setzen
-                                leftHand.Position = worldPos2;
+                                leftHand.Position = worldPos2L;
                                 #endregion
 
                                 #region Auswahl Textur/ Objekt
-                                auswahl = Auswahl.auswahl(normScreenPos);
+                                auswahl = Auswahl.auswahl(normScreenPosL);
 
                                 #endregion
                             }
@@ -928,6 +934,7 @@ namespace Crazy_Castle_Crush
             }
         }
         #endregion
+
         public override void HandleInput(InputState input)
         {
 
@@ -972,7 +979,7 @@ namespace Crazy_Castle_Crush
            
             if (currentState == States.Bauphase1O)
             {
-                wobinich = "Bau1 Obj"+ auswahl + "    " + weiterSym.Visible + weiterSym.Position;
+                wobinich = "Bau1 Obj"+ auswahl + "    " + rightHand.Position.X +"::"+leftHand.Position.X;
             }
             else if (currentState == States.Bauphase1T)
             {
@@ -1028,6 +1035,14 @@ namespace Crazy_Castle_Crush
                 Objektverwaltung.Geldanzeige(spieler2); //Blendet die Geldbetrag des Spielers ein
             }
             #endregion
+
+            #region Handpos
+            if (currentState == States.Bauphase1O || currentState == States.Bauphase1T || currentState == States.Bauphase2O || currentState == States.Bauphase2T)
+            {
+                //DOING
+            }
+            #endregion
+
 
             base.Draw(gameTime);
         }
