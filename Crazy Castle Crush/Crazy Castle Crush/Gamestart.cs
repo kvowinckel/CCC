@@ -886,10 +886,19 @@ namespace Crazy_Castle_Crush
                                 Vector2 screenPos = skeleton.Joints[JointType.Head].ScreenPosition;
                                 Vector2 normScreenPos = new Vector2(screenPos.X / Scene.Game.Window.ClientBounds.Width, screenPos.Y / Scene.Game.Window.ClientBounds.Height);
 
+                                Vector3 realPos=skeleton.Joints[JointType.Head].WorldPosition;
                                 //Hintergrund bewegen
                                 startObjects.MoveBackground(normScreenPos.X - 0.5f, normScreenPos.Y - 0.5f);
                                 
+                                //Kamera auf z-Achse bewegen
+                                float zoom;
+                                zoom=realPos.Z;
+                                if (zoom >= 1.5 && zoom <= 4)
+                                {
+                                    zoom -= 1.5f;
 
+                                    cam.Position = new Vector3(cam.Position.X, cam.Position.Y, zoom * 5);
+                                }
 
                             }
                             

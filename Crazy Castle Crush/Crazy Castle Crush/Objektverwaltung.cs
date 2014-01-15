@@ -84,28 +84,11 @@ namespace Crazy_Castle_Crush
 
             if (auswahl == 1)//Kanone
             {
-                Vector3 diff = new Vector3(0.095f, 0.1828f, 0);
-                ModelObject Kanonenrohr = new ModelObject(startort + diff, Quaternion.Identity, new Vector3(0.1f, 0.1f, 0.1f), CollisionType.ExactMesh, " ", "Kanonenrohr", 0.001f);
-                Kanonenrohr.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
-                scene.Add(Kanonenrohr);
-
-                ModelObject Kanonenhalterung = new ModelObject(startort, Quaternion.Identity, new Vector3(0.1f, 0.1f, 0.1f), CollisionType.ExactMesh, " ", "Kanonenhalterung", 1f);
-                Kanonenhalterung.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
-                scene.Add(Kanonenhalterung);
-
-                newcon = new Controller(new Vector3(0, 0, 0));// Neuer Controller an der Position 0/0/0
-                newcon.Add(Kanonenrohr);
-                newcon.Add(Kanonenhalterung);
-
-                revolute = new RevoluteJoint(Kanonenhalterung.Physics, Kanonenrohr.Physics, Kanonenhalterung.Position + new Vector3(0, 1, 0), Vector3.Backward);
-                /*revolute.Limit.IsActive = true;
-                revolute.Limit.MinimumAngle = -MathHelper.Pi;
-                revolute.Limit.MaximumAngle = 0;*/
-                scene.Physics.Add(revolute);
-
-                revolute.Motor.IsActive = true;
-                revolute.Motor.Settings.Mode = BEPUphysics.Constraints.TwoEntity.Motors.MotorMode.Servomechanism;
-                revolute.Motor.Settings.Servo.Goal = -MathHelper.Pi / 4;
+                ModelObject Kanone = new ModelObject(startort , Quaternion.Identity, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Kanone_ganz", 1f);
+                Kanone.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                scene.Add(Kanone);
+                
+               
             }
             else //TEMPORÄR
             {
@@ -145,15 +128,15 @@ namespace Crazy_Castle_Crush
         public static Waffen getWaffe(Spieler spieler, int firedwappons)
         {
             //firedwappons = 0 ==> erste Waffe
-           
+            
              return spieler.getList()[firedwappons]; 
-            // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!    
+            // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!           
             
             // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!           
         }
        
 
-        public static Objekte projektil(int id, Vector3 startpos, float winkel) //TODO WIRD NICHT VERWENDET
+        public static Objekte projektil(int id, Vector3 startpos, float winkel) //TODO
         {
             SceneObject newobj;
             Objekte dasobj;
