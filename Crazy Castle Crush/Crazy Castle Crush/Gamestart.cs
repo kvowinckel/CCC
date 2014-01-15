@@ -64,7 +64,6 @@ namespace Crazy_Castle_Crush
         SphereObject bullet;                                  //Geschoss  
         bool bulletInAir;
         Vector2 screenPos;                                    //normierte Position der Hände
-        Vector3 realPos;
 
 
 
@@ -92,10 +91,8 @@ namespace Crazy_Castle_Crush
             base.Initialize();
             
             //Kinect initialisieren
+            Scene.InitKinect();
 
-             Scene.InitKinect(); 
-            
-            
             Scene.Physics.ForceUpdater.Gravity = new Vector3(0,-5.0f,0);            //Definierte Schwerkraft
 
             //Kamera
@@ -119,7 +116,7 @@ namespace Crazy_Castle_Crush
 
             currentState = States.Menu;                                            //Anfangszustand
         }
-
+        
 
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
@@ -228,6 +225,7 @@ namespace Crazy_Castle_Crush
 
                 #region Objektemenüs
                 case States.Bauphase2O:
+
                 case States.Bauphase1O:
                     aktuallisiereZeit(gameTime);
                     detecting = true;               //Kinect aktiv
@@ -236,6 +234,7 @@ namespace Crazy_Castle_Crush
                         weiterSym.Visible = true;
                     }
                     float pos;
+                    
 
                     #region Spieler &  Spielerposition
                     if (currentState == States.Bauphase1O)
@@ -259,7 +258,6 @@ namespace Crazy_Castle_Crush
                         {
                             objInHand = true;                                               //soll jetzt der Hand folgen
                             aktuellesObj = Objektverwaltung.createObj(auswahl, gamer, pos); //aktuelles Objekt wird erzeugt
-                            
                         }
 
                         if (objInHand)//Ausrichten des Obj
@@ -521,7 +519,7 @@ namespace Crazy_Castle_Crush
                            bullet = new SphereObject(new Vector3(aktuelleWaffe.getPosition().X, aktuelleWaffe.getPosition().Y,rightHand.Position.Z), 0.1f, 10, 10, 0.05f);
                            Vector3 shootdirection = new Vector3();
                            Scene.Add(bullet);
-                           
+                            
                            schusswinkel = aktuelleWaffe.getWinkel();
                            x=(float)Math.Cos(schusswinkel);
                            y=(float)Math.Sin(schusswinkel);
@@ -554,7 +552,7 @@ namespace Crazy_Castle_Crush
                     
                     if (bulletInAir)
                     {
-                        
+                       
                         cameraMovement.chaseBullet(bullet.Position, cam.Position);
                         
                         bullet.Collided +=new EventHandler<CollisionArgs>(bulletCollidedHandler);
@@ -616,6 +614,7 @@ namespace Crazy_Castle_Crush
                         };
 
                         ParticleObject particle = new ParticleObject(bullet.Position, effect);
+                        
                        
 
 
@@ -751,30 +750,32 @@ namespace Crazy_Castle_Crush
                         if (skeleton.TrackingState == SkeletonTrackingState.Tracked && skeleton.Joints.Count != 0)
                         {
                             //Box auf Hand, Klick auf Weiter
-                           #region Detektion der rechten Hand
+                            #region Detektion der rechten Hand
 
                             if (skeleton.Joints[JointType.HandRight].TrackingState == JointTrackingState.Tracked)
                             {
                                 //Position der rechten Hand des Spielers in Bildschirmkoodinaten
-                                Vector2 screenPos = skeleton.Joints[JointType.HandRight].ScreenPosition;
-                                Vector2 normScreenPos = new Vector2(screenPos.X, screenPos.Y);
-                                normScreenPos.X /= (float)Core.Width;//Scene.Game.Window.ClientBounds.Width;
-                                normScreenPos.Y /= (float)Core.Height;//Scene.Game.Window.ClientBounds.Height;
-                                //TextanzeigerCenter("Left Hand X=" +  normScreenPos.X + ", Y=" + normScreenPos.Y);
-
+                                Vector2 screenPosR = skeleton.Joints[JointType.HandRight].ScreenPosition;
+                                Vector2 normScreenPosR = new Vector2(screenPosR.X, screenPosR.Y);
+                                normScreenPosR.X /= (float)Core.Width;
+                                normScreenPosR.Y /= (float)Core.Height;
+                                /*
+                                screenPos.X = screenPos.X * Scene.Game.Window.ClientBounds.Width;
+                                screenPos.Y *= Scene.Game.Window.ClientBounds.Height;
+                                */
                                 //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
                                 Plane plane2 = new Plane(Vector3.Forward, -4f);
 
                                 //Weltkoordinatenpunk finden
-                                Vector3 worldPos2 = Helpers.Unproject(/*normScreenPos*/screenPos, plane2, false);
+                                Vector3 worldPos2R = Helpers.Unproject(screenPosR, plane2, false);
 
                                 #region Box auf Hand
                                 //Position der Kugel setzen
-                                rightHand.Position = worldPos2;
+                                rightHand.Position = worldPos2R;
                                 #endregion
 
                                 #region getObj
-                                if (normScreenPos.X >= 0.2f && normScreenPos.X <= 0.8f && normScreenPos.Y <= 0.1f)
+                                if (normScreenPosR.X >= 0.2f && normScreenPosR.X <= 0.8f && normScreenPosR.Y <= 0.1f)
                                 {
                                     getObj = true;
                                 }
@@ -783,7 +784,7 @@ namespace Crazy_Castle_Crush
 
                                 #region WEITER klick
                                 //Wenn sich die rechte Hand in der oberen, rechten Ecke befindet & KLICK -> Klick auf WEITER
-                                if (normScreenPos.X >= 0.9f && normScreenPos.Y >= 0.9f)
+                                if (normScreenPosR.X >= 0.9f && normScreenPosR.Y >= 0.9f)
                                 {
                                     //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
                                     PosX1 = Scene.Camera.Position.X;
@@ -840,26 +841,27 @@ namespace Crazy_Castle_Crush
                             if (skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked)
                             {
                                 //Position der linken Hand des Spielers in Bildschirmkoodinaten
-                                screenPos = skeleton.Joints[JointType.HandLeft].ScreenPosition;
-                                Vector2 normScreenPos = new Vector2(screenPos.X, screenPos.Y);
-                                
-                                normScreenPos.X = screenPos.X / Scene.Game.Window.ClientBounds.Width;
-                                normScreenPos.Y /= Scene.Game.Window.ClientBounds.Height;
-                                //TextanzeigerCenter("Left Hand X=" +  /*normScreenPos.X + ", Y=" + normScreenPos.Y*/);
-
+                                Vector2 screenPosL = skeleton.Joints[JointType.HandLeft].ScreenPosition;
+                                Vector2 normScreenPosL = new Vector2(screenPosL.X, screenPosL.Y);
+                                normScreenPosL.X /= (float)Core.Width;
+                                normScreenPosL.Y /= (float)Core.Height;
+                                /*
+                                screenPos.X = screenPos.X * Scene.Game.Window.ClientBounds.Width;
+                                screenPos.Y *= Scene.Game.Window.ClientBounds.Height;
+                                */
                                 //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
-                                Plane plane2 = new Plane(Vector3.Forward, -1f);
+                                Plane plane2 = new Plane(Vector3.Forward, -4f);
 
                                 //Weltkoordinatenpunk finden
-                                Vector3 worldPos2 = Helpers.Unproject(normScreenPos, plane2);
+                                Vector3 worldPos2L = Helpers.Unproject(screenPosL, plane2, false);
 
                                 #region Box auf Hand
                                 //Position der Kugel setzen
-                                leftHand.Position = worldPos2;
+                                leftHand.Position = worldPos2L;
                                 #endregion
 
                                 #region Auswahl Textur/ Objekt
-                                auswahl = Auswahl.auswahl(normScreenPos);
+                                auswahl = Auswahl.auswahl(normScreenPosL);
 
                                 #endregion
                             }
@@ -873,9 +875,11 @@ namespace Crazy_Castle_Crush
                                 //Position des Kopfes des Spielers in Bildschirmkoodinaten
                                 Vector2 screenPos = skeleton.Joints[JointType.Head].ScreenPosition;
                                 Vector2 normScreenPos = new Vector2(screenPos.X / Scene.Game.Window.ClientBounds.Width, screenPos.Y / Scene.Game.Window.ClientBounds.Height);
+
                                 Vector3 realPos=skeleton.Joints[JointType.Head].WorldPosition;
                                 //Hintergrund bewegen
                                 startObjects.MoveBackground(normScreenPos.X - 0.5f, normScreenPos.Y - 0.5f);
+                                
                                 //Kamera auf z-Achse bewegen
                                 float zoom;
                                 zoom=realPos.Z;
@@ -928,7 +932,7 @@ namespace Crazy_Castle_Crush
                     bulletInAir = false;
                     Scene.Remove(bullet);
                     cameraMovement.move(zeit, 3000, PosX1, level.getSpieler1Pos()); //TODO Kamera fahrt noch ändern
-        }
+                }
             }
             if (e.Collider is Objekte)
             {
@@ -939,6 +943,7 @@ namespace Crazy_Castle_Crush
             }
         }
         #endregion
+
         public override void HandleInput(InputState input)
         {
 
@@ -983,7 +988,7 @@ namespace Crazy_Castle_Crush
            
             if (currentState == States.Bauphase1O)
             {
-                wobinich = "Bau1 Obj"+ auswahl + "    " + weiterSym.Visible + weiterSym.Position;
+                wobinich = "Bau1 Obj"+ auswahl + "    " + rightHand.Position.X +"::"+leftHand.Position.X;
             }
             else if (currentState == States.Bauphase1T)
             {
@@ -1039,6 +1044,14 @@ namespace Crazy_Castle_Crush
                 Objektverwaltung.Geldanzeige(spieler2); //Blendet die Geldbetrag des Spielers ein
             }
             #endregion
+
+            #region Handpos
+            if (currentState == States.Bauphase1O || currentState == States.Bauphase1T || currentState == States.Bauphase2O || currentState == States.Bauphase2T)
+            {
+                //DOING
+            }
+            #endregion
+
 
             base.Draw(gameTime);
         }
