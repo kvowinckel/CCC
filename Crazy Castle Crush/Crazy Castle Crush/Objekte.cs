@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Crazy_Castle_Crush
 {
-    public class Objekte:SceneObject
+    public class Objekte  //:SceneObject
     {
         private int lebenspunkte;
         private RenderMaterial material;

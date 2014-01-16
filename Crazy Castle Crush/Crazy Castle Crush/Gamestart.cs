@@ -319,7 +319,7 @@ namespace Crazy_Castle_Crush
                         if (objInHand && showWaffe == true)                                              //Ausrichten der Waffe
                         {
                             Vector3 rH = new Vector3(rightHand.Position.X, rightHand.Position.Y, -5f);  //Handvektor ohne Tiefenveränderung
-                            aktuelleWaffe.setPosition(rH);                                              //Waffenposition wird auf Handgelegt
+                            aktuelleWaffe.getModelObject().Position = rH;                               //Waffenposition wird auf Handgelegt
                             
                             rightHand.Visible = false;                                                  //Anzeige der rechten Hand deaktiviert
                             
@@ -694,7 +694,8 @@ namespace Crazy_Castle_Crush
 
                 #endregion
 
-                
+
+
             }
 
 
@@ -944,13 +945,18 @@ namespace Crazy_Castle_Crush
                     cameraMovement.move(zeit, 3000, PosX1, level.getSpieler1Pos()); //TODO Kamera fahrt noch ändern
                 }
             }
+            //TODO: Objektkollision
+
+            /*
             if (e.Collider is Objekte)
             {
-                ((Objekte)e.Collider).decreaseLP();
+                
+                e.Collider.decreaseLP();
                 Scene.Remove(bullet);
                 cameraMovement.move(zeit, 3000, PosX1, level.getSpieler1Pos());//TODO Kamera fahr noch ändern
                 bulletInAir = false;
             }
+             * */
         }
         #endregion
 

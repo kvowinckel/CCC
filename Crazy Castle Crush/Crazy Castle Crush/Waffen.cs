@@ -14,30 +14,38 @@ namespace Crazy_Castle_Crush
     public class Waffen
     {
         private int lebenspunkte;
-        private Controller controller;
+        private ModelObject mo;
         private float schusswinkel;
         private float shootspeed;
-        private RevoluteJoint revolute;
+        
 
-        public Waffen( Controller Kontroller, RevoluteJoint Revolute, int Lebenspunkte, float Schusswinkel, float ShootSpeed) //Controller rausgenommen 
+        public Waffen(ModelObject MO, int Lebenspunkte, float Schusswinkel, float ShootSpeed) //Controller rausgenommen 
         {
-            controller = Kontroller;
+            mo = MO;
             lebenspunkte = Lebenspunkte;
             schusswinkel = Schusswinkel;
             shootspeed = ShootSpeed;
-            revolute = Revolute;
-            
+        }
+
+        public ModelObject getModelObject()
+        {
+            return mo;
         }
 
         public void setWinkel(float rHandY)
         {
+            //TODO Winkel der Waffe
+
             
             rHandY = rHandY / 1.6f; // Schusswinkel hängt nur mit Höhe der rechten Hand zusammen
 
             schusswinkel = rHandY * 3.1415f/2; // mit float math.pi ersetzen!!!
-            
+
+            mo.SubModels[1].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, schusswinkel);
+
+            /*
             revolute.Motor.Settings.Servo.Goal = schusswinkel;//stellt Motor auf Winkel ein
-            
+            */
         }
 
         public float getWinkel()
@@ -45,38 +53,19 @@ namespace Crazy_Castle_Crush
             return schusswinkel;
         }
 
-       /* public Vector3 getPosition()
+        public void setPosition(Vector3 vec)
         {
-            
+            mo.Position = vec;
         }
-       */
-       public void setPosition(Vector3 vektor)
+
+        public Vector3 getPosition()
         {
-            controller.Position = vektor;
-            
-          // controller.Orientation = quad = new Quaternion( new Vector3(0,0,1),0f);
-           
-           
+            return mo.Position;
         }
-       public Vector3 getPosition()
-       {
-           return controller.Position;
-          
-       }
-            
-       
-       
 
         public int getLP()
         {
             return lebenspunkte;
-        }
-
-      
-
-        public Controller getController()
-        {
-            return controller;
         }
        
     }

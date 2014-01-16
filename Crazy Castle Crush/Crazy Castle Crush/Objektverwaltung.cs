@@ -77,49 +77,15 @@ namespace Crazy_Castle_Crush
 
         public static Waffen createWaffe(int auswahl, Spieler spieler, Vector3 posi)//TODO
         {
-            Controller newcon;
-            RevoluteJoint revolute;
             Waffen dasobj;
             Vector3 startort = new Vector3(posi.X,posi.Y, -5f);
 
-            if (auswahl == 1)//Kanone
-            {
-                ModelObject Kanone = new ModelObject(startort , Quaternion.Identity, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Kanone_ganz", 1f);
-                Kanone.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
-                scene.Add(Kanone);
+            ModelObject Kanone = new ModelObject(startort , Quaternion.Identity, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Kanone_ganz", 1f);
+            Kanone.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+            scene.Add(Kanone);
                 
-               
-            }
-            else //TEMPORÄR
-            {
-                BoxObject Box = new BoxObject(startort, new Vector3(0.4f, 0.25f, 0.3f), 0.001f);
-                scene.Add(Box);//Standbox
 
-                BoxObject Lat = new BoxObject(startort + new Vector3(0 , 0.35f , 0), new Vector3(0.35f, 0.1f, 0.1f), 0.00001f);
-                scene.Add(Lat);//KanonenRohr
-
-                newcon = new Controller(startort);
-                newcon.Add(Box);
-                newcon.Add(Lat);
-                scene.Add(newcon);
-
-                revolute = new RevoluteJoint(Box.Physics, Lat.Physics, Box.Position + new Vector3(0, 0.32f, 0), Vector3.Backward);
-                /*revolute.Limit.IsActive = true;
-                revolute.Limit.MinimumAngle = -MathHelper.Pi;
-                revolute.Limit.MaximumAngle = 0;*/
-                scene.Physics.Add(revolute);
-
-                revolute.Motor.IsActive = true;
-                revolute.Motor.Settings.Mode = BEPUphysics.Constraints.TwoEntity.Motors.MotorMode.Servomechanism;
-                revolute.Motor.Settings.Servo.Goal = MathHelper.Pi / 6;
-                
-            }
-
-            //TODO z-Achse sperren
-
-            
-            //scene.Add(newcon);
-            dasobj = new Waffen( newcon, revolute, 1, (float)Math.PI / 4, 5f);
+            dasobj = new Waffen(Kanone, 1, (float)Math.PI / 4, 5f);
             spieler.setWaffen(dasobj);
             return dasobj;
 
@@ -259,7 +225,7 @@ namespace Crazy_Castle_Crush
             {
                 if (temp.getLP() <= 0)
                 {
-                    scene.Remove(temp.getController());
+                    scene.Remove(temp.getModelObject());
                     spieler1.resetWaffen(temp);
                 }
             }
@@ -268,7 +234,7 @@ namespace Crazy_Castle_Crush
             {
                 if (temp.getLP() <= 0)
                 {
-                    scene.Remove(temp.getController());
+                    scene.Remove(temp.getModelObject());
                     spieler2.resetWaffen(temp);
                 }
             }
