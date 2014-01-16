@@ -69,7 +69,8 @@ namespace Crazy_Castle_Crush
         SphereObject bullet;                                  //Geschoss  
         bool bulletInAir;
         Vector2 screenPos;                                    //normierte Position der Hände
-
+        float zoomOld = 0;
+        Vector3 realPos;
 
 
 
@@ -887,19 +888,41 @@ namespace Crazy_Castle_Crush
                                 Vector2 screenPos = skeleton.Joints[JointType.Head].ScreenPosition;
                                 Vector2 normScreenPos = new Vector2(screenPos.X / Scene.Game.Window.ClientBounds.Width, screenPos.Y / Scene.Game.Window.ClientBounds.Height);
 
-                                Vector3 realPos=skeleton.Joints[JointType.Head].WorldPosition;
+                                realPos=skeleton.Joints[JointType.Head].WorldPosition;
                                 //Hintergrund bewegen
                                 startObjects.MoveBackground(normScreenPos.X - 0.5f, normScreenPos.Y - 0.5f);
-                                
-                                //Kamera auf z-Achse bewegen
-                                float zoom;
-                                zoom=realPos.Z;
-                                if (zoom >= 1.5 && zoom <= 4)
-                                {
-                                    zoom -= 1.5f;
 
-                                    cam.Position = new Vector3(cam.Position.X, cam.Position.Y, zoom * 5);
+                                //Kamera auf z-Achse bewegen
+
+                                #region Zoom Funktionen
+                                //ZOOM Funktionen
+                                if (currentState == States.Schussphase1 || currentState == States.Schussphase2)
+                                {
+                                    if (gamer == spieler1)
+                                    {
+                                        cameraMovement.zoom(realPos.Z,1,new Vector3(10f,2f,15f));
+                                    }
+                                    if (gamer == spieler2)
+                                    {
+                                        cameraMovement.zoom(realPos.Z, -1,new Vector3(10f,2f,15f));
+                                    }
+
                                 }
+                                if (currentState == States.Bauphase1O || currentState == States.Bauphase1T || currentState == States.Bauphase2O || currentState == States.Bauphase2T)
+                                {
+                                    if(gamer==spieler1)
+                                    {
+                                        cameraMovement.zoom(realPos.Z,1,new Vector3(1.5f,0f,4f));
+                                    }
+                                    if(gamer==spieler2)
+                                    {
+                                        cameraMovement.zoom(realPos.Z,-1,new Vector3(1.5f,0f,4f));
+                                    }
+                                }
+
+                                #endregion
+
+
 
                             }
                             

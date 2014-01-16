@@ -32,6 +32,22 @@ namespace Crazy_Castle_Crush
             camera.Position = new Vector3(positionBullet.X, positionBullet.Y, startposition.Z);//Bewegt die Kamera mit dem Geschoss mit
 
         }
+        public void zoom(float zoom, int player,Vector3 zoomparameter)
+        {
+            
+            if (zoom >= 1.5 && zoom <= 4)
+            {
+
+                zoom -= 1.5f;
+                camera.Position = new Vector3((-20f + zoom * zoomparameter.X)*player, 1 + zoom * zoomparameter.Y, zoom * (zoomparameter.Z));
+                float rotationAngle = -(float)(zoom * Math.PI / 32);
+                Matrix rotMatrix = Matrix.CreateRotationX(0) * Matrix.CreateRotationY(0) * Matrix.CreateRotationZ(0);
+                camera.Orientation = Quaternion.CreateFromRotationMatrix(rotMatrix);
+
+                
+            }
+        }
+
          
         
         //Erzeut eine Bewegung von Start zum Zielpunkt. Benötigt runTime und exeTime, Zeit in der die Bewegung ausgeführt werden soll
