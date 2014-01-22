@@ -1041,6 +1041,9 @@ namespace Crazy_Castle_Crush
 
             Texture2D HandsmallR = Core.Content.Load<Texture2D>("HandCursorR");
             UI2DRenderer.DrawTexture(HandsmallR, new Vector2((int)posR.X, (int)posR.Y), 30, 30);
+            /*HandBilder 
+             * Texture2D Handsmall = Core.Content.Load<Texture2D>("HandCursor");
+            UI2DRenderer.DrawTexture(Handsmall, new Vector2(0, 0), 140, 90);*/
         }
 
         private void drawBox(Vector2 pos, Vector2 dim, String bild)
