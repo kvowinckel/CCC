@@ -14,7 +14,6 @@ namespace Crazy_Castle_Crush
     {
         BoxObject hintergrund;
         Vector3 pos = new Vector3(0, 0, -11);
-        bool lastR = false;
         
         public StartObjects(Scene scene, Levels level)
         {
