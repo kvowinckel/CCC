@@ -1029,11 +1029,18 @@ namespace Crazy_Castle_Crush
 
         private void Handkreise(Vector2 posL, Vector2 posR)
         {
+            /*
             Point centerL = new Point((int)posL.X,(int)posL.Y);
             UI2DRenderer.DrawCircle(centerL, 20, Color.Green);
 
             Point centerR = new Point((int)posR.X, (int)posR.Y);
             UI2DRenderer.DrawCircle(centerR, 20, Color.Red);
+            */
+            Texture2D HandsmallL = Core.Content.Load<Texture2D>("HandCursorL");
+            UI2DRenderer.DrawTexture(HandsmallL, new Vector2((int)posL.X, (int)posL.Y), 30, 30);
+
+            Texture2D HandsmallR = Core.Content.Load<Texture2D>("HandCursorR");
+            UI2DRenderer.DrawTexture(HandsmallR, new Vector2((int)posR.X, (int)posR.Y), 30, 30);
         }
 
         private void drawBox(Vector2 pos, Vector2 dim, String bild)
