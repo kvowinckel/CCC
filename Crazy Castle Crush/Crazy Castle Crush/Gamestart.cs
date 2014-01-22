@@ -62,8 +62,7 @@ namespace Crazy_Castle_Crush
 
         bool klickRH;                                       //klick der rechten Hand
         bool klickLH;                                       //klick der linken Hand
-        double klickedRH;                                   //zeit seit letztem grab
-        double klickedLH;                                   //zeit seit letztem grab
+        
         bool shoot;                                         //Wenn Spieler schießt (noch S)
         
         bool objInHand;                                     //solange das Objekt an der Hand ist
@@ -73,9 +72,6 @@ namespace Crazy_Castle_Crush
         SphereObject bullet;                                  //Geschoss  
         bool bulletInAir;
 
-        Vector2 screenPos;                                    //normierte Position der Hände
-
-        bool test;
 
 
         //Benötigt für die einblendung von Auswahlmenu
@@ -113,6 +109,10 @@ namespace Crazy_Castle_Crush
             cameraMovement = new CameraMovement(cam);
 
 
+            this.Scene.ShowCameraImage = true;
+            this.Scene.Kinect.ShowCameraImage = NOVA.Components.Kinect.Kinect.KinectCameraImage.ReducedRGB;
+            
+
             //Objecte
             startObjects = new StartObjects(Scene, level);
             Objektverwaltung.setObjektverwaltung(Scene,level);
@@ -141,6 +141,7 @@ namespace Crazy_Castle_Crush
                         {
                             //Position der rechten Hand des Spielers in Bildschirmkoodinaten
                             rHv2s = skeleton.Joints[JointType.HandRight].ScreenPosition;
+                            rHv2s -= new Vector2(0, 10);
                             rHv2n.X = rHv2s.X / screenDim.X;
                             rHv2n.Y = rHv2s.Y / screenDim.Y;
 
@@ -155,56 +156,14 @@ namespace Crazy_Castle_Crush
 
                             #endregion
 
-                            #region WEITER
-                            //Wenn sich die rechte Hand in der oberen, rechten Ecke befindet & KLICK -> Klick auf WEITER
-                            if (rHv2n.X >= 0.9f && rHv2n.Y >= 0.9f && klickRH)
+                            if (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.GripRelease)
                             {
-                                //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
-                                PosX1 = Scene.Camera.Position.X;
-                                Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
-                                aktuallisiereZeit(gameTime);
-
-                                if (currentState == States.Bauphase1O)
-                                {
-                                    prewState = States.Bauphase1O;
-
-                                    //wenn Spieler2 über genügend Geld zum bauen verfügt, Bauphase Spieler 2
-                                    //Wenn Spieler2 mehr Geld besitzt fängt er die Schussphase2 an
-                                    if (spieler2.getMoney() >= level.getMinMoney() || spieler2.getMoney() > spieler1.getMoney())
-                                    {
-                                        currentState = States.Camto2;
-                                    }
-                                    //wenn Spieler2 nicht über genügend Geld zum bauen verfügt, und Spieler1 mehr Geld hat beginnt Schussphase1
-                                    else
-                                    {
-                                        currentState = States.Schussphase1;
-                                    }
-
-                                }
-                                else if (currentState == States.Bauphase2O)
-                                {
-                                    prewState = States.Bauphase2O;
-
-                                    //Wenn Spieler2 mehr Geld besitzt fängt er die Schussphase2 an
-                                    if (spieler2.getMoney() > spieler1.getMoney())
-                                    {
-                                        currentState = States.Schussphase2;
-                                    }
-                                    //sonst Spieler 1
-                                    else
-                                    {
-                                        currentState = States.Camto1;
-                                    }
-
-                                }
-                                else
-                                {
-                                    return;
-                                }
+                                klickRH = true;
                             }
-                            #endregion
-
-                            klickRH = (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.Grip);
+                            else
+                            {
+                                klickRH = false;
+                            }
 
                         }
                         #endregion
@@ -224,6 +183,7 @@ namespace Crazy_Castle_Crush
                             //Weltkoordinatenpunk finden
                             Vector3 worldPos2L = Helpers.Unproject(lHv2s, plane2, false);
                             lHv2w = new Vector2(worldPos2L.X, worldPos2L.Y);
+
 
                             klickLH = (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.Grip);
                         }
@@ -352,7 +312,6 @@ namespace Crazy_Castle_Crush
 
                 case States.Bauphase1O:
                     aktuallisiereZeit(gameTime);
-                    detecting = true;               //Kinect aktiv
                     float pos;
 
                     #region Spieler &  Spielerposition
@@ -371,14 +330,7 @@ namespace Crazy_Castle_Crush
                     #region Objekt erzeugen und mit Hand positionieren
                     if (!showWaffe)
                     {
-
-                        if (shoot)
-                        {
-                            showGeld = new int[2]{-90,100};
-                        }
-
-
-                        if (klickRH && !objInHand && auswahl != 0 && auswahl < 5)    //"klick" und das Objekt wurde noch nicht erstellt und linke hand befindet sich auf auswahlfeld
+                        if (klickRH && !objInHand && auswahl != 0 &&auswahl < 5)    //"klick" und das Objekt wurde noch nicht erstellt und linke hand befindet sich auf auswahlfeld
                         {
                             klickRH = false;
                             objInHand = true;                                               //soll jetzt der Hand folgen
@@ -793,6 +745,56 @@ namespace Crazy_Castle_Crush
 
             }
 
+
+            #region WEITER
+            //Wenn sich die rechte Hand in der oberen, rechten Ecke befindet & KLICK -> Klick auf WEITER
+            if (rHv2n.X >= 0.9f && rHv2n.Y >= 0.9f && klickRH)
+            {
+                //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
+                PosX1 = Scene.Camera.Position.X;
+                Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
+                aktuallisiereZeit(gameTime);
+
+                if (currentState == States.Bauphase1O)
+                {
+                    prewState = States.Bauphase1O;
+
+                    //wenn Spieler2 über genügend Geld zum bauen verfügt, Bauphase Spieler 2
+                    //Wenn Spieler2 mehr Geld besitzt fängt er die Schussphase2 an
+                    if (spieler2.getMoney() >= level.getMinMoney() || spieler2.getMoney() > spieler1.getMoney())
+                    {
+                        currentState = States.Camto2;
+                    }
+                    //wenn Spieler2 nicht über genügend Geld zum bauen verfügt, und Spieler1 mehr Geld hat beginnt Schussphase1
+                    else
+                    {
+                        currentState = States.Schussphase1;
+                    }
+
+                }
+                else if (currentState == States.Bauphase2O)
+                {
+                    prewState = States.Bauphase2O;
+
+                    //Wenn Spieler2 mehr Geld besitzt fängt er die Schussphase2 an
+                    if (spieler2.getMoney() > spieler1.getMoney())
+                    {
+                        currentState = States.Schussphase2;
+                    }
+                    //sonst Spieler 1
+                    else
+                    {
+                        currentState = States.Camto1;
+                    }
+
+                }
+                else
+                {
+                    return;
+                }
+            }
+            #endregion
+
             #region Update Ende
 
             /*
@@ -872,10 +874,10 @@ namespace Crazy_Castle_Crush
         {
             #region State Anzeige
             string wobinich = "";
-           
+
             if (currentState == States.Bauphase1O)
             {
-                wobinich = "Bau1 Obj"+ auswahl + "Klick RH: " + klickRH + test +klickedRH;
+                wobinich = "Bau1 Obj"+ rHv2n + rHv2s + rHv2w;
             }
             else if (currentState == States.Bauphase1T)
             {
