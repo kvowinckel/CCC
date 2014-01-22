@@ -203,14 +203,36 @@ namespace Crazy_Castle_Crush
                             startObjects.MoveBackground(normScreenPos.X - 0.5f, normScreenPos.Y - 0.5f);
 
                             //Kamera auf z-Achse bewegen
-                            float zoom;
-                            zoom = realPos.Z;
-                            if (zoom >= 1.5 && zoom <= 4)
-                            {
-                                zoom -= 1.5f;
+                            realPos=skeleton.Joints[JointType.Head].WorldPosition;
 
-                                cam.Position = new Vector3(cam.Position.X, cam.Position.Y, zoom * 5);
+                            #region Zoom Funktionen
+                            //ZOOM Funktionen
+                            if (currentState == States.Schussphase1 || currentState == States.Schussphase2)
+                            {
+                                if (gamer == spieler1)
+                                {
+                                    cameraMovement.zoom(realPos.Z, 1, new Vector3(10f, 2f, 15f));
+                                }
+                                if (gamer == spieler2)
+                                {
+                                    cameraMovement.zoom(realPos.Z, -1, new Vector3(10f, 2f, 15f));
+                                }
                             }
+                            if (currentState == States.Bauphase1O || currentState == States.Bauphase1T || currentState == States.Bauphase2O || currentState == States.Bauphase2T)
+                            {
+                                if (gamer == spieler1)
+                                {
+                                    cameraMovement.zoom(realPos.Z, 1, new Vector3(1.5f, 0f, 4f));
+                                }
+                                if (gamer == spieler2)
+                                {
+                                    cameraMovement.zoom(realPos.Z, -1, new Vector3(1.5f, 0f, 4f));
+                                }
+                            }
+
+
+                            #endregion
+
 
                         }
 
@@ -334,7 +356,7 @@ namespace Crazy_Castle_Crush
                         {
                             klickRH = false;
                             objInHand = true;                                               //soll jetzt der Hand folgen
-                            aktuellesObj = Objektverwaltung.createObj(auswahl, gamer, pos); //aktuelles Objekt wird erzeugt
+                            aktuellesObj = Objektverwaltung.createObj(auswahl, gamer, pos, rHv2s); //aktuelles Objekt wird erzeugt
                         }
 
                         if (objInHand)//Ausrichten des Obj
@@ -475,18 +497,15 @@ namespace Crazy_Castle_Crush
                         { } //kostenlos
                         else if (aktuellesObj.getMaterial() == "MStein")
                         {
-                            gamer.setMoney(spieler1.getMoney() - 50);
-                            setShowGeld(-50, 100);           //Kosten visualisieren
+                            DrawHelper.setmoney(gamer, -50, rHv2s);
                         }
                         else if (auswahl == 3)
                         {
-                            gamer.setMoney(spieler1.getMoney() - 100);
-                            setShowGeld(-100, 100);           //Kosten visualisieren
+                            DrawHelper.setmoney(gamer, -100, rHv2s);
                         }
                         else if (auswahl == 4)
                         {
-                            gamer.setMoney(spieler1.getMoney() - 200);
-                            setShowGeld(-200, 100);           //Kosten visualisieren
+                            DrawHelper.setmoney(gamer, -200, rHv2s);
                         }
                         #endregion
 
@@ -748,7 +767,7 @@ namespace Crazy_Castle_Crush
 
             #region WEITER
             //Wenn sich die rechte Hand in der oberen, rechten Ecke befindet & KLICK -> Klick auf WEITER
-            if (rHv2n.X >= 0.9f && rHv2n.Y >= 0.9f && klickRH)
+            if (rHv2n.X >= 0.9f && rHv2n.Y >= 0.4f && rHv2n.Y <= 0.6f && klickRH)
             {
                 //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
                 PosX1 = Scene.Camera.Position.X;
@@ -941,7 +960,7 @@ namespace Crazy_Castle_Crush
             if (currentState == States.Bauphase1O || currentState == States.Bauphase2O)
             {
                 Vector2 dim = new Vector2((screenDim.X * 0.09f), (screenDim.Y * 0.09f));
-                Vector2 pos = new Vector2(screenDim.X - dim.X - screenDim.X * 0.01f, screenDim.Y - dim.Y - screenDim.Y * 0.01f);
+                Vector2 pos = new Vector2(screenDim.X - dim.X - screenDim.X * 0.01f, screenDim.Y *0.45f);
                 drawBox(pos, dim, "weiter2");
             }
             #endregion
@@ -992,13 +1011,7 @@ namespace Crazy_Castle_Crush
             }
             #endregion
 
-            #region showGeld
-            if (showGeld[1] > 0)
-            {
-                geldFliegt(showGeld[0],new Vector2(showGeld[1],showGeld[1]),showGeld[1]);
-                showGeld[1]--;
-            }
-            #endregion
+            DrawHelper.run();
 
             base.Draw(gameTime);
         }
@@ -1033,14 +1046,6 @@ namespace Crazy_Castle_Crush
         private void aktuallisiereZeit(GameTime gameTime)
         {
             zeit = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000 - Zeit1;
-        }
-
-        private void geldFliegt(int betrag, Vector2 pos, int prozent)
-        {
-            Color farbe = (betrag > 0) ? Color.Green : Color.Red;
-            String text = (betrag > 0) ? "+" + betrag.ToString() : betrag.ToString();
-            UI2DRenderer.WriteText(new Vector2(pos.X, pos.Y),
-                text, farbe, null, new Vector2(0.01f*prozent, 0.01f*prozent));
         }
 
         public static void setShowGeld(int betrag, int prozent)

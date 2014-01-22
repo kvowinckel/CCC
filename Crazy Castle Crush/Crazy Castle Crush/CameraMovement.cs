@@ -37,14 +37,11 @@ namespace Crazy_Castle_Crush
             
             if (zoom >= 1.5 && zoom <= 4)
             {
-
                 zoom -= 1.5f;
                 camera.Position = new Vector3((-20f + zoom * zoomparameter.X)*player, 1 + zoom * zoomparameter.Y, zoom * (zoomparameter.Z));
                 float rotationAngle = -(float)(zoom * Math.PI / 32);
                 Matrix rotMatrix = Matrix.CreateRotationX(0) * Matrix.CreateRotationY(0) * Matrix.CreateRotationZ(0);
                 camera.Orientation = Quaternion.CreateFromRotationMatrix(rotMatrix);
-
-                
             }
         }
 

@@ -27,7 +27,7 @@ namespace Crazy_Castle_Crush
         private static List<SceneObject> umgebungsListe = new List<SceneObject>();
         //private static List<Waffen> waffenListe = new List<Waffen>();
 
-        public static Objekte createObj(int auswahl, Spieler spieler, float xPos)
+        public static Objekte createObj(int auswahl, Spieler spieler, float xPos, Vector2 rHv2s)
         {
             idnummer++;
             Vector3 startort = new Vector3(xPos, 2, -5);
@@ -37,22 +37,30 @@ namespace Crazy_Castle_Crush
             if (auswahl == 1)//Würfel
             {
                 newobj = buildbox(startort, new Vector3(0.4f, 0.4f, 0.4f));
-                spieler.setMoney(spieler.getMoney() - 150); //Rohkosten abziehen
+                DrawHelper.setmoney(spieler, -150, rHv2s);
+                /*spieler.setMoney(spieler.getMoney() - 150); //Rohkosten abziehen
                 Gamestart.setShowGeld(-150, 100);           //Kosten visualisieren
+                */
                 newobj.Physics.Mass = 1f;
             }
             else if (auswahl == 2)
             {
                 ModelObject l = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1,2,0),(float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "L", 2f);
                 newobj = l;
+                DrawHelper.setmoney(spieler, -200, rHv2s);
+/*
                 spieler.setMoney(spieler.getMoney() - 200);
                 Gamestart.setShowGeld(-200, 100);           //Kosten visualisieren
+            */
             }
             else if (auswahl == 3) // Latte
             {
                 newobj = buildbox(startort, new Vector3(1.2f, 0.1f, 0.4f));
+                DrawHelper.setmoney(spieler, -200, rHv2s);
+                /*
                 spieler.setMoney(spieler.getMoney() - 200); //Rohkosten abziehen
                 Gamestart.setShowGeld(-200, 100);           //Kosten visualisieren
+                */
                 newobj.Physics.Mass = 2f;
             }
             else if (auswahl == 4) // Quader       das kommentierte ist die //Pyramide
@@ -61,7 +69,10 @@ namespace Crazy_Castle_Crush
                 newobj.Physics.Mass = 2f;
                 /*ModelObject p = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1, 2, 0), (float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "Pyramide", 1f);
                 newobj = p;*/
+                DrawHelper.setmoney(spieler, -200, rHv2s);
+                /*
                 spieler.setMoney(spieler.getMoney() - 200);
+                */
                 Gamestart.setShowGeld(-200, 100);           //Kosten visualisieren
             }
             else
