@@ -38,6 +38,7 @@ namespace Crazy_Castle_Crush
             {
                 newobj = buildbox(startort, new Vector3(0.4f, 0.4f, 0.4f));
                 spieler.setMoney(spieler.getMoney() - 150); //Rohkosten abziehen
+                Gamestart.setShowGeld(-150, 100);           //Kosten visualisieren
                 newobj.Physics.Mass = 1f;
             }
             else if (auswahl == 2)
@@ -45,11 +46,13 @@ namespace Crazy_Castle_Crush
                 ModelObject l = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1,2,0),(float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "L", 2f);
                 newobj = l;
                 spieler.setMoney(spieler.getMoney() - 200);
+                Gamestart.setShowGeld(-200, 100);           //Kosten visualisieren
             }
             else if (auswahl == 3) // Latte
             {
                 newobj = buildbox(startort, new Vector3(1.2f, 0.1f, 0.4f));
                 spieler.setMoney(spieler.getMoney() - 200); //Rohkosten abziehen
+                Gamestart.setShowGeld(-200, 100);           //Kosten visualisieren
                 newobj.Physics.Mass = 2f;
             }
             else if (auswahl == 4) // Quader       das kommentierte ist die //Pyramide
@@ -59,6 +62,7 @@ namespace Crazy_Castle_Crush
                 /*ModelObject p = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1, 2, 0), (float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "Pyramide", 1f);
                 newobj = p;*/
                 spieler.setMoney(spieler.getMoney() - 200);
+                Gamestart.setShowGeld(-200, 100);           //Kosten visualisieren
             }
             else
             {
@@ -75,15 +79,15 @@ namespace Crazy_Castle_Crush
             return dasobj;
         }
 
-        public static Waffen createWaffe(int auswahl, Spieler spieler, Vector3 posi)//TODO
+        public static Waffen createWaffe(int auswahl, Spieler spieler, Vector2 posi)//TODO
         {
             Waffen dasobj;
-            Vector3 startort = new Vector3(posi.X,posi.Y, -5f);
+            Vector3 startort = new Vector3(posi, -5f);
 
             ModelObject Kanone = new ModelObject(startort , Quaternion.Identity, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Kanone_ganz", 1f);
             Kanone.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
             scene.Add(Kanone);
-                
+            //TODO Kosten?    
 
             dasobj = new Waffen(Kanone, 1, (float)Math.PI / 4, 5f);
             spieler.setWaffen(dasobj);
