@@ -1019,6 +1019,9 @@ namespace Crazy_Castle_Crush
 
             Point centerR = new Point((int)posR.X, (int)posR.Y);
             UI2DRenderer.DrawCircle(centerR, 20, Color.Red);
+            /*HandBilder 
+             * Texture2D Handsmall = Core.Content.Load<Texture2D>("HandCursor");
+            UI2DRenderer.DrawTexture(Handsmall, new Vector2(0, 0), 140, 90);*/
         }
 
         private void drawBox(Vector2 pos, Vector2 dim, String bild)
