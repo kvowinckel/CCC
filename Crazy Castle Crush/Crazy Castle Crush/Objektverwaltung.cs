@@ -94,16 +94,31 @@ namespace Crazy_Castle_Crush
         {
             Waffen dasobj;
             Vector3 startort = new Vector3(posi, -5f);
+            Matrix rotationKanone;
+            rotationKanone= Matrix.CreateRotationY( (float) Math.PI);
 
-            ModelObject Kanone = new ModelObject(startort , Quaternion.Identity, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Kanone_ganz", 1f);
-            Kanone.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
-            scene.Add(Kanone);
-            //TODO Kosten?    
+            if (posi.X > 0) //-->Spieler 2
+            {
+                ModelObject Kanone = new ModelObject(startort, Quaternion.CreateFromRotationMatrix(rotationKanone), new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Kanone_ganz", 1f);
+                Kanone.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                scene.Add(Kanone);
+                //TODO Kosten?    
 
-            dasobj = new Waffen(Kanone, 1, (float)Math.PI / 4, 5f);
-            spieler.setWaffen(dasobj);
-            return dasobj;
+                dasobj = new Waffen(Kanone, 1, (float)Math.PI / 4, 5f);
+                spieler.setWaffen(dasobj);
+                return dasobj;
+            }
+            else
+            {
+                ModelObject Kanone = new ModelObject(startort, Quaternion.Identity, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Kanone_ganz", 1f);
+                Kanone.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                scene.Add(Kanone);
+                //TODO Kosten?    
 
+                dasobj = new Waffen(Kanone, 1, (float)Math.PI / 4, 5f);
+                spieler.setWaffen(dasobj);
+                return dasobj;
+            }
         }
         
         public static Waffen getWaffe(Spieler spieler, int firedwappons)

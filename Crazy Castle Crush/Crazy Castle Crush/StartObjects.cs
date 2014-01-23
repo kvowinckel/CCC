@@ -45,7 +45,7 @@ namespace Crazy_Castle_Crush
 
             hintergrundsbild.Texture = Core.Content.Load<Texture2D>(bildname);
             hintergrundsbild.Diffuse = Color.White.ToVector4();
-            hintergrundsbild.EnableGlow = true;
+            hintergrundsbild.EnableGlow = false;
             hintergrund.RenderMaterial = hintergrundsbild;
 
             scene.Add(hintergrund);
