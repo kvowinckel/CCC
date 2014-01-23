@@ -71,6 +71,7 @@ namespace Crazy_Castle_Crush
         CameraObject cam;                                   //camera
         SphereObject bullet;                                  //Geschoss  
         bool bulletInAir;
+        int klickCounter=0;
 
 
 
@@ -95,11 +96,12 @@ namespace Crazy_Castle_Crush
         public override void Initialize()
         {
             base.Initialize();
-            
+
+            Scene.ShowObjectOrigin = true;
             //Kinect initialisieren
             Scene.InitKinect();
 
-            Scene.Physics.ForceUpdater.Gravity = new Vector3(0,-5.0f,0);            //Definierte Schwerkraft
+            Scene.Physics.ForceUpdater.Gravity = new Vector3(0,-1.0f,0);            //Definierte Schwerkraft
 
             //Kamera
             cam = new CameraObject(new Vector3(0,0,0),                 //Position
@@ -155,16 +157,33 @@ namespace Crazy_Castle_Crush
                             auswahl = Auswahl.auswahl(rHv2n);
 
                             #endregion
-
-                            if (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.GripRelease)
+                            if (klickCounter<100)
                             {
-                                klickRH = true;
+                                klickCounter++;
+                                
+                                
+                                
                             }
-                            else
+                            UI2DRenderer.WriteText(new Vector2(Scene.Camera.Position.X, Scene.Camera.Position.Y),            // DEBUUUG !!!!
+                                 "Zaehler:" + klickCounter,                    //Anzuzeigender Text
+                                 Color.Black,                   //Textfarbe
+                                 null,                    //Interne Schriftart verwenden
+                                 Vector2.One,             //Textskallierung
+                                 UI2DRenderer.HorizontalAlignment.Center, //Horizontal zentriert
+                             
+                                 UI2DRenderer.VerticalAlignment.Center);  //am unteren Bildschirmrand ausrichten
+                            if (skeleton.HandPointers[1].IsTracked == true)
                             {
-                                klickRH = false;
+                                if (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.GripRelease && klickCounter >= 100)
+                                {
+                                    klickRH = true;
+                                    klickCounter = 0;
+                                }
+                                else
+                                {
+                                    klickRH = false;
+                                }
                             }
-
                         }
                         #endregion
 
@@ -191,49 +210,52 @@ namespace Crazy_Castle_Crush
                         #endregion
 
                         //Hintergrundsbild verschieben
-                        #region Detektion des Kopfes
-                        if (skeleton.Joints[JointType.Head].TrackingState == JointTrackingState.Tracked)
+                        if (bulletInAir == false)
                         {
-                            //Position des Kopfes des Spielers in Bildschirmkoodinaten
-                            Vector2 screenPos = skeleton.Joints[JointType.Head].ScreenPosition;
-                            Vector2 normScreenPos = new Vector2(screenPos.X / screenDim.X, screenPos.Y / screenDim.Y);
-
-                            Vector3 realPos = skeleton.Joints[JointType.Head].WorldPosition;
-                            //Hintergrund bewegen
-                            startObjects.MoveBackground(normScreenPos.X - 0.5f, normScreenPos.Y - 0.5f);
-
-                            //Kamera auf z-Achse bewegen
-                            realPos=skeleton.Joints[JointType.Head].WorldPosition;
-
-                            #region Zoom Funktionen
-                            //ZOOM Funktionen
-                            if (currentState == States.Schussphase1 || currentState == States.Schussphase2)
+                            #region Detektion des Kopfes
+                            if (skeleton.Joints[JointType.Head].TrackingState == JointTrackingState.Tracked)
                             {
-                                if (gamer == spieler1)
+                                //Position des Kopfes des Spielers in Bildschirmkoodinaten
+                                Vector2 screenPos = skeleton.Joints[JointType.Head].ScreenPosition;
+                                Vector2 normScreenPos = new Vector2(screenPos.X / screenDim.X, screenPos.Y / screenDim.Y);
+
+                                Vector3 realPos = skeleton.Joints[JointType.Head].WorldPosition;
+                                //Hintergrund bewegen
+                                startObjects.MoveBackground(normScreenPos.X - 0.5f, normScreenPos.Y - 0.5f);
+
+                                //Kamera auf z-Achse bewegen
+                                realPos = skeleton.Joints[JointType.Head].WorldPosition;
+
+                                #region Zoom Funktionen
+                                //ZOOM Funktionen
+                                if (currentState == States.Schussphase1 || currentState == States.Schussphase2)
                                 {
-                                    cameraMovement.zoom(realPos.Z, 1, new Vector3(10f, 2f, 15f));
+                                    if (gamer == spieler1)
+                                    {
+                                        cameraMovement.zoom(realPos.Z, 1, new Vector3(10f, 2f, 15f));
+                                    }
+                                    if (gamer == spieler2)
+                                    {
+                                        cameraMovement.zoom(realPos.Z, -1, new Vector3(10f, 2f, 15f));
+                                    }
                                 }
-                                if (gamer == spieler2)
+                                if (currentState == States.Bauphase1O || currentState == States.Bauphase1T || currentState == States.Bauphase2O || currentState == States.Bauphase2T)
                                 {
-                                    cameraMovement.zoom(realPos.Z, -1, new Vector3(10f, 2f, 15f));
+                                    if (gamer == spieler1)
+                                    {
+                                        cameraMovement.zoom(realPos.Z, 1, new Vector3(1.5f, 0f, 4f));
+                                    }
+                                    if (gamer == spieler2)
+                                    {
+                                        cameraMovement.zoom(realPos.Z, -1, new Vector3(1.5f, 0f, 4f));
+                                    }
                                 }
+
+
+                                #endregion
+
+
                             }
-                            if (currentState == States.Bauphase1O || currentState == States.Bauphase1T || currentState == States.Bauphase2O || currentState == States.Bauphase2T)
-                            {
-                                if (gamer == spieler1)
-                                {
-                                    cameraMovement.zoom(realPos.Z, 1, new Vector3(1.5f, 0f, 4f));
-                                }
-                                if (gamer == spieler2)
-                                {
-                                    cameraMovement.zoom(realPos.Z, -1, new Vector3(1.5f, 0f, 4f));
-                                }
-                            }
-
-
-                            #endregion
-
-
                         }
 
                         #endregion
@@ -609,16 +631,16 @@ namespace Crazy_Castle_Crush
                             float y;
                             float velocity;
                             
-                            bullet = new SphereObject(new Vector3(aktuelleWaffe.getPosition().X, aktuelleWaffe.getPosition().Y,aktuelleWaffe.getPosition().Z), 0.1f, 10, 10, 0.05f);
-                            Vector3 shootdirection = new Vector3();
+                            bullet = new SphereObject(new Vector3(aktuelleWaffe.getPosition().X, aktuelleWaffe.getPosition().Y+0.5f,aktuelleWaffe.getPosition().Z), 0.1f, 10, 10, 0.05f);
+                            
                             Scene.Add(bullet);
                             
                             schusswinkel = aktuelleWaffe.getWinkel();
                             x=(float)Math.Cos(schusswinkel);
                             y=(float)Math.Sin(schusswinkel);
-                            shootdirection = new Vector3(x,y,0);
+                            Vector3 shootdirection = new Vector3(x,y,0);
 
-                            velocity = -lHv2n.Y * 10f;
+                            velocity = (1-lHv2n.Y) * 10f;
                             bullet.Physics.LinearVelocity = shootdirection * velocity * xR;
 
                             firedWaffen++;
@@ -1036,10 +1058,10 @@ namespace Crazy_Castle_Crush
             Point centerR = new Point((int)posR.X, (int)posR.Y);
             UI2DRenderer.DrawCircle(centerR, 20, Color.Red);
             */
-            Texture2D HandsmallL = Core.Content.Load<Texture2D>("HandCursorL");
+            Texture2D HandsmallL = Core.Content.Load<Texture2D>("HandCursorR");
             UI2DRenderer.DrawTexture(HandsmallL, new Vector2((int)posL.X, (int)posL.Y), 30, 30);
 
-            Texture2D HandsmallR = Core.Content.Load<Texture2D>("HandCursorR");
+            Texture2D HandsmallR = Core.Content.Load<Texture2D>("HandCursorL");
             UI2DRenderer.DrawTexture(HandsmallR, new Vector2((int)posR.X, (int)posR.Y), 30, 30);
             /*HandBilder 
              * Texture2D Handsmall = Core.Content.Load<Texture2D>("HandCursor");

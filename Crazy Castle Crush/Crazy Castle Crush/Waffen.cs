@@ -37,7 +37,7 @@ namespace Crazy_Castle_Crush
             //TODO Winkel der Waffe
 
             
-            rHandY = rHandY / 1.6f; // Schusswinkel hängt nur mit Höhe der rechten Hand zusammen
+            rHandY = (1-rHandY) / 1.6f; // Schusswinkel hängt nur mit Höhe der rechten Hand zusammen
 
             schusswinkel = rHandY * 3.1415f/2; // mit float math.pi ersetzen!!!
 
