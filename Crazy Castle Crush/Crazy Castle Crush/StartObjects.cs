@@ -40,7 +40,7 @@ namespace Crazy_Castle_Crush
         {
             RenderMaterial hintergrundsbild = new RenderMaterial();
             hintergrund = new BoxObject(pos,
-                                        new Vector3(58, 12, 0),
+                                        new Vector3(110, 35, 0),
                                         0f);
 
             hintergrundsbild.Texture = Core.Content.Load<Texture2D>(bildname);
