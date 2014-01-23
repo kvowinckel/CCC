@@ -96,12 +96,12 @@ namespace Crazy_Castle_Crush
         public override void Initialize()
         {
             base.Initialize();
-
-            Scene.ShowObjectOrigin = true;
+            Scene.ShowFPS = true;
+            Scene.ShowObjectOrigin = false;
             //Kinect initialisieren
             Scene.InitKinect();
 
-            Scene.Physics.ForceUpdater.Gravity = new Vector3(0,-1.0f,0);            //Definierte Schwerkraft
+            Scene.Physics.ForceUpdater.Gravity = new Vector3(0,-9.81f,0);            //Definierte Schwerkraft
 
             //Kamera
             cam = new CameraObject(new Vector3(0,0,0),                 //Position
@@ -172,6 +172,7 @@ namespace Crazy_Castle_Crush
                                  UI2DRenderer.HorizontalAlignment.Center, //Horizontal zentriert
                              
                                  UI2DRenderer.VerticalAlignment.Center);  //am unteren Bildschirmrand ausrichten
+                            
                             if (skeleton.HandPointers[1].IsTracked == true)
                             {
                                 if (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.GripRelease && klickCounter >= 100)

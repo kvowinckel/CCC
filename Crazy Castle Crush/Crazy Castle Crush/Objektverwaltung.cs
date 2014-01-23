@@ -45,7 +45,9 @@ namespace Crazy_Castle_Crush
             }
             else if (auswahl == 2)
             {
-                ModelObject l = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1,2,0),(float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "L", 2f);
+                ModelObject l = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1,2,0),(float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "L", 1f);
+                l.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                l.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
                 newobj = l;
                 DrawHelper.setmoney(spieler, -200, rHv2s);
 /*
@@ -96,26 +98,20 @@ namespace Crazy_Castle_Crush
             Vector3 startort = new Vector3(posi, -5f);
             Matrix rotationKanone;
             rotationKanone= Matrix.CreateRotationY( (float) Math.PI);
-
+            Quaternion AP;
             if (posi.X > 0) //-->Spieler 2
             {
-                ModelObject Kanone = new ModelObject(startort, Quaternion.CreateFromRotationMatrix(rotationKanone), new Vector3(1f, 1f, 1f), CollisionType.BoundingSphere, " ", "Kanone_ganz", 0.1f);
-                Kanone.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
-                Kanone.SubModels[1].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
-                Kanone.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
-                Kanone.SubModels[1].RenderMaterial.Specular= new Vector4(0.1f, 0.1f, 0.1f, 1);
-                Kanone.Physics.Material.Bounciness = 0;
-                scene.Add(Kanone);
-                //TODO Kosten?    
-               
-                
-                dasobj = new Waffen(Kanone, 1, (float)Math.PI / 4, 5f);
-                spieler.setWaffen(dasobj);
-                return dasobj;
+                AP = Quaternion.CreateFromRotationMatrix(rotationKanone);
             }
             else
             {
-                ModelObject Kanone = new ModelObject(startort, Quaternion.Identity, new Vector3(1f, 1f, 1f), CollisionType.BoundingSphere, " ", "Kanone_ganz", 1f);
+                AP = Quaternion.Identity;
+            }
+            
+            if (auswahl == 1)
+            {               
+
+                ModelObject Kanone = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "Kanone_ganz", 0.1f);
                 Kanone.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Kanone.SubModels[1].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Kanone.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
@@ -129,6 +125,34 @@ namespace Crazy_Castle_Crush
                 spieler.setWaffen(dasobj);
                 return dasobj;
             }
+            if (auswahl == 2)
+            {
+
+                ModelObject Balliste = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "Balliste", 0.1f);
+                Balliste.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                Balliste.SubModels[1].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                Balliste.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
+                Balliste.SubModels[1].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
+                Balliste.Physics.Material.Bounciness = 0;
+                scene.Add(Balliste);
+                //TODO Kosten?    
+
+
+                dasobj = new Waffen(Balliste, 1, (float)Math.PI / 4, 5f);
+                spieler.setWaffen(dasobj);
+                return dasobj;
+            }
+            else
+            {
+                ModelObject König = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "König_Subdivision", 0.1f);
+                König.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                König.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
+                scene.Add(König);
+                dasobj = new Waffen(König, 1, (float)Math.PI / 4, 5f);
+                spieler.setWaffen(dasobj);
+                return dasobj;
+            }
+            
         }
         
         public static Waffen getWaffe(Spieler spieler, int firedwappons)
