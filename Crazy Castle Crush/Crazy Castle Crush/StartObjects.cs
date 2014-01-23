@@ -27,7 +27,8 @@ namespace Crazy_Castle_Crush
             {
                 ModelObject Welt = new ModelObject(new Vector3(0, -1.5f, -5f), Quaternion.CreateFromYawPitchRoll(0, -1.57f, 0), new Vector3(1, 1, 1), CollisionType.ExactMesh, " ", "Welt_xna", 0f);
                 Welt.PhysicsMaterial.Bounciness = 0.2f;
-                Welt.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                Welt.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                Welt.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 0.1f);
                 scene.Add(Welt);
                 Objektverwaltung.addToUmgebungsListe(Welt);
 
@@ -45,7 +46,7 @@ namespace Crazy_Castle_Crush
 
             hintergrundsbild.Texture = Core.Content.Load<Texture2D>(bildname);
             hintergrundsbild.Diffuse = Color.White.ToVector4();
-            hintergrundsbild.EnableGlow = true;
+            hintergrundsbild.EnableGlow = false;
             hintergrund.RenderMaterial = hintergrundsbild;
 
             scene.Add(hintergrund);
