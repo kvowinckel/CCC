@@ -94,16 +94,41 @@ namespace Crazy_Castle_Crush
         {
             Waffen dasobj;
             Vector3 startort = new Vector3(posi, -5f);
+            Matrix rotationKanone;
+            rotationKanone= Matrix.CreateRotationY( (float) Math.PI);
 
-            ModelObject Kanone = new ModelObject(startort , Quaternion.Identity, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Kanone_ganz", 1f);
-            Kanone.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
-            scene.Add(Kanone);
-            //TODO Kosten?    
+            if (posi.X > 0) //-->Spieler 2
+            {
+                ModelObject Kanone = new ModelObject(startort, Quaternion.CreateFromRotationMatrix(rotationKanone), new Vector3(1f, 1f, 1f), CollisionType.BoundingSphere, " ", "Kanone_ganz", 0.1f);
+                Kanone.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                Kanone.SubModels[1].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                Kanone.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
+                Kanone.SubModels[1].RenderMaterial.Specular= new Vector4(0.1f, 0.1f, 0.1f, 1);
+                Kanone.Physics.Material.Bounciness = 0;
+                scene.Add(Kanone);
+                //TODO Kosten?    
+               
+                
+                dasobj = new Waffen(Kanone, 1, (float)Math.PI / 4, 5f);
+                spieler.setWaffen(dasobj);
+                return dasobj;
+            }
+            else
+            {
+                ModelObject Kanone = new ModelObject(startort, Quaternion.Identity, new Vector3(1f, 1f, 1f), CollisionType.BoundingSphere, " ", "Kanone_ganz", 1f);
+                Kanone.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                Kanone.SubModels[1].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                Kanone.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
+                Kanone.SubModels[1].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
+                Kanone.Physics.Material.Bounciness = 0;
+                scene.Add(Kanone);
+                //TODO Kosten?    
 
-            dasobj = new Waffen(Kanone, 1, (float)Math.PI / 4, 5f);
-            spieler.setWaffen(dasobj);
-            return dasobj;
 
+                dasobj = new Waffen(Kanone, 1, (float)Math.PI / 4, 5f);
+                spieler.setWaffen(dasobj);
+                return dasobj;
+            }
         }
         
         public static Waffen getWaffe(Spieler spieler, int firedwappons)
