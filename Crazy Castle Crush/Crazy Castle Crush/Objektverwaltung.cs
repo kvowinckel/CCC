@@ -158,8 +158,14 @@ namespace Crazy_Castle_Crush
         public static Waffen getWaffe(Spieler spieler, int firedwappons)
         {
             //firedwappons = 0 ==> erste Waffe
-            
-             return spieler.getList()[firedwappons]; 
+            if (spieler.getList().Count == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return spieler.getList()[firedwappons];
+            }
             // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!           
             
             // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!           
@@ -272,7 +278,6 @@ namespace Crazy_Castle_Crush
 
         }
 
-
         public static void refreshObj(Spieler spieler1, Spieler spieler2)
         {
             foreach (Objekte temp in objListe)
@@ -304,7 +309,6 @@ namespace Crazy_Castle_Crush
             }
            
         }
-       
 
         public static void addToUmgebungsListe(SceneObject obj)
         {

@@ -40,7 +40,7 @@ namespace Crazy_Castle_Crush
         #region Variablen (Deklarationen)
 
         States currentState;                                //aktueller Zustand
-        States prewState;                                   //vorheriger Zustand
+        //States prewState;                                   //vorheriger Zustand
         float Zeit1;                                        //Zeit nach State
         float Zeit2 =0;                                        //Zeit nach grab RH
         float Zeit3 =0;                                        //Zeit nach grab LH
@@ -85,6 +85,7 @@ namespace Crazy_Castle_Crush
         Spieler spieler2 = new Spieler();
         Spieler gamer;                                      //Zum zwischenspeichern des aktuellen Spielers
         Levels level = new Levels();
+        Logik logik = new Logik();
 
         //Initiallisiert die Klassen
         CameraMovement cameraMovement;
@@ -283,7 +284,6 @@ namespace Crazy_Castle_Crush
                     showGeld[1] = 0;
 
                     //danach Kamera an Spielerposition 1 bewegen
-                    prewState = States.Start;
                     currentState = States.Camto1;
 
                     break;
@@ -311,6 +311,8 @@ namespace Crazy_Castle_Crush
                         Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
                         aktuallisiereZeit(gameTime);
 
+                        currentState = logik.uebergang(currentState, spieler1, spieler2, level);
+                        /*
                         //Wenn wir aus der Startphase kommen, -> Bauphase 1
                         if (prewState == States.Start)
                         {
@@ -335,7 +337,7 @@ namespace Crazy_Castle_Crush
                                 currentState = States.Schussphase1;
                                 /* schussphasenDurch wird auf true gesetzt, damit nach der nächsten Schussphase wieder in die Bauphase gewechselt wird.
                                  * Schussphase2 sagt also schussphaseDurch= true, will aber erst noch Schussphase 1
-                                 */
+                                 *
 
                             }
                             //sonst Schussphase 1
@@ -345,6 +347,7 @@ namespace Crazy_Castle_Crush
                                 currentState = States.Bauphase1O;
                             }
                         }
+                        */
                     } 
                 #endregion
 
@@ -397,12 +400,10 @@ namespace Crazy_Castle_Crush
 
                             if (currentState == States.Bauphase1O)
                             {
-                                prewState = States.Bauphase1O;              //Statewechsel
                                 currentState = States.Bauphase1T;
                             }
                             else
                             {
-                                prewState = States.Bauphase2O;
                                 currentState = States.Bauphase2T;
                             }
                         }
@@ -457,6 +458,7 @@ namespace Crazy_Castle_Crush
                     }
                     #endregion
                     
+
                     #region Übergangsbedingungen
                     //Wenn Spieler nicht ausreichend Geld hat (oder auf weiter Klickt => in Kinect realisiert)
                     if (gamer.getMoney() < level.getMinMoney() && objInHand == false)
@@ -464,7 +466,10 @@ namespace Crazy_Castle_Crush
                         PosX1 = Scene.Camera.Position.X;
                         Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
                         aktuallisiereZeit(gameTime);
+                        showWaffe = false;
 
+                        currentState = logik.uebergang(currentState, spieler1, spieler2, level);
+                        /*
                         if (currentState == States.Bauphase1O)
                         {
                             prewState = States.Bauphase1O;
@@ -489,6 +494,7 @@ namespace Crazy_Castle_Crush
                                 currentState = States.Camto1;
                             }
                         }
+                         * */
                     }
                     #endregion
                     
@@ -534,12 +540,10 @@ namespace Crazy_Castle_Crush
 
                         if (currentState == States.Bauphase1T)
                         {
-                            prewState = States.Bauphase1T;
                             currentState = States.Bauphase1O;
                         }
                         else
                         {
-                            prewState = States.Bauphase2T;
                             currentState = States.Bauphase2O;
                         }
                     }
@@ -568,6 +572,9 @@ namespace Crazy_Castle_Crush
                         Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
                         aktuallisiereZeit(gameTime);
 
+                        currentState = logik.uebergang(currentState, spieler1, spieler2, level);
+
+                        /*
                         //Wenn wir aus der Bauphase1 kommen -> Bauphase 2 (ohne Geld, aber mehr Geld als Sp1 Schussphase2)
                         if (prewState == States.Bauphase1O)
                         {
@@ -590,7 +597,7 @@ namespace Crazy_Castle_Crush
                             prewState = States.Camto2;
                             currentState = States.Schussphase2;
                         }
-
+                        */
                     }
                 #endregion
 
@@ -730,6 +737,8 @@ namespace Crazy_Castle_Crush
                         Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
                         aktuallisiereZeit(gameTime);
 
+                        currentState = logik.uebergang(currentState, spieler1, spieler2, level);
+                        /*
                         //Wenn die Schussphase durch ist, beginnt die Bauphase
                         if (schussphasenDurch)
                         {
@@ -763,6 +772,7 @@ namespace Crazy_Castle_Crush
                                 currentState = States.Camto1;
                             }
                         }
+                        */
                     }
 
                     #endregion
@@ -787,7 +797,6 @@ namespace Crazy_Castle_Crush
 
             }
 
-
             #region WEITER
             //Wenn sich die rechte Hand in der oberen, rechten Ecke befindet & KLICK -> Klick auf WEITER
             if (rHv2n.X >= 0.9f && rHv2n.Y >= 0.4f && rHv2n.Y <= 0.6f && klickRH)
@@ -797,6 +806,8 @@ namespace Crazy_Castle_Crush
                 Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
                 aktuallisiereZeit(gameTime);
 
+                currentState = logik.uebergang(currentState, spieler1, spieler2, level);
+                /*
                 if (currentState == States.Bauphase1O)
                 {
                     prewState = States.Bauphase1O;
@@ -834,6 +845,7 @@ namespace Crazy_Castle_Crush
                 {
                     return;
                 }
+                 */
             }
             #endregion
 
