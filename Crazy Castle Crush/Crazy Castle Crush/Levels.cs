@@ -13,6 +13,7 @@ namespace Crazy_Castle_Crush
         private float Sp1Pos = -20;         //Position Sp1 im ersten Level
         private float Sp2Pos = 20;          //Position Sp2 im ersten Level
         private int minMoney = 200;         //mindestGeld im ersten Level
+        private int roundmoney = 200;
 
         //Nächsten Level
         public void nextLevel()
@@ -50,9 +51,14 @@ namespace Crazy_Castle_Crush
         }
 
         //Das Geld was man im Level mindestens braucht, um etwas zu bauen
-        public float getMinMoney()
+        public int getMinMoney()
         {
             return minMoney;
+        }
+
+        public int getRoundMoney()
+        {
+            return roundmoney;
         }
     }
 }

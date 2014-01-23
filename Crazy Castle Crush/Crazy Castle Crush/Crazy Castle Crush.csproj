@@ -136,6 +136,7 @@
     <Compile Include="DrawHelper.cs" />
     <Compile Include="Gamestart.cs" />
     <Compile Include="Levels.cs" />
+    <Compile Include="Logik.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Objekte.cs" />
     <Compile Include="Objektverwaltung.cs" />
