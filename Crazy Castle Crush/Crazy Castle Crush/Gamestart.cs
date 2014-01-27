@@ -89,12 +89,12 @@ namespace Crazy_Castle_Crush
         public override void Initialize()
         {
             base.Initialize();
-
-            Scene.ShowObjectOrigin = true;
+            Scene.ShowFPS = true;
+            Scene.ShowObjectOrigin = false;
             //Kinect initialisieren
             Scene.InitKinect();
 
-            Scene.Physics.ForceUpdater.Gravity = new Vector3(0,-1.0f,0);            //Definierte Schwerkraft
+            Scene.Physics.ForceUpdater.Gravity = new Vector3(0,-1.5f,0);            //Definierte Schwerkraft
 
             //Kamera
             cam = new CameraObject(new Vector3(0,0,0),                 //Position
@@ -155,22 +155,25 @@ namespace Crazy_Castle_Crush
                             {
                                 klickCounter++;
                             }
+
                             try
                             {
                                 if (skeleton.HandPointers[1].IsTracked == true)
                                 {
-                                    if (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.GripRelease && klickCounter >= 100)
+                                    if (skeleton.HandPointers[1].IsTracked == true)
                                     {
-                                        klickRH = true;
-                                        klickCounter = 0;
-                                    }
-                                    else
-                                    {
-                                        klickRH = false;
+                                        if (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.GripRelease && klickCounter >= 100)
+                                        {
+                                            klickRH = true;
+                                            klickCounter = 0;
+                                        }
+                                        else
+                                        {
+                                            klickRH = false;
+                                        }
                                     }
                                 }
-                            }
-                            catch { };
+                            } catch { };
 
                         }
                         #endregion
@@ -243,9 +246,9 @@ namespace Crazy_Castle_Crush
 
 
                             }
+                            #endregion
                         }
 
-                        #endregion
 
                     }
                 }
