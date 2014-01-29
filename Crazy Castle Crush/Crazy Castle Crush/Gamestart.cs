@@ -160,10 +160,9 @@ namespace Crazy_Castle_Crush
 
                             try
                             {
+
                                 if (skeleton.HandPointers[1].IsTracked == true)
                                 {
-                                    if (skeleton.HandPointers[1].IsTracked == true)
-                                    {
                                     if (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.GripRelease && klickCounter >= 100)
                                     {
                                         klickRH = true;
@@ -173,6 +172,7 @@ namespace Crazy_Castle_Crush
                                     {
                                         klickRH = false;
                                     }
+
                                 }
                             }
                             catch { };
