@@ -111,7 +111,7 @@ namespace Crazy_Castle_Crush
             if (auswahl == 1)
             {               
 
-                ModelObject Kanone = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "Kanone_ganz", 0.1f);
+                ModelObject Kanone = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.BoundingSphere, " ", "Kanone_ganz", 0.1f);
                 Kanone.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Kanone.SubModels[1].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Kanone.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
@@ -121,7 +121,7 @@ namespace Crazy_Castle_Crush
                 //TODO Kosten?    
 
 
-                dasobj = new Waffen(Kanone, 1, (float)Math.PI / 4, 5f);
+                dasobj = new Waffen(Kanone, 1, (float)Math.PI / 4, 5f,"Kanone");
                 spieler.setWaffen(dasobj);
                 return dasobj;
             }
@@ -135,10 +135,13 @@ namespace Crazy_Castle_Crush
                 Balliste.SubModels[1].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
                 Balliste.Physics.Material.Bounciness = 0;
                 scene.Add(Balliste);
+                
+                 
+                
                 //TODO Kosten?    
 
 
-                dasobj = new Waffen(Balliste, 1, (float)Math.PI / 4, 5f);
+                dasobj = new Waffen(Balliste, 1, (float)Math.PI / 4, 5f,"Balliste");
                 spieler.setWaffen(dasobj);
                 return dasobj;
             }
@@ -148,7 +151,7 @@ namespace Crazy_Castle_Crush
                 König.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 König.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
                 scene.Add(König);
-                dasobj = new Waffen(König, 1, (float)Math.PI / 4, 5f);
+                dasobj = new Waffen(König, 1, (float)Math.PI / 4, 5f,"König");
                 spieler.setWaffen(dasobj);
                 return dasobj;
             }
@@ -170,7 +173,6 @@ namespace Crazy_Castle_Crush
             
             // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!           
         }
-       
 
         public static Objekte projektil(int id, Vector3 startpos, float winkel) //TODO
         {
@@ -245,13 +247,15 @@ namespace Crazy_Castle_Crush
             }
             else if (auswahl == 3)
             {
-                first.setMaterial("Papayrus");
+                first.setMaterial("Metal");
                 first.increaseLP(2); 
                 
             }
             else if (auswahl == 4)
             {
-                first.setMaterial("himmel");
+                first.setMaterial("Rubber");
+                first.setBounciness(1);
+                
             }
         }
 
@@ -313,6 +317,17 @@ namespace Crazy_Castle_Crush
         public static void addToUmgebungsListe(SceneObject obj)
         {
             umgebungsListe.Add(obj);
+        }
+
+        public static void removeLP(SceneObject obj)
+        {
+            foreach (Objekte akt in objListe)
+            {
+                if(akt.getSceneObject().Equals(obj))
+                {
+                    akt.decreaseLP();
+                }
+            }
         }
 
     }

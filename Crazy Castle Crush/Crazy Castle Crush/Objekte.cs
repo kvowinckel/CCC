@@ -71,6 +71,12 @@ namespace Crazy_Castle_Crush
             }
             objekt.RenderMaterial = material;
         }
+        public void setBounciness(int wert)
+        {
+            objekt.PhysicsMaterial.Bounciness = wert;
+
+        }
+            
 
         public void decreaseLP(int minus)
         {

@@ -17,19 +17,25 @@ namespace Crazy_Castle_Crush
         private ModelObject mo;
         private float schusswinkel;
         private float shootspeed;
-        
+        string waffentyp;
 
-        public Waffen(ModelObject MO, int Lebenspunkte, float Schusswinkel, float ShootSpeed) //Controller rausgenommen 
+        public Waffen(ModelObject MO, int Lebenspunkte, float Schusswinkel, float ShootSpeed, string Waffentyp) //Controller rausgenommen 
         {
             mo = MO;
             lebenspunkte = Lebenspunkte;
             schusswinkel = Schusswinkel;
+            waffentyp = Waffentyp;
             shootspeed = ShootSpeed;
         }
 
         public ModelObject getModelObject()
         {
             return mo;
+        }
+
+        public string getType()
+        {
+            return waffentyp;
         }
 
         public void setWinkel(float rHandY)

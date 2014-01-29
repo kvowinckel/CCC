@@ -70,6 +70,8 @@ namespace Crazy_Castle_Crush
         Waffen aktuelleWaffe;                                //Waffe die gerade bedient wird
         CameraObject cam;                                   //camera
         SphereObject bullet;                                  //Geschoss  
+        ModelObject bolzen;
+        string Munition;
         bool bulletInAir;
         int klickCounter=0;
 
@@ -102,7 +104,7 @@ namespace Crazy_Castle_Crush
             //Kinect initialisieren
             Scene.InitKinect();
 
-            Scene.Physics.ForceUpdater.Gravity = new Vector3(0,-9.81f,0);            //Definierte Schwerkraft
+            Scene.Physics.ForceUpdater.Gravity = new Vector3(0,-1.5f,0);            //Definierte Schwerkraft
 
             //Kamera
             cam = new CameraObject(new Vector3(0,0,0),                 //Position
@@ -173,19 +175,22 @@ namespace Crazy_Castle_Crush
                                  UI2DRenderer.HorizontalAlignment.Center, //Horizontal zentriert
                              
                                  UI2DRenderer.VerticalAlignment.Center);  //am unteren Bildschirmrand ausrichten
-                            
-                            if (skeleton.HandPointers[1].IsTracked == true)
+                            try
                             {
-                                if (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.GripRelease && klickCounter >= 100)
+                                if (skeleton.HandPointers[1].IsTracked == true)
                                 {
-                                    klickRH = true;
-                                    klickCounter = 0;
-                                }
-                                else
-                                {
-                                    klickRH = false;
+                                    if (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.GripRelease && klickCounter >= 100)
+                                    {
+                                        klickRH = true;
+                                        klickCounter = 0;
+                                    }
+                                    else
+                                    {
+                                        klickRH = false;
+                                    }
                                 }
                             }
+                            catch { };
                         }
                         #endregion
 
@@ -626,7 +631,7 @@ namespace Crazy_Castle_Crush
                         xR = -1;
                     }
                     #region Schussfunktion //shoot Funktion TODO: "auslagern"
-                    if (gamer.getWaffen() != 0)//Wenn der Spieler Waffen hat
+                    if (gamer.getWaffen() != 0 &&bulletInAir==false  )//Wenn der Spieler Waffen hat
                     {   
                         aktuelleWaffe = Objektverwaltung.getWaffe(gamer, firedWaffen);
                         aktuelleWaffe.setWinkel(rHv2n.Y);//Setzt Winkel der Kanone in Waffen
@@ -638,10 +643,28 @@ namespace Crazy_Castle_Crush
                             float x;
                             float y;
                             float velocity;
-                            
-                            bullet = new SphereObject(new Vector3(aktuelleWaffe.getPosition().X, aktuelleWaffe.getPosition().Y+0.5f,aktuelleWaffe.getPosition().Z), 0.1f, 10, 10, 0.05f);
-                            
-                            Scene.Add(bullet);
+                     
+                       
+                            if (aktuelleWaffe.getType()=="Balliste")
+                            {
+                                Munition="Bolzen";
+                            }
+                            else if (aktuelleWaffe.getType() == "Kanone")
+                            { 
+                                Munition = "Kugel"; 
+                            }
+                            else { 
+                                Munition = "Crap";     
+                            }
+                            if (Munition =="Kugel")
+                            { bullet = new SphereObject(new Vector3(aktuelleWaffe.getPosition().X, aktuelleWaffe.getPosition().Y+2.5f,aktuelleWaffe.getPosition().Z), 0.1f, 10, 10, 0.05f);
+                              Scene.Add(bullet);
+                            }
+                            else if (Munition == "Bolzen")
+                            {
+                                bolzen = new ModelObject(new Vector3(aktuelleWaffe.getPosition().X, aktuelleWaffe.getPosition().Y + 0.5f, aktuelleWaffe.getPosition().Z), Quaternion.Identity, new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "Bolzen", 0.05f);
+                                Scene.Add(bolzen);
+                            }
                             
                             schusswinkel = aktuelleWaffe.getWinkel();
                             x=(float)Math.Cos(schusswinkel);
@@ -649,7 +672,15 @@ namespace Crazy_Castle_Crush
                             Vector3 shootdirection = new Vector3(x,y,0);
 
                             velocity = (1-lHv2n.Y) * 10f;
-                            bullet.Physics.LinearVelocity = shootdirection * velocity * xR;
+                            if (Munition == "Kugel")
+                            {
+                                bullet.Physics.LinearVelocity = shootdirection * velocity * xR;
+                            }
+                            else if (Munition == "Bolzen")
+                            {
+                                bolzen.Physics.LinearVelocity = shootdirection * velocity * xR;
+                            }
+                            
 
                             firedWaffen++;
                             bulletInAir = true;
@@ -658,11 +689,19 @@ namespace Crazy_Castle_Crush
 
                     if (bulletInAir)
                     {
-                       
-                        cameraMovement.chaseBullet(bullet.Position, cam.Position);
+                        if (Munition == "Kugel")
+                        {
+                            cameraMovement.chaseBullet(bullet.Position, cam.Position);
+                            bullet.Collided += new EventHandler<CollisionArgs>(bulletCollidedHandler);
+                        }
+                        else if (Munition == "Bolzen")
+                        {
+                            cameraMovement.chaseBullet(bolzen.Position, cam.Position);
+                            bolzen.Collided += new EventHandler<CollisionArgs>(bulletCollidedHandler);
+                        }
                         
-                        bullet.Collided +=new EventHandler<CollisionArgs>(bulletCollidedHandler);
-
+                        
+                        
                         //Partikel Effekte FUNKTIONIERT NOCH NICHT
                         ParticleEffect effect = new ParticleEffect()
                         {
@@ -872,31 +911,32 @@ namespace Crazy_Castle_Crush
 
         private void bulletCollidedHandler(object sender, CollisionArgs e)
         {
-            bullet.Collided -= new EventHandler<CollisionArgs>(bulletCollidedHandler);
+            bulletInAir = false;
+           
 
             object scn = this.Scene.Find("Welt" + e.Collider.ID);
             if (e.Collider == scn)//level.GetType() == e.Collider.GetType())
             {
                 if (this.Scene.SceneObjects.Contains(bullet))
                 {
-
-                    bulletInAir = false;
                     Scene.Remove(bullet);
+                    bullet.Collided -= new EventHandler<CollisionArgs>(bulletCollidedHandler);
+                    
                     cameraMovement.move(zeit, 3000, PosX1, level.getSpieler1Pos()); //TODO Kamera fahrt noch ändern
                 }
             }
             //TODO: Objektkollision
 
-            /*
-            if (e.Collider is Objekte)
+            
+            if (e.Collider != scn)
             {
+                Objektverwaltung.removeLP(e.Collider);
                 
-                e.Collider.decreaseLP();
                 Scene.Remove(bullet);
                 cameraMovement.move(zeit, 3000, PosX1, level.getSpieler1Pos());//TODO Kamera fahr noch ändern
                 bulletInAir = false;
             }
-             * */
+             
         }
       
         public override void HandleInput(InputState input)

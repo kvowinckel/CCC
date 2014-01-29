@@ -30,6 +30,8 @@ namespace Crazy_Castle_Crush
                 Welt.PhysicsMaterial.Bounciness = 0.2f;
                 Welt.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Welt.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 0.1f);
+                
+                Welt.Name = "Welt";
                 scene.Add(Welt);
                 Objektverwaltung.addToUmgebungsListe(Welt);
 
