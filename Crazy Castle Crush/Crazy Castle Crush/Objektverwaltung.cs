@@ -50,32 +50,18 @@ namespace Crazy_Castle_Crush
                 l.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
                 newobj = l;
                 DrawHelper.setmoney(spieler, -200, rHv2s);
-/*
-                spieler.setMoney(spieler.getMoney() - 200);
-                Gamestart.setShowGeld(-200, 100);           //Kosten visualisieren
-            */
             }
             else if (auswahl == 3) // Latte
             {
                 newobj = buildbox(startort, new Vector3(1.2f, 0.1f, 0.4f));
                 DrawHelper.setmoney(spieler, -200, rHv2s);
-                /*
-                spieler.setMoney(spieler.getMoney() - 200); //Rohkosten abziehen
-                Gamestart.setShowGeld(-200, 100);           //Kosten visualisieren
-                */
                 newobj.Physics.Mass = 2f;
             }
             else if (auswahl == 4) // Quader       das kommentierte ist die //Pyramide
             {
                 newobj = buildbox(startort, new Vector3(0.8f, 0.4f, 0.4f));
                 newobj.Physics.Mass = 2f;
-                /*ModelObject p = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1, 2, 0), (float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "Pyramide", 1f);
-                newobj = p;*/
                 DrawHelper.setmoney(spieler, -200, rHv2s);
-                /*
-                spieler.setMoney(spieler.getMoney() - 200);
-                */
-                Gamestart.setShowGeld(-200, 100);           //Kosten visualisieren
             }
             else
             {
@@ -116,6 +102,10 @@ namespace Crazy_Castle_Crush
                 Kanone.SubModels[1].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Kanone.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
                 Kanone.SubModels[1].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
+
+                Kanone.SubModels[0].Physics.Mass = 0.001f;
+                Kanone.SubModels[1].Physics.Mass = 0.001f;
+
                 Kanone.Physics.Material.Bounciness = 0;
                 scene.Add(Kanone);
                 //TODO Kosten?    
@@ -133,6 +123,10 @@ namespace Crazy_Castle_Crush
                 Balliste.SubModels[1].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Balliste.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
                 Balliste.SubModels[1].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
+
+                Balliste.SubModels[0].Physics.Mass = 0.001f;
+                Balliste.SubModels[1].Physics.Mass = 0.001f;
+
                 Balliste.Physics.Material.Bounciness = 0;
                 scene.Add(Balliste);
                 
@@ -150,6 +144,10 @@ namespace Crazy_Castle_Crush
                 ModelObject König = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "König_Subdivision", 0.1f);
                 König.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 König.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
+
+                König.SubModels[0].Physics.Mass = 0.001f;
+                König.SubModels[1].Physics.Mass = 0.001f;
+
                 scene.Add(König);
                 dasobj = new Waffen(König, 1, (float)Math.PI / 4, 5f,"König");
                 spieler.setWaffen(dasobj);
@@ -266,20 +264,6 @@ namespace Crazy_Castle_Crush
                     1f);
 
             return box;
-        }
-
-        public static void Geldanzeige(Spieler spieler)
-        {
-
-            string aktuellerText = "$" + spieler.getMoney();
-            UI2DRenderer.WriteText(new Vector2(scene.Camera.Position.X + 2, scene.Camera.Position.Y),           //Position
-                        aktuellerText,                                                                          //Anzuzeigender Text
-                        Color.Red,                                                                              //Textfarbe
-                        null,                                                                                   //Interne Schriftart verwenden
-                        Vector2.One,                                                                            //Textskallierung
-                        UI2DRenderer.HorizontalAlignment.Left,                                                  //Horizontal zentriert
-                        UI2DRenderer.VerticalAlignment.Top);                                                    //am unteren Bildschirmrand ausrichten
-
         }
 
         public static void refreshObj(Spieler spieler1, Spieler spieler2)
