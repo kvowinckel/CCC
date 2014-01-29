@@ -93,10 +93,11 @@ namespace Crazy_Castle_Crush
             base.Initialize();
             Scene.ShowFPS = true;
             Scene.ShowObjectOrigin = false;
+            Scene.ShowCollisionMeshes = false;
             //Kinect initialisieren
             Scene.InitKinect();
 
-            Scene.Physics.ForceUpdater.Gravity = new Vector3(0,-1.5f,0);            //Definierte Schwerkraft
+            Scene.Physics.ForceUpdater.Gravity = new Vector3(0,-2.5f,0);            //Definierte Schwerkraft
 
             //Kamera
             cam = new CameraObject(new Vector3(0,0,0),                 //Position
@@ -195,8 +196,11 @@ namespace Crazy_Castle_Crush
                             //Weltkoordinatenpunk finden
                             Vector3 worldPos2L = Helpers.Unproject(lHv2s, plane2, false);
                             lHv2w = new Vector2(worldPos2L.X, worldPos2L.Y);
-
-                            klickLH = (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.Grip);
+                          /*  try
+                            {
+                               // klickLH = (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.Grip);
+                            }
+                            catch { };*/
                         }
 
                         #endregion

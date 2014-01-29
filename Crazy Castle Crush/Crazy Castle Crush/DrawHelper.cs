@@ -29,7 +29,7 @@ namespace Crazy_Castle_Crush
                 {
                     if (showWaffe)
                     {
-                        bild = "WaffenMenüDummy";
+                        bild = "Waffenauswahl_transparent";
                     }
                     else
                     {
@@ -67,11 +67,11 @@ namespace Crazy_Castle_Crush
                 String bild;
                 if (showWaffe)
                 {
-                    bild = "pist";
+                    bild = "Bau";
                 }
                 else
                 {
-                    bild = "ChangerDummy";
+                    bild = "Waffenauswahl_transparent";
                 }
 
                 Vector2 dim = new Vector2(screenDim.X * 0.125f, screenDim.Y * 0.15f);

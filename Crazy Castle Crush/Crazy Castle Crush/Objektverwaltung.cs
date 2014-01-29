@@ -97,14 +97,14 @@ namespace Crazy_Castle_Crush
             if (auswahl == 1)
             {               
 
-                ModelObject Kanone = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.BoundingSphere, " ", "Kanone_ganz", 0.1f);
+                ModelObject Kanone = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Kanone_ganz", 0.1f);
                 Kanone.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Kanone.SubModels[1].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Kanone.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
                 Kanone.SubModels[1].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
 
-                Kanone.SubModels[0].Physics.Mass = 0.001f;
-                Kanone.SubModels[1].Physics.Mass = 0.001f;
+                Kanone.SubModels[0].Physics.Mass = 1f;
+                Kanone.SubModels[1].Physics.Mass = 1f;
 
                 Kanone.Physics.Material.Bounciness = 0;
                 scene.Add(Kanone);
@@ -115,7 +115,7 @@ namespace Crazy_Castle_Crush
                 spieler.setWaffen(dasobj);
                 return dasobj;
             }
-            if (auswahl == 2)
+            if (auswahl == 2||auswahl==3)
             {
 
                 ModelObject Balliste = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "Balliste", 0.1f);
@@ -124,8 +124,8 @@ namespace Crazy_Castle_Crush
                 Balliste.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
                 Balliste.SubModels[1].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
 
-                Balliste.SubModels[0].Physics.Mass = 0.001f;
-                Balliste.SubModels[1].Physics.Mass = 0.001f;
+                Balliste.SubModels[0].Physics.Mass = 1f;
+                Balliste.SubModels[1].Physics.Mass = 1f;
 
                 Balliste.Physics.Material.Bounciness = 0;
                 scene.Add(Balliste);
@@ -139,9 +139,33 @@ namespace Crazy_Castle_Crush
                 spieler.setWaffen(dasobj);
                 return dasobj;
             }
+            if (auswahl == 4)
+            {
+
+                ModelObject Rakete = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "Rakete", 0.1f);
+                Rakete.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                
+                Rakete.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
+          
+
+                Rakete.SubModels[0].Physics.Mass = 1f;
+                
+
+                Rakete.Physics.Material.Bounciness = 0;
+                scene.Add(Rakete);
+
+
+
+                //TODO Kosten?    
+
+
+                dasobj = new Waffen(Rakete, 1, (float)Math.PI / 4, 5f, "Rakete");
+                spieler.setWaffen(dasobj);
+                return dasobj;
+            }
             else
             {
-                ModelObject König = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "König_Subdivision", 0.1f);
+                ModelObject König = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.BoundingSphere, " ", "König_Subdivision", 0.1f);
                 König.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 König.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
 
