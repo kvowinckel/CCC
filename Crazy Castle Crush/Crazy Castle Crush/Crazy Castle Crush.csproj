@@ -129,6 +129,7 @@
   <ItemGroup>
     <Compile Include="Auswahl.cs" />
     <Compile Include="CameraMovement.cs" />
+    <Compile Include="Collided.cs" />
     <Compile Include="DrawHelper.cs" />
     <Compile Include="Gamestart.cs" />
     <Compile Include="Levels.cs" />
