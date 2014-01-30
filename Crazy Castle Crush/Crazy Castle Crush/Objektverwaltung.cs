@@ -117,13 +117,12 @@ namespace Crazy_Castle_Crush
                 //TODO Kosten?    
 
 
-                dasobj = new Waffen(Kanone, 1, (float)Math.PI / 4, 5f);
+                dasobj = new Waffen(Kanone, 1, (float)Math.PI / 4, 5f,"Kanone");
                 spieler.setWaffen(dasobj);
                 return dasobj;
             }
-            if (auswahl == 2)
+            if (auswahl == 2 ||auswahl == 3)
             {
-
                 ModelObject Balliste = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Balliste", 0.1f);
                 Balliste.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Balliste.SubModels[1].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
@@ -138,13 +137,25 @@ namespace Crazy_Castle_Crush
                 //TODO Kosten?    
 
 
-                dasobj = new Waffen(Balliste, 1, (float)Math.PI / 4, 5f);
+                dasobj = new Waffen(Balliste, 1, (float)Math.PI / 4, 5f,"Balliste");
                 spieler.setWaffen(dasobj);
                 return dasobj;
             }
             else
             {
-                return null;
+                ModelObject Rakete = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Rakete", 0.1f);
+                Rakete.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+                Rakete.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
+                Rakete.SubModels[0].Physics.Mass = 0.001f;
+
+
+                Rakete.Physics.Material.Bounciness = 0;
+                scene.Add(Rakete);
+                //TODO Kosten?    
+
+                dasobj = new Waffen(Rakete, 1, (float)Math.PI / 4, 5f, "Rakete");
+                spieler.setWaffen(dasobj);
+                return dasobj;
             }
             
         }

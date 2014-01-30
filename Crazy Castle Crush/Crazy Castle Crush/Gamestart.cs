@@ -60,11 +60,11 @@ namespace Crazy_Castle_Crush
         Objekte aktuellesObj;                               //Objekt das gerade bearbeitet wird
         Waffen aktuelleWaffe;                               //Waffe die gerade bedient wird
         CameraObject cam;                                   //camera
-        SphereObject bullet;                                //Geschoss  
+        SceneObject bullet;                                 //Geschoss  
         bool bulletInAir;
         int klickCounter = 0;
         float shootTimer = 0;
-        string winner;
+        public string winner;
         double winkelSec = 0;
 
 
@@ -152,7 +152,8 @@ namespace Crazy_Castle_Crush
                             auswahl = Auswahl.auswahl(rHv2n);
 
                             #endregion
-                            
+
+                            #region Klick
                             if (klickCounter<60)
                             {
                                 klickCounter++;
@@ -162,21 +163,18 @@ namespace Crazy_Castle_Crush
                             {
                                 if (skeleton.HandPointers[1].IsTracked == true)
                                 {
-                                    if (skeleton.HandPointers[1].IsTracked == true)
+                                    if (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.GripRelease && klickCounter >= 60)
                                     {
-                                        if (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.GripRelease && klickCounter >= 60)
-                                        {
-                                            klickRH = true;
-                                            klickCounter = 0;
-                                        }
-                                        else
-                                        {
-                                            klickRH = false;
-                                        }
+                                        klickRH = true;
+                                        klickCounter = 0;
+                                    }
+                                    else
+                                    {
+                                        klickRH = false;
                                     }
                                 }
                             } catch { };
-
+                            #endregion
                         }
                         #endregion
 
@@ -559,30 +557,35 @@ namespace Crazy_Castle_Crush
                         if (klickRH)
                         {
                             klickRH = false;
-                            float schusswinkel;
-                            float x;
-                            float y;
-                            float velocity;
-                            
-                            bullet = new SphereObject(new Vector3(aktuelleWaffe.getPosition().X, aktuelleWaffe.getPosition().Y+0.5f,aktuelleWaffe.getPosition().Z), 0.1f, 10, 10, 0.05f);
+
+                            if (aktuelleWaffe.getType() == "Balliste") 
+                            { 
+                                bullet = new ModelObject(new Vector3(aktuelleWaffe.getPosition().X, aktuelleWaffe.getPosition().Y + 0.5f, aktuelleWaffe.getPosition().Z), Quaternion.Identity, new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "Bolzen", 0.05f);
+                            } 
+                            else if (aktuelleWaffe.getType() == "Kanone") 
+                            {
+                                bullet = new SphereObject(new Vector3(aktuelleWaffe.getPosition().X, aktuelleWaffe.getPosition().Y+2.5f,aktuelleWaffe.getPosition().Z), 0.1f, 10, 10, 0.05f); 
+                            } 
+                            else 
+                            { 
+                                // TODO bullet = lenkrakete
+                            } 
+
+                            aktuelleWaffe.UpdatePhysics();
+
+                            Vector3 shootdirection = new Vector3((float)Math.Cos(aktuelleWaffe.getWinkel()),(float)Math.Sin(aktuelleWaffe.getWinkel()),0);
+
+                            float velocity = (1-lHv2n.Y) * 10f; //war zwischendurch 15f
+                            bullet.Physics.LinearVelocity = shootdirection * velocity * xR; 
                             
                             Scene.Add(bullet);
-                            
-                            schusswinkel = aktuelleWaffe.getWinkel();
-                            aktuelleWaffe.UpdatePhysics();
-                            x=(float)Math.Cos(schusswinkel);
-                            y=(float)Math.Sin(schusswinkel);
-                            Vector3 shootdirection = new Vector3(x,y,0);
-
-                            velocity = (1-lHv2n.Y) * 15f;
-                            bullet.Physics.LinearVelocity = shootdirection * velocity * xR;
 
                             shootTimer = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000;
                             bullet.Collided += new EventHandler<CollisionArgs>(bulletCollidedHandler);
 
                             firedWaffen++;
-                            bulletInAir = true;
-                        }
+                            bulletInAir = true; 
+                        } 
                     }
                     #endregion
                     #region bullet in Air
@@ -754,6 +757,16 @@ namespace Crazy_Castle_Crush
         {
             bullet.Collided -= new EventHandler<CollisionArgs>(bulletCollidedHandler);
 
+            if(currentState== States.Schussphase1)
+            {
+                Spieler spieler = spieler1;
+            }
+            else
+            {
+                Spieler spieler = spieler2;
+            }
+            //Collided.Zerstören(sender, e, Scene, currentState, );
+            /*
             Objekte getroffenesObj = Objektverwaltung.getObj(e.Collider);
             if (getroffenesObj!=null)
             {
@@ -770,7 +783,7 @@ namespace Crazy_Castle_Crush
                 winner = "Spieler 1";
                 currentState = States.End;
             }
-
+            */
             AfterBulletHit();
         }
 
