@@ -192,6 +192,7 @@ namespace Crazy_Castle_Crush
             }
             #endregion
 
+
             return Gamestart.States.End;
         }
 
@@ -200,6 +201,11 @@ namespace Crazy_Castle_Crush
             spieler1.setMoney(spieler1.getMoney() + level.getRoundMoney());
             spieler2.setMoney(spieler2.getMoney() + level.getRoundMoney());
             schussphase1done = schussphase2done = false;
+        }
+
+        public void setZielStatebyHand(Gamestart.States ziel)
+        {
+            zielstate = ziel;
         }
     }
 }

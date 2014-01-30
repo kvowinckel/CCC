@@ -34,14 +34,12 @@ namespace Crazy_Castle_Crush
 
         public void setWinkel(float rHandY)
         {
-            //TODO Winkel der Waffe
-
-            
+            /*
             rHandY = (1-rHandY) / 1.6f; // Schusswinkel hängt nur mit Höhe der rechten Hand zusammen
-
             schusswinkel = rHandY * 3.1415f/2; // mit float math.pi ersetzen!!!
-
-            mo.SubModels[1].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, schusswinkel);
+            */
+            mo.IsUpdatingCompoundBody = false;
+            mo.SubModels[1].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, /*schusswinkel*/ (1-rHandY));
 
             /*
             revolute.Motor.Settings.Servo.Goal = schusswinkel;//stellt Motor auf Winkel ein
@@ -67,6 +65,11 @@ namespace Crazy_Castle_Crush
         {
             return lebenspunkte;
         }
-       
+
+        public void UpdatePhysics()
+        {
+            this.mo.IsUpdatingCompoundBody = true;
+           //this.mo.UpdateCompoundBody();
+        }
     }
 }

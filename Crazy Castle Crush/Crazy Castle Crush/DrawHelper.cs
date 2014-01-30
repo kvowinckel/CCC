@@ -90,7 +90,7 @@ namespace Crazy_Castle_Crush
             #endregion
 
             #region Poweranzeige
-            if (state == Gamestart.States.Schussphase1 || state == Gamestart.States.Schussphase2 /* && !bulletInAir*/ || state == Gamestart.States.Bauphase1O)
+            if ((state == Gamestart.States.Schussphase1 || state == Gamestart.States.Schussphase2) && !bulletInAir)
             {
                 float pro;
                 if (lHv2s.Y < 0.15f * screenDim.Y)

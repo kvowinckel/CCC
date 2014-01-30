@@ -32,6 +32,7 @@ namespace Crazy_Castle_Crush
                 Welt.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 0.1f);
                 scene.Add(Welt);
                 Objektverwaltung.addToUmgebungsListe(Welt);
+                Welt.Name = "Welt";
 
                 //Lädt Spielhintergrund
                 LoadBackground("himmel");

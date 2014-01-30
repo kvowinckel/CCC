@@ -97,16 +97,22 @@ namespace Crazy_Castle_Crush
             if (auswahl == 1)
             {               
 
-                ModelObject Kanone = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "Kanone_ganz", 0.1f);
+                ModelObject Kanone = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Kanone_ganz", 1f);
                 Kanone.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Kanone.SubModels[1].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Kanone.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
                 Kanone.SubModels[1].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
 
-                Kanone.SubModels[0].Physics.Mass = 0.001f;
-                Kanone.SubModels[1].Physics.Mass = 0.001f;
+                Kanone.Collided += new EventHandler<CollisionArgs>(Kanone_Collided);
+                Kanone.Physics.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
+                
+                Kanone.PhysicsMaterial.Bounciness = 0;
+                Kanone.SubModels[0].Physics.Material.Bounciness = 0;
+                Kanone.SubModels[1].Physics.Material.Bounciness = 0;
+                Kanone.SubModels[0].PhysicsMaterial.Bounciness = 0;
+                Kanone.SubModels[1].PhysicsMaterial.Bounciness = 0;
+                
 
-                Kanone.Physics.Material.Bounciness = 0;
                 scene.Add(Kanone);
                 //TODO Kosten?    
 
@@ -118,7 +124,7 @@ namespace Crazy_Castle_Crush
             if (auswahl == 2)
             {
 
-                ModelObject Balliste = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "Balliste", 0.1f);
+                ModelObject Balliste = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Balliste", 0.1f);
                 Balliste.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Balliste.SubModels[1].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Balliste.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
@@ -138,21 +144,35 @@ namespace Crazy_Castle_Crush
             }
             else
             {
-                ModelObject König = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "König_Subdivision", 0.1f);
-                König.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
-                König.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
-
-                König.SubModels[0].Physics.Mass = 0.001f;
-                König.SubModels[1].Physics.Mass = 0.001f;
-
-                scene.Add(König);
-                dasobj = new Waffen(König, 1, (float)Math.PI / 4, 5f);
-                spieler.setWaffen(dasobj);
-                return dasobj;
+                return null;
             }
             
         }
-        
+
+        static void Kanone_Collided(object sender, CollisionArgs e)
+        {
+            if (((ModelObject)sender).Physics.LinearVelocity.Length() < 0.01f && ((ModelObject)sender).Physics.AngularVelocity.Length() < 0.01f)
+            {
+                ((SceneObject)sender).Physics.BecomeKinematic();//Wird von der PhysicsEngine bewegt das Objekt nicht mehr hat masse 0
+            }
+
+        }
+
+        public static void createKing(Levels level)
+        {
+            ModelObject König1 = new ModelObject(new Vector3(level.getSpieler1Pos(),2,-5), Quaternion.Identity, new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "König_Subdivision", 0.1f);
+            König1.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+            König1.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
+            König1.Name = "König1";
+            scene.Add(König1);
+
+            ModelObject König2 = new ModelObject(new Vector3(level.getSpieler2Pos(), 2, -5), Quaternion.CreateFromRotationMatrix(Matrix.CreateRotationY( (float) Math.PI)), new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "König_Subdivision", 0.1f);
+            König2.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+            König2.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
+            König2.Name = "König2";
+            scene.Add(König2);
+        }
+
         public static Waffen getWaffe(Spieler spieler, int firedwappons)
         {
             //firedwappons = 0 ==> erste Waffe
@@ -167,8 +187,7 @@ namespace Crazy_Castle_Crush
             // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!           
             
             // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!           
-        }
-       
+        }   
 
         public static Objekte projektil(int id, Vector3 startpos, float winkel) //TODO
         {
@@ -188,12 +207,6 @@ namespace Crazy_Castle_Crush
 
             return dasobj;
         }
-        /*public void bulletCollided(SphereObject bullet,CollisionArgs e)
-        {
-
-
-
-        }*/
 
         public static void orientObj(Objekte obj, float linkeHX, float linkeHY)
         {
@@ -299,5 +312,17 @@ namespace Crazy_Castle_Crush
             umgebungsListe.Add(obj);
         }
 
+        public static Objekte getObj(SceneObject sobj)
+        {
+            foreach (Objekte obj in objListe)
+            {
+                if (obj.getSceneObject().Equals(sobj))
+                {
+                    return obj;
+                }
+            }
+
+            return null;
+        }
     }
 }
