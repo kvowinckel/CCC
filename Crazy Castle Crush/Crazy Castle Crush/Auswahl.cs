@@ -14,7 +14,7 @@ namespace Crazy_Castle_Crush
         {
             int x = 0;
             //Wenn sich die linke Hand in der y-Achsen-Auszahlzone befindet
-            if (normScreenPos.Y <= 0.15f)
+            if (normScreenPos.Y <= 0.2f)
             {
                 //Menü
                 if (normScreenPos.X > 0.25f && normScreenPos.X <0.75f) 
@@ -42,7 +42,7 @@ namespace Crazy_Castle_Crush
                 }
 
                 //Bau->Waffen
-                else if (normScreenPos.X > 7f / 8)
+                else if (normScreenPos.X > 0.8)
                     {
                         x = 5;
                     }

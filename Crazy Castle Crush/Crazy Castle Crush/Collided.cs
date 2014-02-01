@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using NOVA.Scenery;
 using Microsoft.Xna.Framework;
+using NOVA;
 
 namespace Crazy_Castle_Crush
 {
     static class Collided
     {
-        /*
+        
         public static string Zerstören(object sender, CollisionArgs e, Scene scene, Gamestart.States state, Spieler spieler)
         {
             string winner = "";
@@ -20,9 +21,15 @@ namespace Crazy_Castle_Crush
                 getroffenesObj.decreaseLP();
                 if (getroffenesObj.getLP() <= 0)
                 {
-                    Vector2 pos = getroffenesObj.getPosition().
+                    Vector3 screenPos = Core.Device.Viewport.Project(getroffenesObj.getPosition(), Core.ProjectionMatrix, Core.ViewMatrix, Matrix.Identity);
+                    Vector2 pos = new Vector2(screenPos.X, screenPos.Y);
                     DrawHelper.setmoney(spieler, 200, pos);
                 }
+            }
+            else if (Objektverwaltung.getWaffe(e.Collider) != null)
+            {
+                Waffen getroffeneWaffe = Objektverwaltung.getWaffe(e.Collider);
+                getroffeneWaffe.setLP(1);
             }
 
 
@@ -39,6 +46,6 @@ namespace Crazy_Castle_Crush
             }
 
             return winner;
-        }*/
+        }
     }
 }

@@ -22,6 +22,7 @@ namespace Crazy_Castle_Crush
             Matrix cameraRotation = Matrix.CreateRotationX(0) * Matrix.CreateRotationY(0);
             camera.Orientation = Quaternion.CreateFromRotationMatrix(cameraRotation);
         }
+
         //Verfolgt das Geschoss 
         public void chaseBullet(Vector3 positionBullet, Vector3 startposition)
         {
@@ -32,6 +33,7 @@ namespace Crazy_Castle_Crush
             camera.Position = new Vector3(positionBullet.X, positionBullet.Y, 15f);//Bewegt die Kamera mit dem Geschoss mit
 
         }
+
         public void zoom(float zoom, int player,Vector3 zoomparameter)
         {
             
@@ -45,7 +47,32 @@ namespace Crazy_Castle_Crush
             }
         }
 
-         
+        public bool wackel(float zeit, int dauer)
+        {
+            Matrix cameraRotation;
+            float by = 0.01f;
+            if (zeit < dauer)
+            {
+                if (camera.Orientation.Z < -1.04f)
+                {
+                    by = 0.01f;
+                }
+                else if (camera.Orientation.Z > 1.04f)
+                {
+                    by = -0.01f;
+                }
+                else
+                {
+                    cameraRotation = Matrix.CreateRotationX(0) * Matrix.CreateRotationY(0) * Matrix.CreateRotationZ(camera.Orientation.Z +by);
+                    camera.Orientation = Quaternion.CreateFromRotationMatrix(cameraRotation);
+                }
+                return false;
+            }
+            else
+                cameraRotation = Matrix.CreateRotationX(0) * Matrix.CreateRotationY(0) * Matrix.CreateRotationZ(0);
+                camera.Orientation = Quaternion.CreateFromRotationMatrix(cameraRotation);
+                return true;
+        }
         
         //Erzeut eine Bewegung von Start zum Zielpunkt. Benötigt runTime und exeTime, Zeit in der die Bewegung ausgeführt werden soll
         //Das ganze mit einer Sin-Funktion versehen, damit eine Beschleunigung und abbremsung der Kamera realisiert wird

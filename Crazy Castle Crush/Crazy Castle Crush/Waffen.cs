@@ -33,6 +33,35 @@ namespace Crazy_Castle_Crush
         {
             return this.mo;
         }
+
+        public SceneObject shoot(Scene scene, float velocity, int richtung)
+        {
+            SceneObject bullet;
+            Vector2 shootdirection = new Vector2(0, 1);
+
+            if (this.getType().Equals("Balliste"))
+            {
+                bullet = new ModelObject(new Vector3(this.getPosition().X, this.getPosition().Y + 0.5f, this.getPosition().Z), Quaternion.Identity, new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "Bolzen", 0.05f);
+                scene.Add(bullet);
+                shootdirection = new Vector2((float)Math.Cos(this.getWinkel()), (float)Math.Sin(this.getWinkel()));
+            }
+            else if (this.getType().Equals("Kanone"))
+            {
+                bullet = new SphereObject(new Vector3(this.getPosition().X, this.getPosition().Y + 0.5f, this.getPosition().Z), 0.1f, 6, 6, 0.05f);
+                scene.Add(bullet);
+                shootdirection = new Vector2((float)Math.Cos(this.getWinkel()), (float)Math.Sin(this.getWinkel()));
+            }
+            else
+            {
+                bullet = this.getModelObject();
+            }
+
+            float velo = (1 - velocity) * 15f;
+            bullet.Physics.LinearVelocity = new Vector3(shootdirection.X *richtung, shootdirection.Y, 0) * velo; 
+
+            return bullet;
+        }
+
         public string getType()
         {
             return this.waffentyp;
@@ -65,6 +94,11 @@ namespace Crazy_Castle_Crush
         public int getLP()
         {
             return lebenspunkte;
+        }
+
+        public void setLP(int abzug)
+        {
+            this.lebenspunkte -= abzug;
         }
 
         public void UpdatePhysics()

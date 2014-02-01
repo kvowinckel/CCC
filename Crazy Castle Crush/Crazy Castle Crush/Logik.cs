@@ -118,6 +118,7 @@ namespace Crazy_Castle_Crush
             #region Schussphase 1
             else if (actuellState == Gamestart.States.Schussphase1)
             {
+                schussphase1done = true; //added: may not be needed
                 if (schussphase2done)                                           //War schon in Schussphase2
                 {
                     newround(spieler1, spieler2, level);
@@ -141,6 +142,7 @@ namespace Crazy_Castle_Crush
             #region Schussphase 2
             else if (actuellState == Gamestart.States.Schussphase2)
             {
+                schussphase2done = true; //added: may not be needed
                 if (schussphase1done)                                           //War schon in Schussphase1
                 {
                     newround(spieler1, spieler2, level);
@@ -191,7 +193,6 @@ namespace Crazy_Castle_Crush
                 }
             }
             #endregion
-
 
             return Gamestart.States.End;
         }
