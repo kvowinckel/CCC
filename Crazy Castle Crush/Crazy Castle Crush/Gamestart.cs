@@ -93,6 +93,9 @@ namespace Crazy_Castle_Crush
 
         public override void Initialize()
         {
+            BEPUphysics.Settings.CollisionDetectionSettings.AllowedPenetration = 0.05f;
+            BEPUphysics.Settings.CollisionDetectionSettings.DefaultMargin = 0.05f;
+            BEPUphysics.Settings.CollisionResponseSettings.MaximumPenetrationCorrectionSpeed /= 2; 
             Scene.ShowCollisionMeshes = true;
             base.Initialize();
             Scene.ShowFPS = true;
@@ -360,7 +363,11 @@ namespace Crazy_Castle_Crush
                             RevoluteAngularJoint objRotiertNicht = new RevoluteAngularJoint(null, aktuellesObj.getSceneObject().Physics, new Vector3(0, 0, 1)); 
                             Scene.Add(objRotiertNicht);
 
-                            aktuellesObj.getSceneObject().Physics.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Discrete;
+
+                            aktuellesObj.getSceneObject().Collided +=new EventHandler<CollisionArgs>(Box_Collided);
+                            aktuellesObj.getSceneObject().Physics.LinearVelocity = Vector3.Zero;
+
+                            aktuellesObj.getSceneObject().Physics.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
 
                             if (currentState == States.Bauphase1O)
                             {
@@ -791,6 +798,10 @@ namespace Crazy_Castle_Crush
                 currentState = States.End;
             }
             AfterBulletHit();
+        }
+        private void Box_Collided(object sender, CollisionArgs e)
+        {
+            ((SceneObject)sender).Physics.AngularVelocity = Vector3.Zero;
         }
 
         public void AfterBulletHit()
