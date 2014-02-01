@@ -29,7 +29,7 @@ namespace Crazy_Castle_Crush
                 {
                     if (showWaffe)
                     {
-                        bild = "WaffenMenüDummy";
+                        bild = "Waffenauswahl";
                     }
                     else
                     {
