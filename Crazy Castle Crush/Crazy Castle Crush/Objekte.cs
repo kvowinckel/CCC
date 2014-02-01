@@ -71,11 +71,12 @@ namespace Crazy_Castle_Crush
                 material.Diffuse = Color.White.ToVector4();
                 material.Specular=new Vector4(0.1f, 0.1f, 0.1f, 1);
             }
-            objekt.RenderMaterial = material;
+            
             if (objekt.Name.Contains("L"))
             {
                 ((ModelObject)objekt).SubModels[0].RenderMaterial = material;
             }
+            objekt.RenderMaterial = material;
         }
 
         public void decreaseLP(int minus)

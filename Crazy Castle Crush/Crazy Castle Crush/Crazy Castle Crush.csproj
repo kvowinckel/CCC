@@ -108,8 +108,9 @@
     <Reference Include="mscorlib">
       <Private>False</Private>
     </Reference>
-    <Reference Include="NOVA">
-      <HintPath>C:\Program Files\NOVA\NOVA Framework v1.6.1\bin\NOVA.dll</HintPath>
+    <Reference Include="NOVA, Version=1.6.1.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\NOVA\NOVA 1.7.0\bin\NOVA.dll</HintPath>
     </Reference>
     <Reference Include="ProjectMercury">
       <HintPath>C:\Program Files\NOVA\NOVA Framework v1.6.1\bin\ProjectMercury.dll</HintPath>

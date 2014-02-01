@@ -270,13 +270,13 @@ namespace Crazy_Castle_Crush
             }
             else if (auswahl == 3)
             {
-                first.setMaterial("Papayrus");
+                first.setMaterial("Metal");
                 first.increaseLP(2); 
                 
             }
             else if (auswahl == 4)
             {
-                first.setMaterial("himmel");
+                first.setMaterial("Rubber");
             }
         }
 
