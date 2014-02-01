@@ -69,7 +69,7 @@ namespace Crazy_Castle_Crush
         public string winner;
         GameTime GameT;
         string hilfsstring;
-        
+        bool kinectOn = false;
 
 
 
@@ -99,8 +99,7 @@ namespace Crazy_Castle_Crush
             Scene.ShowCollisionMeshes = true;
             base.Initialize();
             Scene.ShowFPS = true;
-            Scene.ShowObjectOrigin = true;
-            Scene.ShowGrid = true;
+            
             //Kinect initialisieren
             Scene.InitKinect();
 
@@ -115,7 +114,7 @@ namespace Crazy_Castle_Crush
 
 
             this.Scene.ShowCameraImage = true;
-            this.Scene.Kinect.ShowCameraImage = NOVA.Components.Kinect.Kinect.KinectCameraImage.ReducedRGB;
+            this.Scene.BackgroundColor = Color.Black;
             
 
             //Objecte
@@ -129,9 +128,11 @@ namespace Crazy_Castle_Crush
         {
 
             #region Kinect
-            
-            if (Scene.Kinect.SkeletonDataReady && bulletInAir == false)
+            if (kinectOn)
             {
+                //if (Scene.Kinect.SkeletonDataReady && (!bulletInAir || bullet != null || bullet.Name.Contains("Rakete")))
+                if (Scene.Kinect.SkeletonDataReady)
+                {
                 List<NOVA.Components.Kinect.Skeleton> skeletons = new List<NOVA.Components.Kinect.Skeleton>(Scene.Kinect.Skeletons);
 
                 //Aktives Skelett finden
@@ -162,7 +163,7 @@ namespace Crazy_Castle_Crush
                             #endregion
 
                             #region Klick
-                            if (klickCounter<60)
+                                if (klickCounter < 60)
                             {
                                 klickCounter++;
                             }
@@ -181,7 +182,8 @@ namespace Crazy_Castle_Crush
                                         klickRH = false;
                                     }
                                 }
-                            } catch { };
+                                }
+                                catch { };
                             #endregion
                         }
                         #endregion
@@ -262,6 +264,7 @@ namespace Crazy_Castle_Crush
                 }
 
             }
+            }
             #endregion
 
             switch (currentState)
@@ -289,6 +292,7 @@ namespace Crazy_Castle_Crush
                 #region Camto1
                 //Camto1: Kamera wird an die Linke Position bewegt
                 case States.Camto1:
+                    kinectOn = false;
                     aktuallisiereZeit(gameTime);
 
                     //Variable wird für nächste Schussphasen zurückgesetzt
@@ -320,6 +324,7 @@ namespace Crazy_Castle_Crush
                 case States.Bauphase1O:
                     aktuallisiereZeit(gameTime);
                     float pos;
+                    kinectOn = true;
 
                     #region Spieler &  Spielerposition
                     if (currentState == States.Bauphase1O)
@@ -363,11 +368,6 @@ namespace Crazy_Castle_Crush
                             RevoluteAngularJoint objRotiertNicht = new RevoluteAngularJoint(null, aktuellesObj.getSceneObject().Physics, new Vector3(0, 0, 1)); 
                             Scene.Add(objRotiertNicht);
 
-
-                            aktuellesObj.getSceneObject().Collided +=new EventHandler<CollisionArgs>(Box_Collided);
-                            aktuellesObj.getSceneObject().Physics.LinearVelocity = Vector3.Zero;
-
-                            aktuellesObj.getSceneObject().Physics.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
 
                             if (currentState == States.Bauphase1O)
                             {
@@ -443,6 +443,7 @@ namespace Crazy_Castle_Crush
                     //Wenn Spieler nicht ausreichend Geld hat (oder auf weiter Klickt => in Kinect realisiert)
                     if (gamer.getMoney() < level.getMinMoney() && objInHand == false && (currentState == States.Bauphase1O ||currentState == States.Bauphase2O))
                     {
+                        kinectOn = false;
                         PosX1 = Scene.Camera.Position.X;
                         Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
                         aktuallisiereZeit(gameTime);
@@ -509,7 +510,7 @@ namespace Crazy_Castle_Crush
                 //Kamera wird an die Rechte Positon bewegt
                 case States.Camto2:
                     aktuallisiereZeit(gameTime);
-
+                    kinectOn = false;
                     //Variable wird für nächste Schussphasen zurückgesetzt
                     //firedWaffen = 0; 
 
@@ -541,6 +542,7 @@ namespace Crazy_Castle_Crush
                     aktuallisiereZeit(gameTime);
                     int xR;
 
+
                     #region Spieler und Richtung
                     if (currentState == States.Schussphase1)
                     {
@@ -553,12 +555,13 @@ namespace Crazy_Castle_Crush
                         xR = -1;
                     }
                     #endregion
-                    hilfsstring = gamer.getWaffen().ToString();
+                    
 
                     #region Schussfunktion //shoot Funktion TODO: "auslagern"
                     #region Abschießen
                     if (gamer.getWaffen() != 0 && !bulletInAir && gamer.getWaffen() > firedWaffen)//Wenn der Spieler Waffen hat
                     {
+                        kinectOn = true;
                         aktuelleWaffe = Objektverwaltung.getWaffe(gamer, firedWaffen);
                         aktuelleWaffe.setWinkel(rHv2n.Y);//Setzt Winkel der Kanone in Waffen
 
@@ -582,7 +585,7 @@ namespace Crazy_Castle_Crush
                     if (bulletInAir)
                     {
                         float aktTime = (float)gameTime.TotalGameTime.TotalMilliseconds - shootTimer;
-                        if (aktTime < 10000)
+                        if (aktTime < 20000)
                         {
                             if (bullet.Position.Y > -2)
                             {
@@ -591,14 +594,19 @@ namespace Crazy_Castle_Crush
                                     cameraMovement.chaseBullet(bullet.Position, cam.Position);
                                     if (bullet.Name.Contains("Rakete"))
                                     {
-                                        rocketDirection.X += (rHv2n.Y - 0.5f) * (-0.2f); 
+                                        kinectOn = true;
+                                        ((ModelObject)bullet).IsUpdatingCompoundBody = false;
+                                        rocketDirection.X += (float)Math.Cos((Math.PI * (0.5f - rHv2n.Y))) * 0.02f;
+                                        rocketDirection.Y += (float)Math.Sin((Math.PI * (0.5f - rHv2n.Y))) * 0.02f;
                                         rocketDirection.Normalize();
-                                        bullet.Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, (float)Math.Atan(rocketDirection.X / rocketDirection.Y));
-                                        bullet.Physics.LinearVelocity = rocketDirection * 5;
+                                        ((ModelObject)bullet).SubModels[0].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, -(float)Math.Atan2(rocketDirection.X, rocketDirection.Y));
 
-
-                                        //Vector3 rocketDirection = new Vector3(0,1,0)
+                                        bullet.Physics.LinearVelocity = rocketDirection * 4f;
                                     }
+                                    else
+                                    {
+                                        kinectOn = false;
+                                }
                                 }
                                 else
                                 {
@@ -706,7 +714,7 @@ namespace Crazy_Castle_Crush
                 #region Wackel
                 case States.Wackel:
                     aktuallisiereZeit(gameTime);
-
+                    kinectOn = false;
                     if (zeit > 950 && zeit < 1050)
                     {
                         Objektverwaltung.refreshObj(spieler1, spieler2); //Entfernt Objekte ohne LP

@@ -54,6 +54,7 @@ namespace Crazy_Castle_Crush
             else
             {
                 bullet = this.getModelObject();
+                bullet.Position = bullet.Position + new Vector3(0, 0.2f, 0);
             }
 
             float velo = (1 - velocity) * 15f;
