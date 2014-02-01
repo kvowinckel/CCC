@@ -66,10 +66,16 @@ namespace Crazy_Castle_Crush
             }
             else
             {
+
                 material.Texture = Core.Content.Load<Texture2D>(bild);
                 material.Diffuse = Color.White.ToVector4();
+                material.Specular=new Vector4(0.1f, 0.1f, 0.1f, 1);
             }
             objekt.RenderMaterial = material;
+            if (objekt.Name.Contains("L"))
+            {
+                ((ModelObject)objekt).SubModels[0].RenderMaterial = material;
+            }
         }
 
         public void decreaseLP(int minus)

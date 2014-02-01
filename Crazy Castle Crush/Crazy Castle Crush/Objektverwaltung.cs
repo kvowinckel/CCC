@@ -48,6 +48,7 @@ namespace Crazy_Castle_Crush
                 ModelObject l = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1,2,0),(float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "L", 1f);
                 l.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 l.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
+                l.Name = "L";
                 newobj = l;
                 DrawHelper.setmoney(spieler, -200, rHv2s);
             }
@@ -165,6 +166,7 @@ namespace Crazy_Castle_Crush
             if (((ModelObject)sender).Physics.LinearVelocity.Length() < 0.01f && ((ModelObject)sender).Physics.AngularVelocity.Length() < 0.01f)
             {
                 ((SceneObject)sender).Physics.BecomeKinematic();//Wird von der PhysicsEngine bewegt das Objekt nicht mehr hat masse 0
+                ((SceneObject)sender).Physics.LinearVelocity = Vector3.Zero;
             }
 
         }
