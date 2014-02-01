@@ -299,22 +299,32 @@ namespace Crazy_Castle_Crush
 
             objListe.RemoveAll(x => x.getLP() <= 0); //Löscht Objekte aus Liste
 
+            List<Waffen> tempL = new List<Waffen>();
             foreach (Waffen temp in spieler1.getList())
             {
                 if (temp.getLP() <= 0)
                 {
                     scene.Remove(temp.getModelObject());
-                    spieler1.resetWaffen(temp);
+                    tempL.Add(temp);
                 }
             }
+            foreach (Waffen temp in tempL)
+            {
+                spieler1.resetWaffen(temp);
+            }
 
+            List<Waffen> tempL2 = new List<Waffen>();
             foreach (Waffen temp in spieler2.getList())
             {
                 if (temp.getLP() <= 0)
                 {
                     scene.Remove(temp.getModelObject());
-                    spieler2.resetWaffen(temp);
+                    tempL2.Add(temp);
                 }
+            }
+            foreach (Waffen temp2 in tempL2)
+            {
+                spieler2.resetWaffen(temp2);
             }
            
         }

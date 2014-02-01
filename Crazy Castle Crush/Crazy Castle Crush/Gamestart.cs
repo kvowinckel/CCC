@@ -69,7 +69,7 @@ namespace Crazy_Castle_Crush
         public string winner;
         GameTime GameT;
         string hilfsstring;
-        
+        bool kinectOn = false;
 
 
 
@@ -126,138 +126,142 @@ namespace Crazy_Castle_Crush
         {
 
             #region Kinect
-            
-            if (Scene.Kinect.SkeletonDataReady && bulletInAir == false)
+            if (kinectOn)
             {
-                List<NOVA.Components.Kinect.Skeleton> skeletons = new List<NOVA.Components.Kinect.Skeleton>(Scene.Kinect.Skeletons);
-
-                //Aktives Skelett finden
-                foreach (NOVA.Components.Kinect.Skeleton skeleton in skeletons)
+                //if (Scene.Kinect.SkeletonDataReady && (!bulletInAir || bullet != null || bullet.Name.Contains("Rakete")))
+                if (Scene.Kinect.SkeletonDataReady)
                 {
-                    if (skeleton.TrackingState == SkeletonTrackingState.Tracked && skeleton.Joints.Count != 0)
+                    List<NOVA.Components.Kinect.Skeleton> skeletons = new List<NOVA.Components.Kinect.Skeleton>(Scene.Kinect.Skeletons);
+
+                    //Aktives Skelett finden
+                    foreach (NOVA.Components.Kinect.Skeleton skeleton in skeletons)
                     {
-                        //Box auf Hand, Klick auf Weiter
-                        #region Detektion der rechten Hand
-
-                        if (skeleton.Joints[JointType.HandRight].TrackingState == JointTrackingState.Tracked)
+                        if (skeleton.TrackingState == SkeletonTrackingState.Tracked && skeleton.Joints.Count != 0)
                         {
-                            //Position der rechten Hand des Spielers in Bildschirmkoodinaten
-                            rHv2s = skeleton.Joints[JointType.HandRight].ScreenPosition;
-                            rHv2s -= new Vector2(0, 10);
-                            rHv2n.X = rHv2s.X / screenDim.X;
-                            rHv2n.Y = rHv2s.Y / screenDim.Y;
+                            //Box auf Hand, Klick auf Weiter
+                            #region Detektion der rechten Hand
 
-                            Plane plane2 = new Plane(Vector3.Forward, -4f);
-
-                            //Weltkoordinatenpunk finden
-                            Vector3 worldPos2R = Helpers.Unproject(rHv2s, plane2, false);
-                            rHv2w = new Vector2(worldPos2R.X, worldPos2R.Y);
-
-                            #region Auswahl Textur/ Objekt
-                            auswahl = Auswahl.auswahl(rHv2n);
-
-                            #endregion
-
-                            #region Klick
-                            if (klickCounter<60)
+                            if (skeleton.Joints[JointType.HandRight].TrackingState == JointTrackingState.Tracked)
                             {
-                                klickCounter++;
-                            }
+                                //Position der rechten Hand des Spielers in Bildschirmkoodinaten
+                                rHv2s = skeleton.Joints[JointType.HandRight].ScreenPosition;
+                                rHv2s -= new Vector2(0, 10);
+                                rHv2n.X = rHv2s.X / screenDim.X;
+                                rHv2n.Y = rHv2s.Y / screenDim.Y;
 
-                            try
-                            {
-                                if (skeleton.HandPointers[1].IsTracked == true)
-                                {
-                                    if (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.GripRelease && klickCounter >= 60)
-                                    {
-                                        klickRH = true;
-                                        klickCounter = 0;
-                                    }
-                                    else
-                                    {
-                                        klickRH = false;
-                                    }
-                                }
-                            } catch { };
-                            #endregion
-                        }
-                        #endregion
+                                Plane plane2 = new Plane(Vector3.Forward, -4f);
 
-                        //Box auf Hand, Auswahl Textur/ Objekt
-                        #region Detektion der linken Hand
-                        if (skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked)
-                        {
-                            //Position der linken Hand des Spielers in Bildschirmkoodinaten
-                            lHv2s = skeleton.Joints[JointType.HandLeft].ScreenPosition;
-                            lHv2n.X = lHv2s.X / screenDim.X;
-                            lHv2n.Y = lHv2s.Y / screenDim.Y;
+                                //Weltkoordinatenpunk finden
+                                Vector3 worldPos2R = Helpers.Unproject(rHv2s, plane2, false);
+                                rHv2w = new Vector2(worldPos2R.X, worldPos2R.Y);
 
-                            //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
-                            Plane plane2 = new Plane(Vector3.Forward, -4f);
-
-                            //Weltkoordinatenpunk finden
-                            Vector3 worldPos2L = Helpers.Unproject(lHv2s, plane2, false);
-                            lHv2w = new Vector2(worldPos2L.X, worldPos2L.Y);
-
-                            //klickLH = (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.Grip);
-                        }
-
-                        #endregion
-
-                        //Hintergrundsbild verschieben
-                        if (bulletInAir == false)
-                        {
-                            #region Detektion des Kopfes
-                            if (skeleton.Joints[JointType.Head].TrackingState == JointTrackingState.Tracked)
-                            {
-                                //Position des Kopfes des Spielers in Bildschirmkoodinaten
-                                Vector2 screenPos = skeleton.Joints[JointType.Head].ScreenPosition;
-                                Vector2 normScreenPos = new Vector2(screenPos.X / screenDim.X, screenPos.Y / screenDim.Y);
-
-                                Vector3 realPos = skeleton.Joints[JointType.Head].WorldPosition;
-                                //Hintergrund bewegen
-                                startObjects.MoveBackground(normScreenPos.X - 0.5f, normScreenPos.Y - 0.5f);
-
-                                //Kamera auf z-Achse bewegen
-                                realPos = skeleton.Joints[JointType.Head].WorldPosition;
-
-                                #region Zoom Funktionen
-                                //ZOOM Funktionen
-                                if (currentState == States.Schussphase1 || currentState == States.Schussphase2)
-                                {
-                                    if (gamer == spieler1)
-                                    {
-                                        cameraMovement.zoom(realPos.Z, 1, new Vector3(10f, 2f, 15f));
-                                    }
-                                    if (gamer == spieler2)
-                                    {
-                                        cameraMovement.zoom(realPos.Z, -1, new Vector3(10f, 2f, 15f));
-                                    }
-                                }
-                                if (currentState == States.Bauphase1O || currentState == States.Bauphase1T || currentState == States.Bauphase2O || currentState == States.Bauphase2T)
-                                {
-                                    if (gamer == spieler1)
-                                    {
-                                        cameraMovement.zoom(realPos.Z, 1, new Vector3(1.5f, 0f, 4f));
-                                    }
-                                    if (gamer == spieler2)
-                                    {
-                                        cameraMovement.zoom(realPos.Z, -1, new Vector3(1.5f, 0f, 4f));
-                                    }
-                                }
-
+                                #region Auswahl Textur/ Objekt
+                                auswahl = Auswahl.auswahl(rHv2n);
 
                                 #endregion
 
+                                #region Klick
+                                if (klickCounter < 60)
+                                {
+                                    klickCounter++;
+                                }
 
+                                try
+                                {
+                                    if (skeleton.HandPointers[1].IsTracked == true)
+                                    {
+                                        if (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.GripRelease && klickCounter >= 60)
+                                        {
+                                            klickRH = true;
+                                            klickCounter = 0;
+                                        }
+                                        else
+                                        {
+                                            klickRH = false;
+                                        }
+                                    }
+                                }
+                                catch { };
+                                #endregion
                             }
                             #endregion
+
+                            //Box auf Hand, Auswahl Textur/ Objekt
+                            #region Detektion der linken Hand
+                            if (skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked)
+                            {
+                                //Position der linken Hand des Spielers in Bildschirmkoodinaten
+                                lHv2s = skeleton.Joints[JointType.HandLeft].ScreenPosition;
+                                lHv2n.X = lHv2s.X / screenDim.X;
+                                lHv2n.Y = lHv2s.Y / screenDim.Y;
+
+                                //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
+                                Plane plane2 = new Plane(Vector3.Forward, -4f);
+
+                                //Weltkoordinatenpunk finden
+                                Vector3 worldPos2L = Helpers.Unproject(lHv2s, plane2, false);
+                                lHv2w = new Vector2(worldPos2L.X, worldPos2L.Y);
+
+                                //klickLH = (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.Grip);
+                            }
+
+                            #endregion
+
+                            //Hintergrundsbild verschieben
+                            if (bulletInAir == false)
+                            {
+                                #region Detektion des Kopfes
+                                if (skeleton.Joints[JointType.Head].TrackingState == JointTrackingState.Tracked)
+                                {
+                                    //Position des Kopfes des Spielers in Bildschirmkoodinaten
+                                    Vector2 screenPos = skeleton.Joints[JointType.Head].ScreenPosition;
+                                    Vector2 normScreenPos = new Vector2(screenPos.X / screenDim.X, screenPos.Y / screenDim.Y);
+
+                                    Vector3 realPos = skeleton.Joints[JointType.Head].WorldPosition;
+                                    //Hintergrund bewegen
+                                    startObjects.MoveBackground(normScreenPos.X - 0.5f, normScreenPos.Y - 0.5f);
+
+                                    //Kamera auf z-Achse bewegen
+                                    realPos = skeleton.Joints[JointType.Head].WorldPosition;
+
+                                    #region Zoom Funktionen
+                                    //ZOOM Funktionen
+                                    if (currentState == States.Schussphase1 || currentState == States.Schussphase2)
+                                    {
+                                        if (gamer == spieler1)
+                                        {
+                                            cameraMovement.zoom(realPos.Z, 1, new Vector3(10f, 2f, 15f));
+                                        }
+                                        if (gamer == spieler2)
+                                        {
+                                            cameraMovement.zoom(realPos.Z, -1, new Vector3(10f, 2f, 15f));
+                                        }
+                                    }
+                                    if (currentState == States.Bauphase1O || currentState == States.Bauphase1T || currentState == States.Bauphase2O || currentState == States.Bauphase2T)
+                                    {
+                                        if (gamer == spieler1)
+                                        {
+                                            cameraMovement.zoom(realPos.Z, 1, new Vector3(1.5f, 0f, 4f));
+                                        }
+                                        if (gamer == spieler2)
+                                        {
+                                            cameraMovement.zoom(realPos.Z, -1, new Vector3(1.5f, 0f, 4f));
+                                        }
+                                    }
+
+
+                                    #endregion
+
+
+                                }
+                                #endregion
+                            }
+
+
                         }
-
-
                     }
-                }
 
+                }
             }
             #endregion
 
@@ -286,6 +290,7 @@ namespace Crazy_Castle_Crush
                 #region Camto1
                 //Camto1: Kamera wird an die Linke Position bewegt
                 case States.Camto1:
+                    kinectOn = false;
                     aktuallisiereZeit(gameTime);
 
                     //Variable wird für nächste Schussphasen zurückgesetzt
@@ -317,6 +322,7 @@ namespace Crazy_Castle_Crush
                 case States.Bauphase1O:
                     aktuallisiereZeit(gameTime);
                     float pos;
+                    kinectOn = true;
 
                     #region Spieler &  Spielerposition
                     if (currentState == States.Bauphase1O)
@@ -436,6 +442,7 @@ namespace Crazy_Castle_Crush
                     //Wenn Spieler nicht ausreichend Geld hat (oder auf weiter Klickt => in Kinect realisiert)
                     if (gamer.getMoney() < level.getMinMoney() && objInHand == false && (currentState == States.Bauphase1O ||currentState == States.Bauphase2O))
                     {
+                        kinectOn = false;
                         PosX1 = Scene.Camera.Position.X;
                         Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
                         aktuallisiereZeit(gameTime);
@@ -502,7 +509,7 @@ namespace Crazy_Castle_Crush
                 //Kamera wird an die Rechte Positon bewegt
                 case States.Camto2:
                     aktuallisiereZeit(gameTime);
-
+                    kinectOn = false;
                     //Variable wird für nächste Schussphasen zurückgesetzt
                     //firedWaffen = 0; 
 
@@ -534,6 +541,7 @@ namespace Crazy_Castle_Crush
                     aktuallisiereZeit(gameTime);
                     int xR;
 
+
                     #region Spieler und Richtung
                     if (currentState == States.Schussphase1)
                     {
@@ -546,12 +554,13 @@ namespace Crazy_Castle_Crush
                         xR = -1;
                     }
                     #endregion
-                    hilfsstring = gamer.getWaffen().ToString();
+                    
 
                     #region Schussfunktion //shoot Funktion TODO: "auslagern"
                     #region Abschießen
                     if (gamer.getWaffen() != 0 && !bulletInAir && gamer.getWaffen() > firedWaffen)//Wenn der Spieler Waffen hat
                     {
+                        kinectOn = true;
                         aktuelleWaffe = Objektverwaltung.getWaffe(gamer, firedWaffen);
                         aktuelleWaffe.setWinkel(rHv2n.Y);//Setzt Winkel der Kanone in Waffen
 
@@ -575,7 +584,7 @@ namespace Crazy_Castle_Crush
                     if (bulletInAir)
                     {
                         float aktTime = (float)gameTime.TotalGameTime.TotalMilliseconds - shootTimer;
-                        if (aktTime < 10000)
+                        if (aktTime < 20000)
                         {
                             if (bullet.Position.Y > -2)
                             {
@@ -584,13 +593,18 @@ namespace Crazy_Castle_Crush
                                     cameraMovement.chaseBullet(bullet.Position, cam.Position);
                                     if (bullet.Name.Contains("Rakete"))
                                     {
-                                        rocketDirection.X += (rHv2n.Y - 0.5f) * (-0.2f); 
+                                        kinectOn = true;
+                                        ((ModelObject)bullet).IsUpdatingCompoundBody = false;
+                                        rocketDirection.X += (float)Math.Cos((Math.PI * (0.5f - rHv2n.Y))) * 0.02f;
+                                        rocketDirection.Y += (float)Math.Sin((Math.PI * (0.5f - rHv2n.Y))) * 0.02f;
                                         rocketDirection.Normalize();
-                                        bullet.Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, (float)Math.Atan(rocketDirection.X / rocketDirection.Y));
-                                        bullet.Physics.LinearVelocity = rocketDirection * 5;
+                                        ((ModelObject)bullet).SubModels[0].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, -(float)Math.Atan2(rocketDirection.X, rocketDirection.Y));
 
-
-                                        //Vector3 rocketDirection = new Vector3(0,1,0)
+                                        bullet.Physics.LinearVelocity = rocketDirection * 4f;
+                                    }
+                                    else
+                                    {
+                                        kinectOn = false;
                                     }
                                 }
                                 else
@@ -699,7 +713,7 @@ namespace Crazy_Castle_Crush
                 #region Wackel
                 case States.Wackel:
                     aktuallisiereZeit(gameTime);
-
+                    kinectOn = false;
                     if (zeit > 950 && zeit < 1050)
                     {
                         Objektverwaltung.refreshObj(spieler1, spieler2); //Entfernt Objekte ohne LP
