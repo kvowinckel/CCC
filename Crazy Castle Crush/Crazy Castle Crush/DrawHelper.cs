@@ -36,9 +36,30 @@ namespace Crazy_Castle_Crush
                         bild = "Bau";
                     }
                 }
-
+                float rny = rHv2s.Y / screenDim.Y;
+                float rnx = rHv2s.X / screenDim.X;
+                double yrun;
+                if (rnx > 0.25f && rnx < 0.75f)
+                {
+                    if (rny > 0.3f)
+                    {
+                        yrun = 0;
+                    }
+                    else if (rny < 0.2f)
+                    {
+                        yrun = 0.105f * screenDim.Y;
+                    }
+                    else
+                    {
+                        yrun = (0.3f - rny) * 1.05f * screenDim.Y;
+                    }
+                }
+                else
+                {
+                    yrun = 0;
+                }
                 Vector2 dim = new Vector2(screenDim.X * 0.5f, screenDim.Y * 0.15f);
-                Vector2 pos = new Vector2(dim.X * 0.5f, 5);
+                Vector2 pos = new Vector2(dim.X * 0.5f, (float)yrun);
                 drawBox(pos, dim, bild);
 
             }
@@ -74,8 +95,31 @@ namespace Crazy_Castle_Crush
                     bild = "ChangerDummy";
                 }
 
+                float rny = rHv2s.Y / screenDim.Y;
+                float rnx = rHv2s.X / screenDim.X;
+                double yrun;
+                if (rnx > 0.75f)
+                {
+                    if (rny > 0.3f)
+                    {
+                        yrun = 0;
+                    }
+                    else if (rny < 0.2f)
+                    {
+                        yrun = 0.105f * screenDim.Y;
+                    }
+                    else
+                    {
+                        yrun = (0.3f - rny) * 1.05f * screenDim.Y;
+                    }
+                }
+                else
+                {
+                    yrun = 0;
+                }
+
                 Vector2 dim = new Vector2(screenDim.X * 0.125f, screenDim.Y * 0.15f);
-                Vector2 pos = new Vector2((screenDim.X * 0.875f) - 5, 5);
+                Vector2 pos = new Vector2((screenDim.X * 0.875f) - 5, (float)yrun);
                 drawBox(pos, dim, bild);
             }
             #endregion

@@ -25,7 +25,7 @@ namespace Crazy_Castle_Crush
 
         private static List<Objekte> objListe = new List<Objekte>();
         private static List<SceneObject> umgebungsListe = new List<SceneObject>();
-        //private static List<Waffen> waffenListe = new List<Waffen>();
+        private static List<Waffen> waffenListe = new List<Waffen>();
 
         public static Objekte createObj(int auswahl, Spieler spieler, float xPos, Vector2 rHv2s)
         {
@@ -119,10 +119,9 @@ namespace Crazy_Castle_Crush
 
 
                 dasobj = new Waffen(Kanone, 1, (float)Math.PI / 4, 5f,"Kanone");
-                spieler.setWaffen(dasobj);
-                return dasobj;
+
             }
-            if (auswahl == 2 ||auswahl == 3)
+            else if (auswahl == 2 ||auswahl == 3)
             {
                 ModelObject Balliste = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Balliste", 0.1f);
                 Balliste.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
@@ -139,8 +138,7 @@ namespace Crazy_Castle_Crush
 
 
                 dasobj = new Waffen(Balliste, 1, (float)Math.PI / 4, 5f,"Balliste");
-                spieler.setWaffen(dasobj);
-                return dasobj;
+
             }
             else
             {
@@ -155,9 +153,11 @@ namespace Crazy_Castle_Crush
                 //TODO Kosten?    
 
                 dasobj = new Waffen(Rakete, 1, (float)Math.PI / 4, 5f, "Rakete");
-                spieler.setWaffen(dasobj);
-                return dasobj;
+
             }
+            spieler.setWaffen(dasobj);
+            waffenListe.Add(dasobj);
+            return dasobj;
             
         }
 
@@ -189,7 +189,7 @@ namespace Crazy_Castle_Crush
         public static Waffen getWaffe(Spieler spieler, int firedwappons)
         {
             //firedwappons = 0 ==> erste Waffe
-            if (spieler.getList().Count == 0)
+            if (spieler.getList().Count == 0 ||spieler.getList().Count <= firedwappons)
             {
                 return null;
             }
@@ -201,7 +201,8 @@ namespace Crazy_Castle_Crush
             
             // TODO darf nur zurück geben wenn es noch unabgefeuerte Waffen gibt sonst -> exception!           
         }   
-
+        
+        /*
         public static Objekte projektil(int id, Vector3 startpos, float winkel) //TODO
         {
             SceneObject newobj;
@@ -219,7 +220,7 @@ namespace Crazy_Castle_Crush
             dasobj = new Objekte(newobj, 0, "blank");
 
             return dasobj;
-        }
+        }*/
 
         public static void orientObj(Objekte obj, float linkeHX, float linkeHY)
         {
@@ -335,6 +336,18 @@ namespace Crazy_Castle_Crush
                 }
             }
 
+            return null;
+        }
+
+        public static Waffen getWaffe(SceneObject sobj)
+        {
+            foreach (Waffen obj in waffenListe)
+            {
+                if (obj.getModelObject().Equals(sobj))
+                {
+                    return obj;
+                }
+            }
             return null;
         }
     }

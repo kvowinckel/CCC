@@ -35,13 +35,14 @@ namespace Crazy_Castle_Crush
             Bauphase2T,     //Bauphase Spieler 2: Texturen,
             Schussphase1,
             Schussphase2,
+            Wackel,
             End
         }
 
         #region Variablen (Deklarationen)
 
         States currentState;                                //aktueller Zustand
-        //States prewState;                                   //vorheriger Zustand
+        States prewState;                                   //vorheriger Zustand
         float Zeit1;                                        //Zeit nach State
         float zeit;                                         //vergangende Zeit seit letztem State
         float PosX1;                                        //X-Pos nach State
@@ -53,6 +54,7 @@ namespace Crazy_Castle_Crush
         Vector2 lHv2w;                                      //linke Hand als Vector 2 in WorldPos
         Vector2 lHv2n;                                      //linke Hand als Vector 2 in normScreenPos
         Vector2 screenDim;                                  //Screen Dimension
+        Vector3 rocketDirection = new Vector3(0, 1, 0);
         bool showWaffe;                                     //Gibt an ob gerade die Waffen angezeigt werden sollen
         bool objInHand;                                     //solange das Objekt an der Hand ist
         int auswahl;                                        //je nach Position der linken Hand erhält die Auswahl ihre Werte (für Objekt und Texturauswahl)  
@@ -65,12 +67,13 @@ namespace Crazy_Castle_Crush
         int klickCounter = 0;
         float shootTimer = 0;
         public string winner;
-        double winkelSec = 0;
+        GameTime GameT;
+        string hilfsstring;
+        
 
 
 
         //Benötigt für die einblendung von Auswahlmenu
-        States objState = States.Start;
         Auswahl Auswahl = new Auswahl();
 
         
@@ -90,9 +93,11 @@ namespace Crazy_Castle_Crush
 
         public override void Initialize()
         {
+            Scene.ShowCollisionMeshes = true;
             base.Initialize();
             Scene.ShowFPS = true;
-            Scene.ShowObjectOrigin = false;
+            Scene.ShowObjectOrigin = true;
+            Scene.ShowGrid = true;
             //Kinect initialisieren
             Scene.InitKinect();
 
@@ -284,14 +289,14 @@ namespace Crazy_Castle_Crush
                     aktuallisiereZeit(gameTime);
 
                     //Variable wird für nächste Schussphasen zurückgesetzt
-                    firedWaffen = 0;                        
+                    //firedWaffen = 0;                        
                     
                     //Kamera wird bewegt
                     cameraMovement.move(zeit,3000,PosX1, level.getSpieler1Pos());
 
                 #region Übergangsbedingungen
                     //Wenn die Spielerposition 1 erreicht wurde startet die Bauphase/Schussphase
-                    if (Scene.Camera.Position.X == level.getSpieler1Pos())
+                    if (Scene.Camera.Position.X < level.getSpieler1Pos()+0.5f)
                     {
                         //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
                         PosX1 = Scene.Camera.Position.X;
@@ -499,14 +504,14 @@ namespace Crazy_Castle_Crush
                     aktuallisiereZeit(gameTime);
 
                     //Variable wird für nächste Schussphasen zurückgesetzt
-                    firedWaffen = 0; 
+                    //firedWaffen = 0; 
 
                     //Kamera wird bewegt
                     cameraMovement.move(zeit, 3000, PosX1, level.getSpieler2Pos());
 
                 #region Übergangsbedingungen
                     //Wenn die Spielerposition 2 erreicht wurde startet die Bauphase/Schussphase
-                    if (Scene.Camera.Position.X == level.getSpieler2Pos())
+                    if (Scene.Camera.Position.X > level.getSpieler2Pos()-0.5f)
                     {
                         //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
                         PosX1 = Scene.Camera.Position.X;
@@ -541,68 +546,52 @@ namespace Crazy_Castle_Crush
                         xR = -1;
                     }
                     #endregion
+                    hilfsstring = gamer.getWaffen().ToString();
 
                     #region Schussfunktion //shoot Funktion TODO: "auslagern"
                     #region Abschießen
-                    if (gamer.getWaffen() != 0 && !bulletInAir)//Wenn der Spieler Waffen hat
+                    if (gamer.getWaffen() != 0 && !bulletInAir && gamer.getWaffen() > firedWaffen)//Wenn der Spieler Waffen hat
                     {
-                        //if (winkelSec < gameTime.TotalGameTime.Seconds)
-                        {
-                            aktuelleWaffe = Objektverwaltung.getWaffe(gamer, firedWaffen);
-
-                            aktuelleWaffe.setWinkel(rHv2n.Y);//Setzt Winkel der Kanone in Waffen
-                            winkelSec = gameTime.TotalGameTime.TotalSeconds;
-                        }
+                        aktuelleWaffe = Objektverwaltung.getWaffe(gamer, firedWaffen);
+                        aktuelleWaffe.setWinkel(rHv2n.Y);//Setzt Winkel der Kanone in Waffen
 
                         if (klickRH)
                         {
                             klickRH = false;
 
-                            if (aktuelleWaffe.getType() == "Balliste") 
-                            { 
-                                bullet = new ModelObject(new Vector3(aktuelleWaffe.getPosition().X, aktuelleWaffe.getPosition().Y + 0.5f, aktuelleWaffe.getPosition().Z), Quaternion.Identity, new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "Bolzen", 0.05f);
-                            } 
-                            else if (aktuelleWaffe.getType() == "Kanone") 
-                            {
-                                bullet = new SphereObject(new Vector3(aktuelleWaffe.getPosition().X, aktuelleWaffe.getPosition().Y+2.5f,aktuelleWaffe.getPosition().Z), 0.1f, 10, 10, 0.05f); 
-                            } 
-                            else 
-                            { 
-                                // TODO bullet = lenkrakete
-                            } 
-
+                            bullet = aktuelleWaffe.shoot(Scene, lHv2n.Y,xR);    //bullet wir 0.5f über die Waffe gesetzt
                             aktuelleWaffe.UpdatePhysics();
-
-                            Vector3 shootdirection = new Vector3((float)Math.Cos(aktuelleWaffe.getWinkel()),(float)Math.Sin(aktuelleWaffe.getWinkel()),0);
-
-                            float velocity = (1-lHv2n.Y) * 10f; //war zwischendurch 15f
-                            bullet.Physics.LinearVelocity = shootdirection * velocity * xR; 
-                            
-                            Scene.Add(bullet);
 
                             shootTimer = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000;
                             bullet.Collided += new EventHandler<CollisionArgs>(bulletCollidedHandler);
 
                             firedWaffen++;
-                            bulletInAir = true; 
-                        } 
+                            bulletInAir = true;
+                        }
+                        
                     }
                     #endregion
                     #region bullet in Air
                     if (bulletInAir)
                     {
-                        float aktTime = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000 - shootTimer;
+                        float aktTime = (float)gameTime.TotalGameTime.TotalMilliseconds - shootTimer;
                         if (aktTime < 10000)
                         {
                             if (bullet.Position.Y > -2)
                             {
-                                if (gamer == spieler1 && bullet.Position.X < level.getSpieler2Pos())
+                                if ((gamer == spieler1 && bullet.Position.X < level.getSpieler2Pos()+3) || (gamer == spieler2 && bullet.Position.X > level.getSpieler1Pos()-3))
                                 {
                                     cameraMovement.chaseBullet(bullet.Position, cam.Position);
-                                }
-                                else if (gamer == spieler2 && bullet.Position.X > level.getSpieler1Pos())
-                                {
-                                    cameraMovement.chaseBullet(bullet.Position, cam.Position);
+                                    if (bullet.Name.Contains("Rakete"))
+                                    {
+                                        rocketDirection.X += (rHv2n.Y - 0.5f) * (-0.2f); 
+                                        rocketDirection.Normalize();
+                                        bullet.Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, (float)Math.Atan(rocketDirection.X / rocketDirection.Y));
+                                        bullet.Physics.LinearVelocity = rocketDirection * 5;
+
+
+                                        //Vector3 rocketDirection = new Vector3(0,1,0)
+                                    }
                                 }
                                 else
                                 {
@@ -689,12 +678,14 @@ namespace Crazy_Castle_Crush
 
                     #region Übergangsbedingungen
                     //Wenn alle Waffen abgefeuert wurden...
-                    if (firedWaffen == gamer.getWaffen())
+                    if (firedWaffen >= gamer.getWaffen() && !bulletInAir)
                     {
                         //setzt die Variable PosX1 auf die Position bevor er in den nächsten State wechselt 
                         PosX1 = Scene.Camera.Position.X;
                         Zeit1 = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000; //Zeit zwischenspeichern
                         aktuallisiereZeit(gameTime);
+
+                        firedWaffen = 0;
 
                         currentState = logik.uebergang(currentState, spieler1, spieler2, level);
                     }
@@ -703,6 +694,37 @@ namespace Crazy_Castle_Crush
 
                     break;
 
+                #endregion
+
+                #region Wackel
+                case States.Wackel:
+                    aktuallisiereZeit(gameTime);
+
+                    if (zeit > 950 && zeit < 1050)
+                    {
+                        Objektverwaltung.refreshObj(spieler1, spieler2); //Entfernt Objekte ohne LP
+                    }
+
+                    cameraMovement.wackel(zeit, 2000);
+                    
+                    if (zeit > 2000)
+                    {
+                        PosX1 = Scene.Camera.Position.X;
+                        Zeit1 = (float)GameT.TotalGameTime.TotalMilliseconds;
+                        aktuallisiereZeit(GameT);
+
+                        if (prewState == States.Schussphase1)
+                        {
+                            logik.setZielStatebyHand(States.Schussphase1);
+                            currentState = States.Camto1;
+                        }
+                        else
+                        {
+                            logik.setZielStatebyHand(States.Schussphase2);
+                            currentState = States.Camto2;
+                        }
+                    }
+                    break;
                 #endregion
 
                 #region End
@@ -741,11 +763,9 @@ namespace Crazy_Castle_Crush
 
             #region Update Ende
 
-            objState = currentState; //Am Ende jenden Updates wird der State angeglichen
+            GameT = gameTime;
 
             screenDim = new Vector2(Scene.Game.Window.ClientBounds.Width, Scene.Game.Window.ClientBounds.Height);
-
-            Objektverwaltung.refreshObj(spieler1,spieler2); //Entfernt Objekte ohne LP
          
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
@@ -756,119 +776,42 @@ namespace Crazy_Castle_Crush
         private void bulletCollidedHandler(object sender, CollisionArgs e)
         {
             bullet.Collided -= new EventHandler<CollisionArgs>(bulletCollidedHandler);
-
+            Spieler spieler;
             if(currentState== States.Schussphase1)
             {
-                Spieler spieler = spieler1;
+                spieler = spieler1;
             }
             else
             {
-                Spieler spieler = spieler2;
+                spieler = spieler2;
             }
-            //Collided.Zerstören(sender, e, Scene, currentState, );
-            /*
-            Objekte getroffenesObj = Objektverwaltung.getObj(e.Collider);
-            if (getroffenesObj!=null)
+            winner = Collided.Zerstören(sender, e, Scene, currentState, spieler);
+            if (!winner.Equals(""))
             {
-                getroffenesObj.decreaseLP();
-            }
-            //TODO: Explosion
-            if (e.Collider == Scene.Find("König1" + e.Collider.ID))
-            {
-                winner = "Spieler 2";
                 currentState = States.End;
             }
-            else if (e.Collider == Scene.Find("König2" + e.Collider.ID))
-            {
-                winner = "Spieler 1";
-                currentState = States.End;
-            }
-            */
             AfterBulletHit();
         }
 
         public void AfterBulletHit()
         {
             bulletInAir = false;
-            Scene.Remove(bullet);
-            if (currentState == States.Schussphase1)
+            if (Scene.Contains(bullet))
             {
-                logik.setZielStatebyHand(States.Schussphase1);
-                currentState = States.Camto1;
+                Scene.Remove(bullet);
             }
-            else
-            {
-                logik.setZielStatebyHand(States.Schussphase2);
-                currentState = States.Camto2;
-            }
-        }
 
-        /* HandleInput
-        public override void HandleInput(InputState input)
-        {
-            #region Spiel Beenden (Esc)
-            if (input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape, PlayerIndex.One))
-            {
-                Environment.Exit(0);
-            }
-            #endregion
+            PosX1 = Scene.Camera.Position.X;
+            Zeit1 = (float)GameT.TotalGameTime.TotalMilliseconds;
+            aktuallisiereZeit(GameT);
 
-            base.HandleInput(input);
+            prewState = currentState;
+            currentState = States.Wackel;
         }
-        */
 
         public override void Draw(GameTime gameTime)
         {
-            /*
-            #region State Anzeige
-            string wobinich = "";
-
-            if (currentState == States.Bauphase1O)
-            {
-                wobinich = "Bau1 Obj"+ rHv2n + rHv2s + rHv2w;
-            }
-            else if (currentState == States.Bauphase1T)
-            {
-                wobinich = "Bau1 Tex" + auswahl + aktuellesObj.getMaterial();
-            }
-            else if (currentState == States.Bauphase2O)
-            {
-                wobinich = "Bau2 Obj"+ auswahl;
-            }
-            else if (currentState == States.Bauphase2T)
-            {
-                wobinich = "Bau2 Tex" + auswahl;
-            }
-            else if (currentState == States.Camto1)
-            {
-                wobinich = "Cam1";
-            }
-            else if (currentState == States.Camto2)
-            {
-                wobinich = "Cam2";
-            }
-            else if (currentState == States.End)
-            {
-                wobinich = "End";
-            }
-            else if (currentState == States.Schussphase1)
-            {
-                wobinich = "Schussphase1" + firedWaffen;
-            }
-            else if (currentState == States.Schussphase2)
-            {
-                wobinich = "Schussphase2" + firedWaffen;
-            }
-            else if (currentState == States.Start)
-            {
-                wobinich = "Start";
-            }
-
-            Textanzeiger(wobinich);
-            #endregion 
-            */
             DrawHelper.run(currentState, rHv2s, lHv2s,screenDim,showWaffe,spieler1,spieler2,bulletInAir);
-
             base.Draw(gameTime);
         }
 
@@ -885,7 +828,7 @@ namespace Crazy_Castle_Crush
 
         private void aktuallisiereZeit(GameTime gameTime)
         {
-            zeit = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000 - Zeit1;
+            zeit = (float)gameTime.TotalGameTime.TotalMilliseconds - Zeit1;
         }
 
 
