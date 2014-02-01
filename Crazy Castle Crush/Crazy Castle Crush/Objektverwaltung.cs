@@ -187,7 +187,7 @@ namespace Crazy_Castle_Crush
         public static Waffen getWaffe(Spieler spieler, int firedwappons)
         {
             //firedwappons = 0 ==> erste Waffe
-            if (spieler.getList().Count == 0)
+            if (spieler.getList().Count == 0 ||spieler.getList().Count <= firedwappons)
             {
                 return null;
             }

@@ -21,34 +21,30 @@ namespace Crazy_Castle_Crush
 
         public Waffen(ModelObject MO, int Lebenspunkte, float Schusswinkel, float ShootSpeed,string Waffentyp) //Controller rausgenommen 
         {
-            mo = MO;
-            lebenspunkte = Lebenspunkte;
-            schusswinkel = Schusswinkel;
-            shootspeed = ShootSpeed;
-            waffentyp = Waffentyp;
+            this.mo = MO;
+            mo.Name = Waffentyp;
+            this.lebenspunkte = Lebenspunkte;
+            this.schusswinkel = Schusswinkel;
+            this.shootspeed = ShootSpeed;
+            this.waffentyp = Waffentyp;
         }
 
         public ModelObject getModelObject()
         {
-            return mo;
+            return this.mo;
         }
         public string getType()
         {
-            return waffentyp;
+            return this.waffentyp;
         }
 
         public void setWinkel(float rHandY)
         {
-            /*
-            rHandY = (1-rHandY) / 1.6f; // Schusswinkel hängt nur mit Höhe der rechten Hand zusammen
-            schusswinkel = rHandY * 3.1415f/2; // mit float math.pi ersetzen!!!
-            */
-            mo.IsUpdatingCompoundBody = false;
-            mo.SubModels[1].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, /*schusswinkel*/ (1-rHandY));
-
-            /*
-            revolute.Motor.Settings.Servo.Goal = schusswinkel;//stellt Motor auf Winkel ein
-            */
+            if (!getType().Equals("Rakete"))
+            {
+                mo.IsUpdatingCompoundBody = false;
+                mo.SubModels[1].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, /*schusswinkel*/ (1 - rHandY));
+            }
         }
 
         public float getWinkel()

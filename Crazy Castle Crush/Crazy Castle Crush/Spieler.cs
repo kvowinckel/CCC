@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+
 namespace Crazy_Castle_Crush
 {
     public class Spieler
     {
         private int geld = 1000;    //Anfangsgeld
-        private int anzWaffen=1;
+        private int anzWaffen=0;
 
         List<Waffen> waffen = new List<Waffen>();
 
@@ -28,8 +29,11 @@ namespace Crazy_Castle_Crush
         //Funktion fügt einer weitere Waffe hinzu
         public void setWaffen(Waffen waffe)
         {
-            anzWaffen += 1;
-            waffen.Add(waffe);
+            if (!waffen.Contains(waffe))
+            {
+                anzWaffen += 1;
+                waffen.Add(waffe);
+            }
         }
 
         //Funktion zieht eine Waffe ab
