@@ -93,11 +93,9 @@ namespace Crazy_Castle_Crush
 
         public override void Initialize()
         {
-            Scene.ShowCollisionMeshes = true;
             base.Initialize();
             Scene.ShowFPS = true;
-            Scene.ShowObjectOrigin = true;
-            Scene.ShowGrid = true;
+            
             //Kinect initialisieren
             Scene.InitKinect();
 
@@ -112,7 +110,7 @@ namespace Crazy_Castle_Crush
 
 
             this.Scene.ShowCameraImage = true;
-            this.Scene.Kinect.ShowCameraImage = NOVA.Components.Kinect.Kinect.KinectCameraImage.ReducedRGB;
+            this.Scene.BackgroundColor = Color.Black;
             
 
             //Objecte
