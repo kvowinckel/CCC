@@ -93,6 +93,10 @@ namespace Crazy_Castle_Crush
 
         public override void Initialize()
         {
+            BEPUphysics.Settings.CollisionDetectionSettings.AllowedPenetration = 0.05f;
+            BEPUphysics.Settings.CollisionDetectionSettings.DefaultMargin = 0.05f;
+            BEPUphysics.Settings.CollisionResponseSettings.MaximumPenetrationCorrectionSpeed /= 2; 
+            Scene.ShowCollisionMeshes = true;
             base.Initialize();
             Scene.ShowFPS = true;
             
@@ -129,137 +133,137 @@ namespace Crazy_Castle_Crush
                 //if (Scene.Kinect.SkeletonDataReady && (!bulletInAir || bullet != null || bullet.Name.Contains("Rakete")))
                 if (Scene.Kinect.SkeletonDataReady)
                 {
-                    List<NOVA.Components.Kinect.Skeleton> skeletons = new List<NOVA.Components.Kinect.Skeleton>(Scene.Kinect.Skeletons);
+                List<NOVA.Components.Kinect.Skeleton> skeletons = new List<NOVA.Components.Kinect.Skeleton>(Scene.Kinect.Skeletons);
 
-                    //Aktives Skelett finden
-                    foreach (NOVA.Components.Kinect.Skeleton skeleton in skeletons)
+                //Aktives Skelett finden
+                foreach (NOVA.Components.Kinect.Skeleton skeleton in skeletons)
+                {
+                    if (skeleton.TrackingState == SkeletonTrackingState.Tracked && skeleton.Joints.Count != 0)
                     {
-                        if (skeleton.TrackingState == SkeletonTrackingState.Tracked && skeleton.Joints.Count != 0)
+                        //Box auf Hand, Klick auf Weiter
+                        #region Detektion der rechten Hand
+
+                        if (skeleton.Joints[JointType.HandRight].TrackingState == JointTrackingState.Tracked)
                         {
-                            //Box auf Hand, Klick auf Weiter
-                            #region Detektion der rechten Hand
+                            //Position der rechten Hand des Spielers in Bildschirmkoodinaten
+                            rHv2s = skeleton.Joints[JointType.HandRight].ScreenPosition;
+                            rHv2s -= new Vector2(0, 10);
+                            rHv2n.X = rHv2s.X / screenDim.X;
+                            rHv2n.Y = rHv2s.Y / screenDim.Y;
 
-                            if (skeleton.Joints[JointType.HandRight].TrackingState == JointTrackingState.Tracked)
-                            {
-                                //Position der rechten Hand des Spielers in Bildschirmkoodinaten
-                                rHv2s = skeleton.Joints[JointType.HandRight].ScreenPosition;
-                                rHv2s -= new Vector2(0, 10);
-                                rHv2n.X = rHv2s.X / screenDim.X;
-                                rHv2n.Y = rHv2s.Y / screenDim.Y;
+                            Plane plane2 = new Plane(Vector3.Forward, -4f);
 
-                                Plane plane2 = new Plane(Vector3.Forward, -4f);
+                            //Weltkoordinatenpunk finden
+                            Vector3 worldPos2R = Helpers.Unproject(rHv2s, plane2, false);
+                            rHv2w = new Vector2(worldPos2R.X, worldPos2R.Y);
 
-                                //Weltkoordinatenpunk finden
-                                Vector3 worldPos2R = Helpers.Unproject(rHv2s, plane2, false);
-                                rHv2w = new Vector2(worldPos2R.X, worldPos2R.Y);
+                            #region Auswahl Textur/ Objekt
+                            auswahl = Auswahl.auswahl(rHv2n);
 
-                                #region Auswahl Textur/ Objekt
-                                auswahl = Auswahl.auswahl(rHv2n);
+                            #endregion
 
-                                #endregion
-
-                                #region Klick
+                            #region Klick
                                 if (klickCounter < 60)
-                                {
-                                    klickCounter++;
-                                }
+                            {
+                                klickCounter++;
+                            }
 
-                                try
+                            try
+                            {
+                                if (skeleton.HandPointers[1].IsTracked == true)
                                 {
-                                    if (skeleton.HandPointers[1].IsTracked == true)
+                                    if (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.GripRelease && klickCounter >= 60)
                                     {
-                                        if (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.GripRelease && klickCounter >= 60)
-                                        {
-                                            klickRH = true;
-                                            klickCounter = 0;
-                                        }
-                                        else
-                                        {
-                                            klickRH = false;
-                                        }
+                                        klickRH = true;
+                                        klickCounter = 0;
                                     }
+                                    else
+                                    {
+                                        klickRH = false;
+                                    }
+                                }
                                 }
                                 catch { };
-                                #endregion
-                            }
                             #endregion
-
-                            //Box auf Hand, Auswahl Textur/ Objekt
-                            #region Detektion der linken Hand
-                            if (skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked)
-                            {
-                                //Position der linken Hand des Spielers in Bildschirmkoodinaten
-                                lHv2s = skeleton.Joints[JointType.HandLeft].ScreenPosition;
-                                lHv2n.X = lHv2s.X / screenDim.X;
-                                lHv2n.Y = lHv2s.Y / screenDim.Y;
-
-                                //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
-                                Plane plane2 = new Plane(Vector3.Forward, -4f);
-
-                                //Weltkoordinatenpunk finden
-                                Vector3 worldPos2L = Helpers.Unproject(lHv2s, plane2, false);
-                                lHv2w = new Vector2(worldPos2L.X, worldPos2L.Y);
-
-                                //klickLH = (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.Grip);
-                            }
-
-                            #endregion
-
-                            //Hintergrundsbild verschieben
-                            if (bulletInAir == false)
-                            {
-                                #region Detektion des Kopfes
-                                if (skeleton.Joints[JointType.Head].TrackingState == JointTrackingState.Tracked)
-                                {
-                                    //Position des Kopfes des Spielers in Bildschirmkoodinaten
-                                    Vector2 screenPos = skeleton.Joints[JointType.Head].ScreenPosition;
-                                    Vector2 normScreenPos = new Vector2(screenPos.X / screenDim.X, screenPos.Y / screenDim.Y);
-
-                                    Vector3 realPos = skeleton.Joints[JointType.Head].WorldPosition;
-                                    //Hintergrund bewegen
-                                    startObjects.MoveBackground(normScreenPos.X - 0.5f, normScreenPos.Y - 0.5f);
-
-                                    //Kamera auf z-Achse bewegen
-                                    realPos = skeleton.Joints[JointType.Head].WorldPosition;
-
-                                    #region Zoom Funktionen
-                                    //ZOOM Funktionen
-                                    if (currentState == States.Schussphase1 || currentState == States.Schussphase2)
-                                    {
-                                        if (gamer == spieler1)
-                                        {
-                                            cameraMovement.zoom(realPos.Z, 1, new Vector3(10f, 2f, 15f));
-                                        }
-                                        if (gamer == spieler2)
-                                        {
-                                            cameraMovement.zoom(realPos.Z, -1, new Vector3(10f, 2f, 15f));
-                                        }
-                                    }
-                                    if (currentState == States.Bauphase1O || currentState == States.Bauphase1T || currentState == States.Bauphase2O || currentState == States.Bauphase2T)
-                                    {
-                                        if (gamer == spieler1)
-                                        {
-                                            cameraMovement.zoom(realPos.Z, 1, new Vector3(1.5f, 0f, 4f));
-                                        }
-                                        if (gamer == spieler2)
-                                        {
-                                            cameraMovement.zoom(realPos.Z, -1, new Vector3(1.5f, 0f, 4f));
-                                        }
-                                    }
-
-
-                                    #endregion
-
-
-                                }
-                                #endregion
-                            }
-
-
                         }
-                    }
+                        #endregion
 
+                        //Box auf Hand, Auswahl Textur/ Objekt
+                        #region Detektion der linken Hand
+                        if (skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked)
+                        {
+                            //Position der linken Hand des Spielers in Bildschirmkoodinaten
+                            lHv2s = skeleton.Joints[JointType.HandLeft].ScreenPosition;
+                            lHv2n.X = lHv2s.X / screenDim.X;
+                            lHv2n.Y = lHv2s.Y / screenDim.Y;
+
+                            //parallele Ebene zum Bildschirm erzeugen in der die Kugel transformiert wird
+                            Plane plane2 = new Plane(Vector3.Forward, -4f);
+
+                            //Weltkoordinatenpunk finden
+                            Vector3 worldPos2L = Helpers.Unproject(lHv2s, plane2, false);
+                            lHv2w = new Vector2(worldPos2L.X, worldPos2L.Y);
+
+                            //klickLH = (skeleton.HandPointers[1].HandEventType == InteractionHandEventType.Grip);
+                        }
+
+                        #endregion
+
+                        //Hintergrundsbild verschieben
+                        if (bulletInAir == false)
+                        {
+                            #region Detektion des Kopfes
+                            if (skeleton.Joints[JointType.Head].TrackingState == JointTrackingState.Tracked)
+                            {
+                                //Position des Kopfes des Spielers in Bildschirmkoodinaten
+                                Vector2 screenPos = skeleton.Joints[JointType.Head].ScreenPosition;
+                                Vector2 normScreenPos = new Vector2(screenPos.X / screenDim.X, screenPos.Y / screenDim.Y);
+
+                                Vector3 realPos = skeleton.Joints[JointType.Head].WorldPosition;
+                                //Hintergrund bewegen
+                                startObjects.MoveBackground(normScreenPos.X - 0.5f, normScreenPos.Y - 0.5f);
+
+                                //Kamera auf z-Achse bewegen
+                                realPos = skeleton.Joints[JointType.Head].WorldPosition;
+
+                                #region Zoom Funktionen
+                                //ZOOM Funktionen
+                                if (currentState == States.Schussphase1 || currentState == States.Schussphase2)
+                                {
+                                    if (gamer == spieler1)
+                                    {
+                                        cameraMovement.zoom(realPos.Z, 1, new Vector3(10f, 2f, 15f));
+                                    }
+                                    if (gamer == spieler2)
+                                    {
+                                        cameraMovement.zoom(realPos.Z, -1, new Vector3(10f, 2f, 15f));
+                                    }
+                                }
+                                if (currentState == States.Bauphase1O || currentState == States.Bauphase1T || currentState == States.Bauphase2O || currentState == States.Bauphase2T)
+                                {
+                                    if (gamer == spieler1)
+                                    {
+                                        cameraMovement.zoom(realPos.Z, 1, new Vector3(1.5f, 0f, 4f));
+                                    }
+                                    if (gamer == spieler2)
+                                    {
+                                        cameraMovement.zoom(realPos.Z, -1, new Vector3(1.5f, 0f, 4f));
+                                    }
+                                }
+
+
+                                #endregion
+
+
+                            }
+                            #endregion
+                        }
+
+
+                    }
                 }
+
+            }
             }
             #endregion
 
@@ -365,7 +369,6 @@ namespace Crazy_Castle_Crush
                             RevoluteAngularJoint objRotiertNicht = new RevoluteAngularJoint(null, aktuellesObj.getSceneObject().Physics, new Vector3(0, 0, 1)); 
                             Scene.Add(objRotiertNicht);
 
-                            aktuellesObj.getSceneObject().Physics.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Discrete;
 
                             if (currentState == States.Bauphase1O)
                             {
@@ -609,7 +612,7 @@ namespace Crazy_Castle_Crush
                                     else
                                     {
                                         kinectOn = false;
-                                    }
+                                }
                                 }
                                 else
                                 {
@@ -821,6 +824,10 @@ namespace Crazy_Castle_Crush
                 currentState = States.End;
             }
             AfterBulletHit();
+        }
+        private void Box_Collided(object sender, CollisionArgs e)
+        {
+            ((SceneObject)sender).Physics.AngularVelocity = Vector3.Zero;
         }
 
         public void AfterBulletHit()

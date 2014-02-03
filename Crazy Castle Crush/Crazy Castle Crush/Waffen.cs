@@ -41,7 +41,7 @@ namespace Crazy_Castle_Crush
 
             if (this.getType().Equals("Balliste"))
             {
-                bullet = new ModelObject(new Vector3(this.getPosition().X, this.getPosition().Y + 1.5f, this.getPosition().Z), Quaternion.Identity, new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "bolzen", 0.05f);
+                bullet = new ModelObject(new Vector3(this.getPosition().X, this.getPosition().Y + 0.5f, this.getPosition().Z), Quaternion.Identity, new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "bolzen", 0.05f);
                 scene.Add(bullet);
                 shootdirection = new Vector2((float)Math.Cos(this.getWinkel()), (float)Math.Sin(this.getWinkel()));
             }
