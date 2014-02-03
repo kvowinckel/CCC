@@ -360,6 +360,7 @@ namespace Crazy_Castle_Crush
 
                             BEPUphysics.Constraints.TwoEntity.Joints.PointOnPlaneJoint Objektwird2D = new BEPUphysics.Constraints.TwoEntity.Joints.PointOnPlaneJoint(null, aktuellesObj.getSceneObject().Physics, new Vector3(0, 0, -5f), Vector3.Forward, aktuellesObj.getPosition()); 
                             Scene.Physics.Add(Objektwird2D);
+                            aktuellesObj.getSceneObject().Collided += new EventHandler<CollisionArgs>(Box_Collided);
 
                             RevoluteAngularJoint objRotiertNicht = new RevoluteAngularJoint(null, aktuellesObj.getSceneObject().Physics, new Vector3(0, 0, 1)); 
                             Scene.Add(objRotiertNicht);
@@ -586,7 +587,7 @@ namespace Crazy_Castle_Crush
                         {
                             if (bullet.Position.Y > -2)
                             {
-                                if ((gamer == spieler1 && bullet.Position.X < level.getSpieler2Pos()+3) || (gamer == spieler2 && bullet.Position.X > level.getSpieler1Pos()-3))
+                                if ((gamer == spieler1 && bullet.Position.X < level.getSpieler2Pos()+4) || (gamer == spieler2 && bullet.Position.X > level.getSpieler1Pos()-4))
                                 {
                                     cameraMovement.chaseBullet(bullet.Position, cam.Position);
                                     if (bullet.Name.Contains("Rakete"))
@@ -599,6 +600,11 @@ namespace Crazy_Castle_Crush
                                         ((ModelObject)bullet).SubModels[0].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, -(float)Math.Atan2(rocketDirection.X, rocketDirection.Y));
 
                                         bullet.Physics.LinearVelocity = rocketDirection * 4f;
+                                    }
+                                    else if (bullet.Name.Contains("bolzen"))
+                                    {
+                                        kinectOn = false;
+                                        ((ModelObject)bullet).SubModels[0].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, -(float)Math.Atan2(bullet.Physics.LinearVelocity.X, bullet.Physics.LinearVelocity.Y));
                                     }
                                     else
                                     {
@@ -718,6 +724,11 @@ namespace Crazy_Castle_Crush
                     }
 
                     cameraMovement.wackel(zeit, 2000);
+                    bulletInAir = false;
+                    if (Scene.Contains(bullet))
+                    {
+                        Scene.Remove(bullet);
+                    }
                     
                     if (zeit > 2000)
                     {
@@ -785,6 +796,11 @@ namespace Crazy_Castle_Crush
 
         }
 
+        void Box_Collided(object sender, CollisionArgs e)
+        {
+            ((SceneObject)sender).Physics.AngularVelocity = Vector3.Zero;
+        }
+
         private void bulletCollidedHandler(object sender, CollisionArgs e)
         {
             bullet.Collided -= new EventHandler<CollisionArgs>(bulletCollidedHandler);
@@ -797,7 +813,9 @@ namespace Crazy_Castle_Crush
             {
                 spieler = spieler2;
             }
+
             winner = Collided.Zerstören(sender, e, Scene, currentState, spieler);
+
             if (!winner.Equals(""))
             {
                 currentState = States.End;
@@ -807,16 +825,8 @@ namespace Crazy_Castle_Crush
 
         public void AfterBulletHit()
         {
-            bulletInAir = false;
-            if (Scene.Contains(bullet))
-            {
-                Scene.Remove(bullet);
-            }
-
-            PosX1 = Scene.Camera.Position.X;
             Zeit1 = (float)GameT.TotalGameTime.TotalMilliseconds;
             aktuallisiereZeit(GameT);
-
             prewState = currentState;
             currentState = States.Wackel;
         }

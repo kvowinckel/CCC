@@ -63,6 +63,7 @@ namespace Crazy_Castle_Crush
                 }
                 else
                 {
+                    //TODO
                     cameraRotation = Matrix.CreateRotationX(0) * Matrix.CreateRotationY(0) * Matrix.CreateRotationZ(camera.Orientation.Z +by);
                     camera.Orientation = Quaternion.CreateFromRotationMatrix(cameraRotation);
                 }

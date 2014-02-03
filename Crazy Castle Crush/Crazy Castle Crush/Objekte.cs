@@ -68,7 +68,7 @@ namespace Crazy_Castle_Crush
             {
 
                 material.Texture = Core.Content.Load<Texture2D>(bild);
-                material.Diffuse = Color.White.ToVector4();
+                material.Diffuse = new Vector4(1, 1, 1, 1); 
                 material.Specular=new Vector4(0.1f, 0.1f, 0.1f, 1);
             }
             

@@ -88,11 +88,11 @@ namespace Crazy_Castle_Crush
                 String bild;
                 if (showWaffe)
                 {
-                    bild = "pist";
+                    bild = "Bau";
                 }
                 else
                 {
-                    bild = "ChangerDummy";
+                    bild = "Waffenauswahl";
                 }
 
                 float rny = rHv2s.Y / screenDim.Y;
@@ -175,7 +175,7 @@ namespace Crazy_Castle_Crush
             #region Handpos
             if (state == Gamestart.States.Bauphase1O || state == Gamestart.States.Bauphase1T || state == Gamestart.States.Bauphase2O || state == Gamestart.States.Bauphase2T)
             {
-                Handkreise(rHv2s, lHv2s);
+                Handkreise(rHv2s, lHv2s, screenDim);
             }
             #endregion
 
@@ -189,13 +189,13 @@ namespace Crazy_Castle_Crush
             prozent = 100;
         }
 
-        private static void Handkreise(Vector2 posL, Vector2 posR)
+        private static void Handkreise(Vector2 posL, Vector2 posR, Vector2 screenDim)
         {
             Texture2D HandsmallL = Core.Content.Load<Texture2D>("HandCursorR");
-            UI2DRenderer.DrawTexture(HandsmallL, new Vector2((int)posL.X, (int)posL.Y), 30, 30);
+            UI2DRenderer.DrawTexture(HandsmallL, new Vector2((int)posL.X, (int)posL.Y), (int)screenDim.X *3/80, (int)screenDim.X *3/80);
 
             Texture2D HandsmallR = Core.Content.Load<Texture2D>("HandCursorL");
-            UI2DRenderer.DrawTexture(HandsmallR, new Vector2((int)posR.X, (int)posR.Y), 30, 30);
+            UI2DRenderer.DrawTexture(HandsmallR, new Vector2((int)posR.X, (int)posR.Y), (int)screenDim.X * 3 / 80, (int)screenDim.X * 3 / 80);
         }
 
         private static void drawBox(Vector2 pos, Vector2 dim, String bild)
