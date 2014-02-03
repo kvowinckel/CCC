@@ -364,7 +364,7 @@ namespace Crazy_Castle_Crush
 
                             BEPUphysics.Constraints.TwoEntity.Joints.PointOnPlaneJoint Objektwird2D = new BEPUphysics.Constraints.TwoEntity.Joints.PointOnPlaneJoint(null, aktuellesObj.getSceneObject().Physics, new Vector3(0, 0, -5f), Vector3.Forward, aktuellesObj.getPosition()); 
                             Scene.Physics.Add(Objektwird2D);
-                            aktuellesObj.getSceneObject().Collided += new EventHandler<CollisionArgs>(Box_Collided);
+                            aktuellesObj.getSceneObject().Collided += new EventHandler<CollisionArgs>(box_Collided);
 
                             RevoluteAngularJoint objRotiertNicht = new RevoluteAngularJoint(null, aktuellesObj.getSceneObject().Physics, new Vector3(0, 0, 1)); 
                             Scene.Add(objRotiertNicht);
@@ -799,8 +799,9 @@ namespace Crazy_Castle_Crush
 
         }
 
-        void Box_Collided(object sender, CollisionArgs e)
+        void box_Collided(object sender, CollisionArgs e)
         {
+            aktuellesObj.getSceneObject().Collided -= new EventHandler<CollisionArgs>(box_Collided);
             ((SceneObject)sender).Physics.AngularVelocity = Vector3.Zero;
         }
 
