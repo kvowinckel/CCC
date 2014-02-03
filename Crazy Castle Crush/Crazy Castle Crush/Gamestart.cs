@@ -96,7 +96,6 @@ namespace Crazy_Castle_Crush
             BEPUphysics.Settings.CollisionDetectionSettings.AllowedPenetration = 0.05f;
             BEPUphysics.Settings.CollisionDetectionSettings.DefaultMargin = 0.05f;
             BEPUphysics.Settings.CollisionResponseSettings.MaximumPenetrationCorrectionSpeed /= 2; 
-            Scene.ShowCollisionMeshes = true;
             base.Initialize();
             Scene.ShowFPS = true;
             
@@ -588,9 +587,10 @@ namespace Crazy_Castle_Crush
                         float aktTime = (float)gameTime.TotalGameTime.TotalMilliseconds - shootTimer;
                         if (aktTime < 20000)
                         {
-                            if (bullet.Position.Y > -2)
+                            if (bullet.Position.Y > -2 && bullet.Position.Y < 20)
                             {
-                                if ((gamer == spieler1 && bullet.Position.X < level.getSpieler2Pos()+4) || (gamer == spieler2 && bullet.Position.X > level.getSpieler1Pos()-4))
+                                if ((gamer == spieler1 && bullet.Position.X < level.getSpieler2Pos()+5 && bullet.Position.X > level.getSpieler1Pos() -5) ||
+                                    (gamer == spieler2 && bullet.Position.X > level.getSpieler1Pos()-5 && bullet.Position.X < level.getSpieler2Pos() +5))
                                 {
                                     cameraMovement.chaseBullet(bullet.Position, cam.Position);
                                     if (bullet.Name.Contains("Rakete"))
@@ -826,6 +826,7 @@ namespace Crazy_Castle_Crush
             }
             AfterBulletHit();
         }
+
         private void Box_Collided(object sender, CollisionArgs e)
         {
             ((SceneObject)sender).Physics.AngularVelocity = Vector3.Zero;
@@ -834,6 +835,10 @@ namespace Crazy_Castle_Crush
         public void AfterBulletHit()
         {
             Zeit1 = (float)GameT.TotalGameTime.TotalMilliseconds;
+            if (aktuelleWaffe.getType().Equals("Rakete"))
+            {
+                aktuelleWaffe.setLP(5);
+            }
             aktuallisiereZeit(GameT);
             prewState = currentState;
             currentState = States.Wackel;

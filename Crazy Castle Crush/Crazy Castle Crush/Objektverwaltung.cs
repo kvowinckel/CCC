@@ -306,7 +306,10 @@ namespace Crazy_Castle_Crush
             {
                 if (temp.getLP() <= 0)
                 {
-                    scene.Remove(temp.getModelObject());
+                    if (scene.Contains(temp.getModelObject()))
+                    {
+                        scene.Remove(temp.getModelObject());
+                    }
                     tempL.Add(temp);
                 }
             }
@@ -320,7 +323,10 @@ namespace Crazy_Castle_Crush
             {
                 if (temp.getLP() <= 0)
                 {
-                    scene.Remove(temp.getModelObject());
+                    if (scene.Contains(temp.getModelObject()))
+                    {
+                        scene.Remove(temp.getModelObject());
+                    }
                     tempL2.Add(temp);
                 }
             }
