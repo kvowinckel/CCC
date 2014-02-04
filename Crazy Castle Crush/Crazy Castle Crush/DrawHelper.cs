@@ -33,7 +33,7 @@ namespace Crazy_Castle_Crush
                     }
                     else
                     {
-                        bild = "Menü_neu";
+                        bild = "Bau";
                     }
                 }
                 float rny = rHv2s.Y / screenDim.Y;
