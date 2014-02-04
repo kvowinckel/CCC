@@ -72,6 +72,7 @@ namespace Crazy_Castle_Crush
         string hilfsstring;
         bool kinectOn = false;
         SoundEffect explosion;
+        int xR;
 
 
         //Benötigt für die einblendung von Auswahlmenu
@@ -541,7 +542,7 @@ namespace Crazy_Castle_Crush
                 case States.Schussphase1:
 
                     aktuallisiereZeit(gameTime);
-                    int xR;
+                    
 
 
                     #region Spieler und Richtung
