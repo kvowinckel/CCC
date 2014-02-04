@@ -5,7 +5,7 @@ using System.Text;
 using NOVA.Scenery;
 using Microsoft.Xna.Framework;
 using NOVA;
-
+using Microsoft.Xna.Framework.Audio;
 namespace Crazy_Castle_Crush
 {
     static class Collided
@@ -18,8 +18,26 @@ namespace Crazy_Castle_Crush
             if (Objektverwaltung.getObj(e.Collider) != null)                    //Objekt
             {
                 Objekte getroffenesObj = Objektverwaltung.getObj(e.Collider);
+               
                 getroffenesObj.decreaseLP();
-                if (getroffenesObj.getLP() <= 0)
+                
+
+                if (getroffenesObj.getMaterial().Equals("MStein") &&getroffenesObj.getLP()>0)
+                {
+                     getroffenesObj.setMaterial("1LPZiegel");                    
+                }
+                if (getroffenesObj.getMaterial().Equals("Metal") && getroffenesObj.getLP() > 0)
+                {
+                    if (getroffenesObj.getLP() == 2)
+                    {
+                        getroffenesObj.setMaterial("2LPMetal");
+                    }
+                    else
+                    {
+                        getroffenesObj.setMaterial("1LPMetal");
+                    }
+                }
+
                 {
                     Vector3 screenPos = Core.Device.Viewport.Project(getroffenesObj.getPosition(), Core.ProjectionMatrix, Core.ViewMatrix, Matrix.Identity);
                     Vector2 pos = new Vector2(screenPos.X, screenPos.Y);
