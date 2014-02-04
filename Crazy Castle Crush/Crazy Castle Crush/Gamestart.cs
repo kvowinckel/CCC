@@ -70,6 +70,8 @@ namespace Crazy_Castle_Crush
         GameTime GameT;
         string hilfsstring;
         bool kinectOn = false;
+        ParticleObject Schweif;
+        ParticleObject Explosion;
 
 
 
@@ -96,7 +98,7 @@ namespace Crazy_Castle_Crush
             BEPUphysics.Settings.CollisionDetectionSettings.AllowedPenetration = 0.05f;
             BEPUphysics.Settings.CollisionDetectionSettings.DefaultMargin = 0.05f;
             BEPUphysics.Settings.CollisionResponseSettings.MaximumPenetrationCorrectionSpeed /= 2; 
-            Scene.ShowCollisionMeshes = true;
+            Scene.ShowCollisionMeshes = false;
             base.Initialize();
             Scene.ShowFPS = true;
             
@@ -569,8 +571,10 @@ namespace Crazy_Castle_Crush
                         if (klickRH)
                         {
                             klickRH = false;
-
+                           
                             bullet = aktuelleWaffe.shoot(Scene, lHv2n.Y,xR);    //bullet wir 0.5f über die Waffe gesetzt
+                            Schweif = new ParticleObject(bullet.Position - new Vector3(0.5f - (float)Math.Cos(aktuelleWaffe.getWinkel()), 0.5f - (float)Math.Sin(aktuelleWaffe.getWinkel()), 0), Partikel.Explosion_neu());
+                            Scene.Add(Schweif);
                             aktuelleWaffe.UpdatePhysics();
 
                             shootTimer = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000;
@@ -585,6 +589,7 @@ namespace Crazy_Castle_Crush
                     #region bullet in Air
                     if (bulletInAir)
                     {
+                        Schweif.Position = bullet.Position;
                         float aktTime = (float)gameTime.TotalGameTime.TotalMilliseconds - shootTimer;
                         if (aktTime < 20000)
                         {
@@ -632,66 +637,7 @@ namespace Crazy_Castle_Crush
                         
 
 
-                        #region Partikel
-                        //Partikel Effekte FUNKTIONIERT NOCH NICHT
-                        ParticleEffect effect = new ParticleEffect()
-                        {
-                            Emitters = new EmitterCollection()
-                                {   
-                                    new SphereEmitter
-                                    {
-                                        Name="Flame",
-                                        Budget = 100,
-                                        Term = 0.5f,
-                                        ReleaseQuantity = 8,
-                                        Enabled = true,
-                                        ReleaseSpeed = new Range(5f,5f),
-                                        ReleaseColour = new ColourRange
-                                        {
-                                            Red = new Range(0.9f,1f),
-                                            Green = new Range(0.5f,0.5f),
-                                            Blue = new Range(0f,0f),
-                                        },
-                                        ReleaseOpacity = new Range(1f,1f),
-                                        ReleaseScale = new Range(2f,2f),
-                                        ReleaseRotation = new RotationRange
-                                        {
-                                            Pitch = new Range(0f,0f),
-                                            Yaw = new Range(0f,0f),
-                                            Roll = new Range(-3.14f,3.14f),
-                                        },
-                                        ParticleTexture = Core.Content.Load<Texture2D>("Flames"),
-                                        BlendMode = EmitterBlendMode.Add,
-                                        Radius = 3f,
-                                        Shell = true,
-                                        Radiate = true,                        
-                                        BillboardStyle = ProjectMercury.BillboardStyle.Spherical,
-                                        Modifiers = new ModifierCollection
-                                        {
-                                            new OpacityInterpolator2
-                                            {
-                                                InitialOpacity = 0.5f,                                
-                                                FinalOpacity = 0f,
-                                            },
-                                            new RotationModifier
-                                            {
-                                                RotationRate = new Vector3(0,0,1)
-                                            }
-                                        },
-                                        Controllers = new ControllerPipeline
-                                        {
-                                            new CooldownController
-                                            {
-                                                CooldownPeriod = 0.02f,
-                                            },
-                                        }
-                                    }
-                                }
-                        };
-                        
-
-                        ParticleObject particle = new ParticleObject(bullet.Position, effect);
-                        #endregion Partikel
+                       
                     #endregion
                     }
                     
@@ -729,12 +675,17 @@ namespace Crazy_Castle_Crush
                     cameraMovement.wackel(zeit, 2000);
                     bulletInAir = false;
                     if (Scene.Contains(bullet))
-                    {
+                    {                       
+                        Explosion = new ParticleObject(bullet.Position, Partikel.Explosion_neu());
+                        Scene.Remove(Schweif);
+                        
                         Scene.Remove(bullet);
+                        Scene.Add(Explosion);
                     }
                     
                     if (zeit > 2000)
                     {
+                        Scene.Remove(Explosion);
                         PosX1 = Scene.Camera.Position.X;
                         Zeit1 = (float)GameT.TotalGameTime.TotalMilliseconds;
                         aktuallisiereZeit(GameT);
@@ -803,12 +754,14 @@ namespace Crazy_Castle_Crush
         {
             aktuellesObj.getSceneObject().Collided -= new EventHandler<CollisionArgs>(box_Collided);
             ((SceneObject)sender).Physics.AngularVelocity = Vector3.Zero;
+            ((SceneObject)sender).Physics.LinearVelocity = Vector3.Zero;
         }
 
         private void bulletCollidedHandler(object sender, CollisionArgs e)
         {
             bullet.Collided -= new EventHandler<CollisionArgs>(bulletCollidedHandler);
             Spieler spieler;
+
             if(currentState== States.Schussphase1)
             {
                 spieler = spieler1;
@@ -824,7 +777,20 @@ namespace Crazy_Castle_Crush
             {
                 currentState = States.End;
             }
-            AfterBulletHit();
+
+            if (e.Collider.RenderMaterial.Texture != null)
+            {
+                if (e.Collider.RenderMaterial.Texture.Name == "Rubber")
+                {
+                    bullet.Collided += new EventHandler<CollisionArgs>(bulletCollidedHandler);
+
+                }
+            }
+            else
+            {
+                AfterBulletHit();
+            }
+            
         }
         private void Box_Collided(object sender, CollisionArgs e)
         {
@@ -833,10 +799,12 @@ namespace Crazy_Castle_Crush
 
         public void AfterBulletHit()
         {
+            
             Zeit1 = (float)GameT.TotalGameTime.TotalMilliseconds;
             aktuallisiereZeit(GameT);
             prewState = currentState;
             currentState = States.Wackel;
+      
         }
 
         public override void Draw(GameTime gameTime)
