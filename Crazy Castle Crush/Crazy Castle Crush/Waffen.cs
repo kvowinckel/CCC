@@ -18,6 +18,7 @@ namespace Crazy_Castle_Crush
         private float schusswinkel;
         private float shootspeed;
         string waffentyp;
+        
 
         public Waffen(ModelObject MO, int Lebenspunkte, float Schusswinkel, float ShootSpeed,string Waffentyp) //Controller rausgenommen 
         {
@@ -61,8 +62,8 @@ namespace Crazy_Castle_Crush
             }
 
             float velo = 8.8f+(1 - velocity) * 3f;
-            bullet.Physics.LinearVelocity = new Vector3(shootdirection.X *richtung, shootdirection.Y, 0) * velo; 
-
+            bullet.Physics.LinearVelocity = new Vector3(shootdirection.X *richtung, shootdirection.Y, 0) * velo;
+            bullet.PhysicsMaterial.Bounciness = 1;
             return bullet;
         }
 
