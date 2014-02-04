@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework;
 using NOVA.UI;
 using NOVA;
 using BEPUphysics.Constraints.SolverGroups;
+using NOVA.Scenery.ComplexObjects;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Crazy_Castle_Crush
 {
@@ -36,7 +38,7 @@ namespace Crazy_Castle_Crush
 
             if (auswahl == 1)//Würfel
             {
-                newobj = buildbox(startort, new Vector3(0.4f, 0.4f, 0.4f));
+                newobj = buildbox(startort, new Vector3(0.5f, 0.5f, 0.5f));
                 DrawHelper.setmoney(spieler, -150, rHv2s);
                 /*spieler.setMoney(spieler.getMoney() - 150); //Rohkosten abziehen
                 Gamestart.setShowGeld(-150, 100);           //Kosten visualisieren
@@ -45,7 +47,7 @@ namespace Crazy_Castle_Crush
             }
             else if (auswahl == 2)
             {
-                ModelObject l = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1,2,0),(float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "L", 1f);
+                ModelObject l = new ModelObject(startort, Quaternion.CreateFromAxisAngle(new Vector3(1.2f,2.4f,0),(float)Math.PI), new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "L", 1f);
                 l.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 l.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
                 l.Name = "L";
@@ -54,13 +56,13 @@ namespace Crazy_Castle_Crush
             }
             else if (auswahl == 3) // Latte
             {
-                newobj = buildbox(startort, new Vector3(1.2f, 0.1f, 0.4f));
+                newobj = buildbox(startort, new Vector3(2.0f, 0.15f, 0.5f));
                 DrawHelper.setmoney(spieler, -200, rHv2s);
                 newobj.Physics.Mass = 2f;
             }
             else if (auswahl == 4) // Quader       das kommentierte ist die //Pyramide
             {
-                newobj = buildbox(startort, new Vector3(0.8f, 0.4f, 0.4f));
+                newobj = buildbox(startort, new Vector3(1.0f, 0.5f, 0.5f));
                 newobj.Physics.Mass = 2f;
                 DrawHelper.setmoney(spieler, -200, rHv2s);
             }
@@ -142,10 +144,10 @@ namespace Crazy_Castle_Crush
             }
             else
             {
-                ModelObject Rakete = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Rakete", 0.1f);
+                ModelObject Rakete = new ModelObject(startort, AP, new Vector3(1.5f, 1.5f, 1.5f), CollisionType.ExactMesh, " ", "Rakete", 0.1f);
                 Rakete.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Rakete.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
-                Rakete.SubModels[0].Physics.Mass = 0.001f;
+                Rakete.SubModels[0].Physics.Mass = 0.1f;
 
 
                 Rakete.Physics.Material.Bounciness = 0;
@@ -173,11 +175,20 @@ namespace Crazy_Castle_Crush
 
         public static void createKing(Levels level)
         {
-            ModelObject König1 = new ModelObject(new Vector3(level.getSpieler1Pos(), 1, -5), Quaternion.CreateFromRotationMatrix(Matrix.CreateRotationY(0)), new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "König_Subdivision", 0.1f);
+            /*ModelObject König1 = new ModelObject(new Vector3(level.getSpieler1Pos(), 1, -5), Quaternion.CreateFromRotationMatrix(Matrix.CreateRotationY(0)), new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "König_Subdivision", 0.1f);
             König1.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
             König1.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
             König1.Name = "König1";
+            scene.Add(König1);*/
+
+            RiggedModel König1 = new RiggedModel(new Vector3(level.getSpieler1Pos(), 1, -5), "König_Subdivision_joined", "König_Subdivision_joined_rigged", 1);
+            König1.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
+            König1.RenderMaterial.Texture = Core.Content.Load<Texture2D>("textur_könig");
+            König1.RenderMaterial.Specular = new Vector4(.1f, .1f, .1f, 1);
+            König1.Position = new Vector3(level.getSpieler2Pos(), 1, -5);
+            König1.Physics.Mass = 10;
             scene.Add(König1);
+            König1.StartClip("Walk");
 
             ModelObject König2 = new ModelObject(new Vector3(level.getSpieler2Pos(), 1, -5), Quaternion.CreateFromRotationMatrix(Matrix.CreateRotationY( (float) Math.PI)), new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "König_Subdivision", 0.1f);
             König2.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
@@ -277,6 +288,7 @@ namespace Crazy_Castle_Crush
             else if (auswahl == 4)
             {
                 first.setMaterial("Rubber");
+                first.increaseLP(1);
             }
         }
 

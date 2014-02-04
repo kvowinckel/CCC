@@ -16,6 +16,7 @@ using ProjectMercury.Modifiers;
 using ProjectMercury.Controllers;
 using Microsoft.Kinect.Toolkit.Interaction;
 using BEPUphysics.Constraints.TwoEntity.Joints;
+using Microsoft.Xna.Framework.Audio;
 
 
 
@@ -70,7 +71,9 @@ namespace Crazy_Castle_Crush
         GameTime GameT;
         string hilfsstring;
         bool kinectOn = false;
-
+  		SoundEffect explosion;
+        ParticleObject Schweif;
+        ParticleObject Explosion;
 
 
         //Benötigt für die einblendung von Auswahlmenu
@@ -96,8 +99,11 @@ namespace Crazy_Castle_Crush
             BEPUphysics.Settings.CollisionDetectionSettings.AllowedPenetration = 0.05f;
             BEPUphysics.Settings.CollisionDetectionSettings.DefaultMargin = 0.05f;
             BEPUphysics.Settings.CollisionResponseSettings.MaximumPenetrationCorrectionSpeed /= 2; 
+
+            Scene.ShowCollisionMeshes = false;
             base.Initialize();
-            Scene.ShowFPS = true;
+
+            
             
             //Kinect initialisieren
             Scene.InitKinect();
@@ -568,8 +574,10 @@ namespace Crazy_Castle_Crush
                         if (klickRH)
                         {
                             klickRH = false;
-
+                           
                             bullet = aktuelleWaffe.shoot(Scene, lHv2n.Y,xR);    //bullet wir 0.5f über die Waffe gesetzt
+                            Schweif = new ParticleObject(bullet.Position - new Vector3(0.5f - (float)Math.Cos(aktuelleWaffe.getWinkel()), 0.5f - (float)Math.Sin(aktuelleWaffe.getWinkel()), 0), Partikel.Explosion_neu());
+                            Scene.Add(Schweif);
                             aktuelleWaffe.UpdatePhysics();
 
                             shootTimer = gameTime.TotalGameTime.Milliseconds + gameTime.TotalGameTime.Seconds * 1000 + gameTime.TotalGameTime.Minutes * 60 * 1000;
@@ -584,6 +592,7 @@ namespace Crazy_Castle_Crush
                     #region bullet in Air
                     if (bulletInAir)
                     {
+                        Schweif.Position = bullet.Position;
                         float aktTime = (float)gameTime.TotalGameTime.TotalMilliseconds - shootTimer;
                         if (aktTime < 20000)
                         {
@@ -596,22 +605,35 @@ namespace Crazy_Castle_Crush
                                     if (bullet.Name.Contains("Rakete"))
                                     {
                                         kinectOn = true;
+                                        //Kein Collision Mesh Update
                                         ((ModelObject)bullet).IsUpdatingCompoundBody = false;
+                                        
+                                        if (gamer == spieler1)
+                                        {                                            
                                         rocketDirection.X += (float)Math.Cos((Math.PI * (0.5f - rHv2n.Y))) * 0.02f;
                                         rocketDirection.Y += (float)Math.Sin((Math.PI * (0.5f - rHv2n.Y))) * 0.02f;
                                         rocketDirection.Normalize();
                                         ((ModelObject)bullet).SubModels[0].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, -(float)Math.Atan2(rocketDirection.X, rocketDirection.Y));
-
+                                        }
+                                        else // -->Spieler2 steuert Rakete
+                                        {
+                                            rocketDirection.X += (float)Math.Cos(Math.PI-(Math.PI * (0.5f - rHv2n.Y))) * 0.02f;
+                                            rocketDirection.Y += (float)Math.Sin(Math.PI-(Math.PI * (0.5f - rHv2n.Y))) * 0.02f;
+                                            rocketDirection.Normalize();
+                                            ((ModelObject)bullet).SubModels[0].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, (float)Math.Atan2(rocketDirection.X, rocketDirection.Y));
+                                        }
                                         bullet.Physics.LinearVelocity = rocketDirection * 4f;
                                     }
                                     else if (bullet.Name.Contains("bolzen"))
                                     {
                                         kinectOn = false;
                                         ((ModelObject)bullet).SubModels[0].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, -(float)Math.Atan2(bullet.Physics.LinearVelocity.X, bullet.Physics.LinearVelocity.Y));
+                                        
                                     }
                                     else
                                     {
                                         kinectOn = false;
+                                       
                                 }
                                 }
                                 else
@@ -632,66 +654,7 @@ namespace Crazy_Castle_Crush
                         
 
 
-                        #region Partikel
-                        //Partikel Effekte FUNKTIONIERT NOCH NICHT
-                        ParticleEffect effect = new ParticleEffect()
-                        {
-                            Emitters = new EmitterCollection()
-                                {   
-                                    new SphereEmitter
-                                    {
-                                        Name="Flame",
-                                        Budget = 100,
-                                        Term = 0.5f,
-                                        ReleaseQuantity = 8,
-                                        Enabled = true,
-                                        ReleaseSpeed = new Range(5f,5f),
-                                        ReleaseColour = new ColourRange
-                                        {
-                                            Red = new Range(0.9f,1f),
-                                            Green = new Range(0.5f,0.5f),
-                                            Blue = new Range(0f,0f),
-                                        },
-                                        ReleaseOpacity = new Range(1f,1f),
-                                        ReleaseScale = new Range(2f,2f),
-                                        ReleaseRotation = new RotationRange
-                                        {
-                                            Pitch = new Range(0f,0f),
-                                            Yaw = new Range(0f,0f),
-                                            Roll = new Range(-3.14f,3.14f),
-                                        },
-                                        ParticleTexture = Core.Content.Load<Texture2D>("Flames"),
-                                        BlendMode = EmitterBlendMode.Add,
-                                        Radius = 3f,
-                                        Shell = true,
-                                        Radiate = true,                        
-                                        BillboardStyle = ProjectMercury.BillboardStyle.Spherical,
-                                        Modifiers = new ModifierCollection
-                                        {
-                                            new OpacityInterpolator2
-                                            {
-                                                InitialOpacity = 0.5f,                                
-                                                FinalOpacity = 0f,
-                                            },
-                                            new RotationModifier
-                                            {
-                                                RotationRate = new Vector3(0,0,1)
-                                            }
-                                        },
-                                        Controllers = new ControllerPipeline
-                                        {
-                                            new CooldownController
-                                            {
-                                                CooldownPeriod = 0.02f,
-                                            },
-                                        }
-                                    }
-                                }
-                        };
-                        
-
-                        ParticleObject particle = new ParticleObject(bullet.Position, effect);
-                        #endregion Partikel
+                       
                     #endregion
                     }
                     
@@ -729,12 +692,18 @@ namespace Crazy_Castle_Crush
                     cameraMovement.wackel(zeit, 2000);
                     bulletInAir = false;
                     if (Scene.Contains(bullet))
-                    {
+                    {                       
+                        Explosion = new ParticleObject(bullet.Position, Partikel.Explosion_neu());
+                        Scene.Remove(Schweif);
+                        
+                        
                         Scene.Remove(bullet);
+                        Scene.Add(Explosion);
                     }
                     
                     if (zeit > 2000)
                     {
+                        Scene.Remove(Explosion);
                         PosX1 = Scene.Camera.Position.X;
                         Zeit1 = (float)GameT.TotalGameTime.TotalMilliseconds;
                         aktuallisiereZeit(GameT);
@@ -803,12 +772,16 @@ namespace Crazy_Castle_Crush
         {
             aktuellesObj.getSceneObject().Collided -= new EventHandler<CollisionArgs>(box_Collided);
             ((SceneObject)sender).Physics.AngularVelocity = Vector3.Zero;
+            ((SceneObject)sender).Physics.LinearVelocity = Vector3.Zero;
         }
 
         private void bulletCollidedHandler(object sender, CollisionArgs e)
         {
             bullet.Collided -= new EventHandler<CollisionArgs>(bulletCollidedHandler);
             Spieler spieler;
+           
+          //  explosion.Play();
+
             if(currentState== States.Schussphase1)
             {
                 spieler = spieler1;
@@ -824,9 +797,21 @@ namespace Crazy_Castle_Crush
             {
                 currentState = States.End;
             }
-            AfterBulletHit();
-        }
 
+            if (e.Collider.RenderMaterial.Texture != null)
+            {
+                if (e.Collider.RenderMaterial.Texture.Name == "Rubber")
+                {
+                    bullet.Collided += new EventHandler<CollisionArgs>(bulletCollidedHandler);
+
+                }
+            }
+            else
+            {
+                AfterBulletHit();
+            }
+            
+        }
         private void Box_Collided(object sender, CollisionArgs e)
         {
             ((SceneObject)sender).Physics.AngularVelocity = Vector3.Zero;
@@ -834,14 +819,18 @@ namespace Crazy_Castle_Crush
 
         public void AfterBulletHit()
         {
+            
             Zeit1 = (float)GameT.TotalGameTime.TotalMilliseconds;
             if (aktuelleWaffe.getType().Equals("Rakete"))
             {
                 aktuelleWaffe.setLP(5);
+                firedWaffen--;
             }
             aktuallisiereZeit(GameT);
             prewState = currentState;
+
             currentState = States.Wackel;
+      
         }
 
         public override void Draw(GameTime gameTime)

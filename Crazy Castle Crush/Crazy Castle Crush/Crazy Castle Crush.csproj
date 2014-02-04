@@ -130,6 +130,9 @@
     <Reference Include="System.Net">
       <Private>False</Private>
     </Reference>
+    <Reference Include="XNAnimationPipeline">
+      <HintPath>C:\Program Files\NOVA\NOVA 1.7.0\bin\XNAnimationPipeline.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auswahl.cs" />
@@ -146,6 +149,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="CCCGame.cs" />
+    <Compile Include="Sounds.cs" />
     <Compile Include="Spieler.cs" />
     <Compile Include="StartObjects.cs" />
     <Compile Include="Waffen.cs" />

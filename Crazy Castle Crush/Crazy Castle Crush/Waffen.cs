@@ -18,6 +18,7 @@ namespace Crazy_Castle_Crush
         private float schusswinkel;
         private float shootspeed;
         string waffentyp;
+        
 
         public Waffen(ModelObject MO, int Lebenspunkte, float Schusswinkel, float ShootSpeed,string Waffentyp) //Controller rausgenommen 
         {
@@ -43,23 +44,26 @@ namespace Crazy_Castle_Crush
             {
                 bullet = new ModelObject(new Vector3(this.getPosition().X, this.getPosition().Y + 0.5f, this.getPosition().Z), Quaternion.Identity, new Vector3(1, 1, 1), CollisionType.ExactMesh, "", "bolzen", 0.05f);
                 scene.Add(bullet);
-                shootdirection = new Vector2((float)Math.Cos(this.getWinkel()), (float)Math.Sin(this.getWinkel()));
+                shootdirection = new Vector2((float)Math.Cos(this.getWinkel())*richtung, (float)Math.Sin(this.getWinkel()));
+                bullet.Physics.Mass = 0.05f;
             }
             else if (this.getType().Equals("Kanone"))
             {
                 bullet = new SphereObject(new Vector3(this.getPosition().X, this.getPosition().Y + 0.5f, this.getPosition().Z), 0.1f, 6, 6, 0.05f);
                 scene.Add(bullet);
-                shootdirection = new Vector2((float)Math.Cos(this.getWinkel()), (float)Math.Sin(this.getWinkel()));
+                shootdirection = new Vector2((float)Math.Cos(this.getWinkel())*richtung, (float)Math.Sin(this.getWinkel()));
+                bullet.Physics.Mass = 0.5f;
             }
             else
             {
                 bullet = this.getModelObject();
                 bullet.Position = bullet.Position + new Vector3(0, 0.2f, 0);
+                bullet.Mass = 0.5f;
             }
 
-            float velo = (1 - velocity) * 15f;
-            bullet.Physics.LinearVelocity = new Vector3(shootdirection.X *richtung, shootdirection.Y, 0) * velo; 
-
+            float velo = 8.8f+(1 - velocity) * 3f;
+            bullet.Physics.LinearVelocity = new Vector3(shootdirection.X *richtung, shootdirection.Y, 0) * velo;
+            bullet.PhysicsMaterial.Bounciness = 1;
             return bullet;
         }
 
@@ -70,10 +74,12 @@ namespace Crazy_Castle_Crush
 
         public void setWinkel(float rHandY)
         {
+            schusswinkel = (float)Math.PI/2 * (1 - rHandY);
             if (!getType().Equals("Rakete"))
             {
+                
                 mo.IsUpdatingCompoundBody = false;
-                mo.SubModels[1].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, /*schusswinkel*/ (1 - rHandY));
+                mo.SubModels[1].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, /*schusswinkel*/(1 - rHandY));
             }
         }
 

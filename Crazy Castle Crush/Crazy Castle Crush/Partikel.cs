@@ -12,9 +12,9 @@ using ProjectMercury.Controllers;
 
 namespace Crazy_Castle_Crush
 {
-    class Partikel
+    static class Partikel
     {
-        public ParticleEffect Explosion_neu()
+        public static ParticleEffect Explosion_neu()
         {
             ParticleEffect Explosion2 = new ParticleEffect
             {
@@ -102,7 +102,7 @@ namespace Crazy_Castle_Crush
 					ReleaseSpeed = new Range(-0.50f, 0.50f),
 					ParticleTexture = Core.Content.Load<Texture2D>("Particle004"),      
                     Shell=true,
-                    Radius=0.1f,
+                    Radius=0.5f,
                     Radiate=true,
 
                      Modifiers = new ModifierCollection
@@ -153,7 +153,7 @@ namespace Crazy_Castle_Crush
 				
 
 					ReleaseScale = new Range(0.3f,0.7f),
-					ReleaseSpeed = new Range(-0.125f, 0.125f),
+					ReleaseSpeed = new Range(-0.125f, 1.25f),
 					ParticleTexture = Core.Content.Load<Texture2D>("Particle005"),      
                     
 
@@ -230,6 +230,132 @@ namespace Crazy_Castle_Crush
             },
             };
             return Explosion2;
+        }
+        public static ParticleEffect Feuerschweif()
+        {
+            ParticleEffect Schweif2 = new ParticleEffect
+            {
+                Emitters = new EmitterCollection
+            {
+                new CircleEmitter
+
+                {
+                    Name="Smoke",
+                    Budget = 500,
+					Term = 2.5f,
+					Enabled = true,
+					BlendMode = EmitterBlendMode.Add ,
+					ReleaseColour = new Vector3 (0.5019608f, 0.5019608f, 0.5019608f),
+					ReleaseOpacity = 1f,
+					ReleaseQuantity = 16,
+					ReleaseRotation = new Vector3(0f, 0f, 0f), //variation 3.14
+					ReleaseScale = new Range(0.16f, 0f),
+					ReleaseSpeed = new Range(0f, 1.28f),
+					ParticleTexture = Core.Content.Load<Texture2D>("Cloud001"),      
+                    Shell=true,
+                    Radius=1,
+                    Radiate=true,
+
+                    Modifiers = new ModifierCollection
+					{
+						new OpacityInterpolator2
+						{
+							InitialOpacity = 0.2f,
+                            FinalOpacity=0f,
+							
+						},
+                        new DampingModifier
+                        {
+                            DampingCoefficient=1,
+                        },
+					
+						new ScaleInterpolator2
+						{
+							InitialScale = 0.48f,
+							FinalScale = 0.255f,
+						},
+						new RotationModifier
+						{
+                            
+							RotationRate = new Vector3(0f,0f,1f),
+						},
+                        new ColourInterpolator2
+                        {
+                            InitialColour=new Vector3(0.305882365f, 0.254901975f, 0.211764708f),
+                            FinalColour = new Vector3(0.5019608f, 0.5019608f, 0.5019608f),
+                        },
+                    },
+
+                           Controllers= new ControllerPipeline
+                           {
+                               new CooldownController
+                               {
+                                   CooldownPeriod=0.25f,
+                               },
+                           },
+                },
+                new SphereEmitter
+                {
+                    Name="Flames",
+                    Budget = 1000,
+					Term = 1f,
+					Enabled = true,
+					BlendMode = EmitterBlendMode.Add ,
+					ReleaseColour = new ColourRange()
+                    {
+                        Red=new Range(0.8f,1f),
+                        Green=new Range(.5f,.5f),
+                        Blue=new Range(0,0),
+                    },
+
+					ReleaseOpacity = 1f,
+					ReleaseQuantity = 64,
+					ReleaseRotation =new RotationRange()
+                    {
+                        Roll= new Range(-1.471f,1.471f),
+                    },
+
+					ReleaseScale = new Range(0.32f,0.64f),
+					ReleaseSpeed = new Range(-0.50f, 0.50f),
+					ParticleTexture = Core.Content.Load<Texture2D>("Flame"),      
+                    Shell=true,
+                    Radius=0.2f,
+                    Radiate=true,
+
+                     Modifiers = new ModifierCollection
+					{
+						new OpacityInterpolator2
+						{
+							InitialOpacity = 0.5f,
+                            FinalOpacity=0f,
+							
+						},
+                        new DampingModifier
+                        {
+                            DampingCoefficient=1,
+                        },					
+						
+						new RotationModifier
+						{
+                            
+							RotationRate = new Vector3(0f,0f,1f),
+						},
+                      
+                    },
+                     Controllers= new ControllerPipeline
+                           {
+                               new CooldownController
+                               {
+                                   CooldownPeriod=0.25f,
+                               },
+                           },
+                },
+                
+                
+            },
+            };
+            return Schweif2;
+        
         }
     }
 }

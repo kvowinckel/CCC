@@ -65,12 +65,21 @@ namespace Crazy_Castle_Crush
                 material = new RenderMaterial();
                 material.Diffuse = Color.Gray.ToVector4();
             }
+            else if (bild.Equals("Rubber"))
+            {
+                
+                material.Texture = Core.Content.Load<Texture2D>(bild);
+                material.Texture.Name = "Rubber";
+                material.Diffuse = new Vector4(1, 1, 1, 1);
+                material.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
+                objekt.PhysicsMaterial.Bounciness = 1;
+            }
             else
             {
 
                 material.Texture = Core.Content.Load<Texture2D>(bild);
-                material.Diffuse = new Vector4(1, 1, 1, 1); 
-                material.Specular=new Vector4(0.1f, 0.1f, 0.1f, 1);
+                material.Diffuse = new Vector4(1, 1, 1, 1);
+                material.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
             }
             
             if (objekt.Name.Contains("L"))
