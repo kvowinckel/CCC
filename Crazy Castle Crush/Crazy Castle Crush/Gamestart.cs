@@ -599,8 +599,8 @@ namespace Crazy_Castle_Crush
                         {
                             if (bullet.Position.Y > -2 && bullet.Position.Y < 20)
                             {
-                                if ((gamer == spieler1 && bullet.Position.X < level.getSpieler2Pos()+5 && bullet.Position.X > level.getSpieler1Pos() -5) ||
-                                    (gamer == spieler2 && bullet.Position.X > level.getSpieler1Pos()-5 && bullet.Position.X < level.getSpieler2Pos() +5))
+                                if ((gamer == spieler1 && bullet.Position.X < level.getSpieler2Pos()+10 && bullet.Position.X > level.getSpieler1Pos() -10) ||
+                                    (gamer == spieler2 && bullet.Position.X > level.getSpieler1Pos()-10 && bullet.Position.X < level.getSpieler2Pos() +10))
                                 {
                                     cameraMovement.chaseBullet(bullet.Position, cam.Position);
                                     if (bullet.Name.Contains("Rakete"))
@@ -802,10 +802,10 @@ namespace Crazy_Castle_Crush
 
             if (e.Collider.RenderMaterial.Texture != null)
             {
-                if (e.Collider.RenderMaterial.Texture.Name == "Rubber")
+                if (e.Collider.RenderMaterial.Texture.Name == "Rubber" && bullet.Name!="Rakete")
                 {
                     bullet.Collided += new EventHandler<CollisionArgs>(bulletCollidedHandler);
-
+                    bullet.Physics.LinearVelocity = -1 * bullet.Physics.LinearVelocity;
                 }
             }
             else

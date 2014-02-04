@@ -242,15 +242,15 @@ namespace Crazy_Castle_Crush
                 {
                     Name="Smoke",
                     Budget = 500,
-					Term = 2.5f,
+					Term = 2f,
 					Enabled = true,
-					BlendMode = EmitterBlendMode.Add ,
+					BlendMode = EmitterBlendMode.Alpha ,
 					ReleaseColour = new Vector3 (0.5019608f, 0.5019608f, 0.5019608f),
 					ReleaseOpacity = 1f,
-					ReleaseQuantity = 16,
+					ReleaseQuantity = 2,
 					ReleaseRotation = new Vector3(0f, 0f, 0f), //variation 3.14
 					ReleaseScale = new Range(0.16f, 0f),
-					ReleaseSpeed = new Range(0f, 1.28f),
+					ReleaseSpeed = new Range(0f, .5f),
 					ParticleTexture = Core.Content.Load<Texture2D>("Cloud001"),      
                     Shell=true,
                     Radius=1,
@@ -272,7 +272,7 @@ namespace Crazy_Castle_Crush
 						new ScaleInterpolator2
 						{
 							InitialScale = 0.48f,
-							FinalScale = 0.255f,
+							FinalScale = 2.55f,
 						},
 						new RotationModifier
 						{
@@ -298,7 +298,7 @@ namespace Crazy_Castle_Crush
                 {
                     Name="Flames",
                     Budget = 1000,
-					Term = 1f,
+					Term = .75f,
 					Enabled = true,
 					BlendMode = EmitterBlendMode.Add ,
 					ReleaseColour = new ColourRange()
@@ -309,17 +309,17 @@ namespace Crazy_Castle_Crush
                     },
 
 					ReleaseOpacity = 1f,
-					ReleaseQuantity = 64,
+					ReleaseQuantity = 8,
 					ReleaseRotation =new RotationRange()
                     {
-                        Roll= new Range(-1.471f,1.471f),
+                        Roll= new Range(-3.14f,3.14f),
                     },
 
-					ReleaseScale = new Range(0.32f,0.64f),
-					ReleaseSpeed = new Range(-0.50f, 0.50f),
+					ReleaseScale = new Range(0.16f,0.32f),
+					ReleaseSpeed = new Range(0.25f, 0.50f),
 					ParticleTexture = Core.Content.Load<Texture2D>("Flame"),      
                     Shell=true,
-                    Radius=0.2f,
+                    Radius=0.05f,
                     Radiate=true,
 
                      Modifiers = new ModifierCollection
@@ -340,6 +340,11 @@ namespace Crazy_Castle_Crush
                             
 							RotationRate = new Vector3(0f,0f,1f),
 						},
+                        new LinearGravityModifier
+                        {
+                            GravityVector=new Vector3(0,9.81f,0),
+                        },
+                        
                       
                     },
                      Controllers= new ControllerPipeline
@@ -349,6 +354,61 @@ namespace Crazy_Castle_Crush
                                    CooldownPeriod=0.25f,
                                },
                            },
+                },
+                 new SphereEmitter
+                {
+                    Name="Dying Flames",
+                    Budget = 1000,
+					Term = 1f,
+					Enabled = true,
+					BlendMode = EmitterBlendMode.Add ,
+					ReleaseColour = new ColourRange()
+                    {
+                        Red=new Range(0.8f,1f),
+                        Green=new Range(.5f,.5f),
+                        Blue=new Range(0,0),
+                    },
+
+					ReleaseOpacity = 1f,
+					ReleaseQuantity = 4,
+					ReleaseRotation =new RotationRange()
+                    {
+                        Roll= new Range(-3.14f,3.14f),
+                    },
+
+					ReleaseScale = new Range(0.16f,0.32f),
+					ReleaseSpeed = new Range(0.4f, 0.6f),
+					ParticleTexture = Core.Content.Load<Texture2D>("Cloud004"),      
+                    Shell=true,
+                    Radius=0.5f,
+                    Radiate=true,
+
+                     Modifiers = new ModifierCollection
+					{
+						new OpacityInterpolator2
+						{
+							InitialOpacity = 0.5f,
+                            FinalOpacity=0f,
+							
+						},
+                        new DampingModifier
+                        {
+                            DampingCoefficient=1,
+                        },					
+						
+						new RotationModifier
+						{
+                            
+							RotationRate = new Vector3(0f,0f,1f),
+						},
+                        new LinearGravityModifier
+                        {
+                            GravityVector=new Vector3(0,9.81f,0),
+                        },
+                        
+                      
+                    },
+                     
                 },
                 
                 

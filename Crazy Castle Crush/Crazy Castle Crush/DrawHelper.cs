@@ -24,7 +24,7 @@ namespace Crazy_Castle_Crush
                 String bild;
                 if (state == Gamestart.States.Bauphase1T || state == Gamestart.States.Bauphase2T)
                 {
-                    bild = "Material";
+                    bild = "Materialmenü_neu";
                 }
                 else
                 {

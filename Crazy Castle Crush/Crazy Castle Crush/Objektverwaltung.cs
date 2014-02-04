@@ -18,7 +18,7 @@ namespace Crazy_Castle_Crush
         static private Scene scene;
         static private Levels level;
         static int idnummer = 0;
-
+        
         public static void setObjektverwaltung(Scene scene0, Levels level0)
         {
             scene = scene0;
@@ -83,6 +83,7 @@ namespace Crazy_Castle_Crush
 
         public static Waffen createWaffe(int auswahl, Spieler spieler, Vector2 posi)//TODO
         {
+           
             Waffen dasobj;
             Vector3 startort = new Vector3(posi, -5f);
             Matrix rotationKanone;
@@ -98,14 +99,14 @@ namespace Crazy_Castle_Crush
             }
             
             if (auswahl == 1)
-            {               
+            {
 
-                ModelObject Kanone = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Kanone_ganz", 1f);
+                ModelObject  Kanone = new ModelObject(startort, AP, new Vector3(1f, 1f, 1f), CollisionType.ExactMesh, " ", "Kanone_ganz", 1f);
                 Kanone.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Kanone.SubModels[1].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Kanone.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
                 Kanone.SubModels[1].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
-
+                Kanone.PhysicsMaterial.KineticFriction = 1;
                 Kanone.Collided += new EventHandler<CollisionArgs>(Kanone_Collided);
                 Kanone.Physics.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Continuous;
                 
@@ -130,7 +131,7 @@ namespace Crazy_Castle_Crush
                 Balliste.SubModels[1].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Balliste.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
                 Balliste.SubModels[1].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
-
+                Balliste.SubModels[1].PhysicsMaterial.KineticFriction = 1;
                 Balliste.SubModels[0].Physics.Mass = 0.001f;
                 Balliste.SubModels[1].Physics.Mass = 0.001f;
 
@@ -167,8 +168,9 @@ namespace Crazy_Castle_Crush
         {
             if (((ModelObject)sender).Physics.LinearVelocity.Length() < 0.01f && ((ModelObject)sender).Physics.AngularVelocity.Length() < 0.01f)
             {
-                ((SceneObject)sender).Physics.BecomeKinematic();//Wird von der PhysicsEngine bewegt das Objekt nicht mehr hat masse 0
+                //((SceneObject)sender).Physics.BecomeKinematic();//Wird von der PhysicsEngine bewegt das Objekt nicht mehr hat masse 0
                 ((SceneObject)sender).Physics.LinearVelocity = Vector3.Zero;
+                ((ModelObject)sender).Collided -= new EventHandler<CollisionArgs>(Kanone_Collided);
             }
 
         }

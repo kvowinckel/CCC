@@ -26,11 +26,12 @@ namespace Crazy_Castle_Crush
             if (level == 1)
             {
                 Scene.ShowTriangleCount = true;
-                ModelObject Welt = new ModelObject(new Vector3(0, -1.5f, -5f), Quaternion.Identity, new Vector3(1, 1, 1), CollisionType.ExactMesh, " ", "Welt_xna_rotiert", 0f);               
+                ModelObject Welt = new ModelObject(new Vector3(0, -9.5f, -5f), Quaternion.Identity, new Vector3(1, 1, 1), CollisionType.ExactMesh, " ", "Welt-xna_magma", 0f);               
                 
                 Welt.PhysicsMaterial.Bounciness = 0.2f;
                 Welt.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
                 Welt.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 0.1f);
+                
                 scene.Add(Welt);
                 Objektverwaltung.addToUmgebungsListe(Welt);
                 Welt.Name = "Welt";
@@ -48,10 +49,12 @@ namespace Crazy_Castle_Crush
                                         0f);
 
             hintergrundsbild.Texture = Core.Content.Load<Texture2D>(bildname);
-            hintergrundsbild.Diffuse = Color.White.ToVector4();
+            hintergrundsbild.Diffuse = new Vector4(1, 1, 1, 1);
             hintergrundsbild.EnableGlow = false;
+            hintergrundsbild.EnableLighting = false;
+            hintergrundsbild.Transparency = 0;
             hintergrund.RenderMaterial = hintergrundsbild;
-
+            
             scene.Add(hintergrund);
         }
 

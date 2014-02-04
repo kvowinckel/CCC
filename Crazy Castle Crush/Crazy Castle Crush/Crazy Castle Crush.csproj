@@ -149,7 +149,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="CCCGame.cs" />
-    <Compile Include="Sounds.cs" />
     <Compile Include="Spieler.cs" />
     <Compile Include="StartObjects.cs" />
     <Compile Include="Waffen.cs" />
