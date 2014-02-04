@@ -16,6 +16,7 @@ using ProjectMercury.Modifiers;
 using ProjectMercury.Controllers;
 using Microsoft.Kinect.Toolkit.Interaction;
 using BEPUphysics.Constraints.TwoEntity.Joints;
+using Microsoft.Xna.Framework.Audio;
 
 
 
@@ -70,7 +71,7 @@ namespace Crazy_Castle_Crush
         GameTime GameT;
         string hilfsstring;
         bool kinectOn = false;
-
+        SoundEffect explosion;
 
 
         //Benötigt für die einblendung von Auswahlmenu
@@ -96,9 +97,12 @@ namespace Crazy_Castle_Crush
             BEPUphysics.Settings.CollisionDetectionSettings.AllowedPenetration = 0.05f;
             BEPUphysics.Settings.CollisionDetectionSettings.DefaultMargin = 0.05f;
             BEPUphysics.Settings.CollisionResponseSettings.MaximumPenetrationCorrectionSpeed /= 2; 
-            Scene.ShowCollisionMeshes = true;
+            //Läd explosions Sound
+           // explosion= Scene.Game.Content.Load <SoundEffect>("Explosion");
+           // Scene.Add(explosion);
+            //Scene.ShowCollisionMeshes = true;
             base.Initialize();
-            Scene.ShowFPS = true;
+            //Scene.ShowFPS = true;
             
             //Kinect initialisieren
             Scene.InitKinect();
@@ -596,22 +600,35 @@ namespace Crazy_Castle_Crush
                                     if (bullet.Name.Contains("Rakete"))
                                     {
                                         kinectOn = true;
+                                        //Kein Collision Mesh Update
                                         ((ModelObject)bullet).IsUpdatingCompoundBody = false;
-                                        rocketDirection.X += (float)Math.Cos((Math.PI * (0.5f - rHv2n.Y))) * 0.02f;
-                                        rocketDirection.Y += (float)Math.Sin((Math.PI * (0.5f - rHv2n.Y))) * 0.02f;
-                                        rocketDirection.Normalize();
-                                        ((ModelObject)bullet).SubModels[0].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, -(float)Math.Atan2(rocketDirection.X, rocketDirection.Y));
-
+                                        
+                                        if (gamer == spieler1)
+                                        {                                            
+                                            rocketDirection.X += (float)Math.Cos((Math.PI * (0.5f - rHv2n.Y))) * 0.02f;
+                                            rocketDirection.Y += (float)Math.Sin((Math.PI * (0.5f - rHv2n.Y))) * 0.02f;
+                                            rocketDirection.Normalize();
+                                            ((ModelObject)bullet).SubModels[0].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, -(float)Math.Atan2(rocketDirection.X, rocketDirection.Y));
+                                        }
+                                        else // -->Spieler2 steuert Rakete
+                                        {
+                                            rocketDirection.X += (float)Math.Cos(Math.PI-(Math.PI * (0.5f - rHv2n.Y))) * 0.02f;
+                                            rocketDirection.Y += (float)Math.Sin(Math.PI-(Math.PI * (0.5f - rHv2n.Y))) * 0.02f;
+                                            rocketDirection.Normalize();
+                                            ((ModelObject)bullet).SubModels[0].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, (float)Math.Atan2(rocketDirection.X, rocketDirection.Y));
+                                        }
                                         bullet.Physics.LinearVelocity = rocketDirection * 4f;
                                     }
                                     else if (bullet.Name.Contains("bolzen"))
                                     {
                                         kinectOn = false;
                                         ((ModelObject)bullet).SubModels[0].Orientation = Quaternion.CreateFromYawPitchRoll(0, 0, -(float)Math.Atan2(bullet.Physics.LinearVelocity.X, bullet.Physics.LinearVelocity.Y));
+                                        
                                     }
                                     else
                                     {
                                         kinectOn = false;
+                                       
                                 }
                                 }
                                 else
@@ -730,6 +747,7 @@ namespace Crazy_Castle_Crush
                     bulletInAir = false;
                     if (Scene.Contains(bullet))
                     {
+                        
                         Scene.Remove(bullet);
                     }
                     
@@ -809,6 +827,9 @@ namespace Crazy_Castle_Crush
         {
             bullet.Collided -= new EventHandler<CollisionArgs>(bulletCollidedHandler);
             Spieler spieler;
+           
+          //  explosion.Play();
+
             if(currentState== States.Schussphase1)
             {
                 spieler = spieler1;
@@ -836,6 +857,7 @@ namespace Crazy_Castle_Crush
             Zeit1 = (float)GameT.TotalGameTime.TotalMilliseconds;
             aktuallisiereZeit(GameT);
             prewState = currentState;
+
             currentState = States.Wackel;
         }
 
