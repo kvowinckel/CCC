@@ -51,13 +51,13 @@ namespace Crazy_Castle_Crush
                 bullet = new SphereObject(new Vector3(this.getPosition().X, this.getPosition().Y + 0.5f, this.getPosition().Z), 0.1f, 6, 6, 0.05f);
                 scene.Add(bullet);
                 shootdirection = new Vector2((float)Math.Cos(this.getWinkel())*richtung, (float)Math.Sin(this.getWinkel()));
-                bullet.Physics.Mass = 0.35f;
+                bullet.Physics.Mass = 0.5f;
             }
             else
             {
                 bullet = this.getModelObject();
                 bullet.Position = bullet.Position + new Vector3(0, 0.2f, 0);
-                bullet.Mass = 0.35f;
+                bullet.Mass = 0.5f;
             }
 
             float velo = 8.8f+(1 - velocity) * 3f;
