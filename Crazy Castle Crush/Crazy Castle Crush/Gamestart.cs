@@ -744,7 +744,7 @@ namespace Crazy_Castle_Crush
 
             #region WEITER
             //Wenn sich die rechte Hand in der oberen, rechten Ecke befindet & KLICK -> Klick auf WEITER
-            if (rHv2n.X >= 0.9f && rHv2n.Y >= 0.4f && rHv2n.Y <= 0.6f && klickRH)
+            if (rHv2n.X >= 0.89f && rHv2n.Y >= 0.42f && rHv2n.Y <= 0.58f && klickRH)
             {
                 klickRH = false;
                 showWaffe = false;
@@ -836,7 +836,7 @@ namespace Crazy_Castle_Crush
 
         public override void Draw(GameTime gameTime)
         {
-            DrawHelper.run(currentState, rHv2s, lHv2s,screenDim,showWaffe,spieler1,spieler2,bulletInAir);
+            DrawHelper.run(currentState, rHv2s, lHv2s,screenDim,showWaffe,spieler1,spieler2,bulletInAir, Scene);
             base.Draw(gameTime);
         }
 

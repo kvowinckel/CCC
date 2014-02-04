@@ -130,6 +130,9 @@
     <Reference Include="System.Net">
       <Private>False</Private>
     </Reference>
+    <Reference Include="XNAnimationPipeline">
+      <HintPath>C:\Program Files\NOVA\NOVA 1.7.0\bin\XNAnimationPipeline.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auswahl.cs" />
