@@ -175,13 +175,13 @@ namespace Crazy_Castle_Crush
 
         public static void createKing(Levels level)
         {
-            /*ModelObject König1 = new ModelObject(new Vector3(level.getSpieler1Pos(), 1, -5), Quaternion.CreateFromRotationMatrix(Matrix.CreateRotationY(0)), new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "König_Subdivision", 0.1f);
+            ModelObject König1 = new ModelObject(new Vector3(level.getSpieler1Pos(), 1, -5), Quaternion.CreateFromRotationMatrix(Matrix.CreateRotationY(0)), new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "König_Subdivision", 0.1f);
             König1.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
             König1.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);
             König1.Name = "König1";
-            scene.Add(König1);*/
+            scene.Add(König1);
 
-            RiggedModel König1 = new RiggedModel(new Vector3(level.getSpieler1Pos(), 1, -5), "König_Subdivision_joined", "König_Subdivision_joined_rigged", 1);
+            /*RiggedModel König1 = new RiggedModel(new Vector3(level.getSpieler1Pos(), 1, -5), "König_Subdivision_joined", "König_Subdivision_joined_rigged", 1);
             König1.RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
             König1.RenderMaterial.Texture = Core.Content.Load<Texture2D>("textur_könig");
             König1.RenderMaterial.Specular = new Vector4(.1f, .1f, .1f, 1);
@@ -189,7 +189,7 @@ namespace Crazy_Castle_Crush
             König1.Physics.Mass = 10;
             scene.Add(König1);
             König1.StartClip("Walk");
-
+            */
             ModelObject König2 = new ModelObject(new Vector3(level.getSpieler2Pos(), 1, -5), Quaternion.CreateFromRotationMatrix(Matrix.CreateRotationY( (float) Math.PI)), new Vector3(1f, 1f, 1f), CollisionType.ConvexHull, " ", "König_Subdivision", 0.1f);
             König2.SubModels[0].RenderMaterial.Diffuse = new Vector4(1, 1, 1, 1);
             König2.SubModels[0].RenderMaterial.Specular = new Vector4(0.1f, 0.1f, 0.1f, 1);

@@ -57,7 +57,7 @@ namespace Crazy_Castle_Crush
             else
             {
                 bullet = this.getModelObject();
-                bullet.Position = bullet.Position + new Vector3(0, 0.2f, 0);
+                bullet.Position = bullet.Position + new Vector3(0, 0.5f, 0);
                 bullet.Mass = 0.5f;
             }
 

@@ -606,6 +606,7 @@ namespace Crazy_Castle_Crush
                                     if (bullet.Name.Contains("Rakete"))
                                     {
                                         kinectOn = true;
+                                        
                                         //Kein Collision Mesh Update
                                         ((ModelObject)bullet).IsUpdatingCompoundBody = false;
                                         
