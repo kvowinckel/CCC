@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using NOVA.UI;
 using Microsoft.Xna.Framework.Graphics;
 using NOVA;
+using NOVA.Scenery;
 
 namespace Crazy_Castle_Crush
 {
@@ -15,7 +16,7 @@ namespace Crazy_Castle_Crush
         private static Vector2 from;
         private static int prozent;
 
-        static public void run(Gamestart.States state, Vector2 rHv2s, Vector2 lHv2s, Vector2 screenDim, bool showWaffe, Spieler spieler1, Spieler spieler2, bool bulletInAir)
+        static public void run(Gamestart.States state, Vector2 rHv2s, Vector2 lHv2s, Vector2 screenDim, bool showWaffe, Spieler spieler1, Spieler spieler2, bool bulletInAir, Scene scene)
         {
             #region Bau/Tex/Waf - Auswahl
             if (state == Gamestart.States.Bauphase1O || state == Gamestart.States.Bauphase1T || state == Gamestart.States.Bauphase2O || state == Gamestart.States.Bauphase2T)
@@ -127,9 +128,44 @@ namespace Crazy_Castle_Crush
             #region Weiterbutton
             if (state == Gamestart.States.Bauphase1O || state == Gamestart.States.Bauphase2O)
             {
-                Vector2 dim = new Vector2((screenDim.X * 0.09f), (screenDim.Y * 0.09f));
+                float x = 0, y = 0;
+                if (rHv2s.X / screenDim.X > 0.7f && rHv2s.Y / screenDim.Y < 0.7f && rHv2s.Y / screenDim.Y > 0.4f)
+                {
+                    if (rHv2s.X / screenDim.X < 0.8f)
+                    {
+                        x = (rHv2s.X / screenDim.X - 0.7f);
+                    }
+                    else
+                    {
+                        x = 0.1f;
+                    }
+                }
+                else if (rHv2s.Y / screenDim.Y > 0.3f && rHv2s.Y / screenDim.Y < 0.4f && rHv2s.X / screenDim.X > 0.8f)
+                {
+                    y = rHv2s.Y / screenDim.Y - 0.3f;
+                }
+                else if (rHv2s.Y / screenDim.Y > 0.6f && rHv2s.Y / screenDim.Y < 0.7f && rHv2s.X / screenDim.X > 0.8f)
+                {
+                    y = 0.7f - rHv2s.Y / screenDim.Y;
+                }
+                else if (rHv2s.Y / screenDim.Y > 0.4f && rHv2s.Y / screenDim.Y < 0.6f && rHv2s.X / screenDim.X > 0.8f)
+                {
+                    y = 0.1f;
+                }
+                if (y > x)
+                {
+                    x = y;
+                }
+                Vector2 dim = new Vector2((screenDim.X * (0.05f + x*0.6f)), (screenDim.Y * (0.10f+x*0.5f)));
                 Vector2 pos = new Vector2(screenDim.X - dim.X - screenDim.X * 0.01f, screenDim.Y * 0.45f);
-                drawBox(pos, dim, "weiter2");
+                if (state == Gamestart.States.Bauphase1O)
+                {
+                    drawBox(pos, dim, "pfeil");
+                }
+                else
+                {
+                    drawBox(pos, dim, "pfeil2");
+                }
             }
             #endregion
 
@@ -215,5 +251,7 @@ namespace Crazy_Castle_Crush
         {
             UI2DRenderer.WriteText(position, text, farbe, null, dimension);
         }
+
+
     }
 }
