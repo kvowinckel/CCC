@@ -30,7 +30,7 @@ namespace Crazy_Castle_Crush
             rotationAngle = (float)Math.Atan((positionBullet.X - startposition.X) / (positionBullet.Z - startposition.Z));
             Matrix cameraRotation = Matrix.CreateRotationX(0) * Matrix.CreateRotationY(rotationAngle);
             camera.Orientation = Quaternion.CreateFromRotationMatrix(cameraRotation);//Richtet Focus auf das Geschoss 
-            camera.Position = new Vector3(positionBullet.X, positionBullet.Y, 15f);//Bewegt die Kamera mit dem Geschoss mit
+            camera.Position = new Vector3(positionBullet.X, positionBullet.Y, 8f);//Bewegt die Kamera mit dem Geschoss mit
 
         }
 
@@ -53,18 +53,20 @@ namespace Crazy_Castle_Crush
             float by = 0.01f;
             if (zeit < dauer)
             {
-                if (camera.Orientation.Z < -1.04f)
+                if (Math.Cos(zeit*Math.PI/150) < 0)
                 {
-                    by = 0.01f;
-                }
-                else if (camera.Orientation.Z > 1.04f)
-                {
-                    by = -0.01f;
+                    cameraRotation = Matrix.CreateRotationX(0) * Matrix.CreateRotationY(0) * Matrix.CreateRotationZ(camera.Orientation.Z + by);
+                    camera.Orientation = Quaternion.CreateFromRotationMatrix(cameraRotation);
                 }
                 else
                 {
-                    cameraRotation = Matrix.CreateRotationX(0) * Matrix.CreateRotationY(0) * Matrix.CreateRotationZ(camera.Orientation.Z +by);
+                    cameraRotation = Matrix.CreateRotationX(0) * Matrix.CreateRotationY(0) * Matrix.CreateRotationZ(camera.Orientation.Z - by);
                     camera.Orientation = Quaternion.CreateFromRotationMatrix(cameraRotation);
+                    
+                }
+                if (zeit < 900)
+                {
+                    camera.Position = new Vector3(camera.Position.X, camera.Position.Y, getXMovement(zeit, 1800, 7, 0));
                 }
                 return false;
             }
